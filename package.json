@@ -14,8 +14,8 @@
   "scripts": {
     "build": "rollup -c",
     "watch": "rollup -cw",
-    "lint": "eslint src/**/*.{js,jsx,ts,tsx,json}",
-    "lint:fix": "eslint --fix 'src/**/*.{js,jsx,ts,tsx,json}'",
+    "lint": "eslint \"src/**/*.{js,jsx,ts,tsx,json}\"",
+    "lint:fix": "eslint --fix \"src/**/*.{js,jsx,ts,tsx,json}\"",
     "test": "jest"
   },
   "devDependencies": {
