@@ -1,10 +1,10 @@
-export type LiteralArgument = [string | number] | [TemplateStringsArray, ...unknown[]];
+export type RegexLiteral = [string | number] | [TemplateStringsArray, ...unknown[]];
 
 export function isTemplateStringsArray(arg: unknown): arg is TemplateStringsArray {
   return Array.isArray(arg) && Object.hasOwn(arg, 'raw');
 }
 
-export function isLiteralArgument(args: unknown[]): args is LiteralArgument {
+export function isLiteralArgument(args: unknown[]): args is RegexLiteral {
   if (args.length === 0) {
     return false;
   } else if (args.length === 1) {
@@ -14,7 +14,7 @@ export function isLiteralArgument(args: unknown[]): args is LiteralArgument {
   }
 }
 
-export function getLiteralString(args: LiteralArgument): string {
+export function getLiteralString(args: RegexLiteral): string {
   if (args.length === 1) {
     return String(args[0]);
   } else {

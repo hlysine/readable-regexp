@@ -1,69 +1,81 @@
-import { assign, getLiteralString, isLiteralArgument, LiteralArgument } from './helper';
+import { assign, getLiteralString, isLiteralArgument, RegexLiteral } from './helper';
 
-type NodeWrapper = (node: string) => string;
+type RegexModifier = (regex: string) => string;
 
-type LiteralOverload = {
-  (literal: string | number): ExpressionNode;
-  (template: TemplateStringsArray, ...args: unknown[]): ExpressionNode;
+type LiteralFunction = {
+  (literal: string | number): RegexExpression;
+  (template: TemplateStringsArray, ...args: unknown[]): RegexExpression;
 };
 
-type NodeOverloads = {
-  (node: ExpressionNode): ExpressionNode;
+type ModifierFunction = {
+  (node: RegexExpression): RegexExpression;
 };
 
-interface IncompleteNode {
-  get char(): ExpressionNode;
-  exactly: LiteralOverload;
+interface ModifiedExpression {
+  get char(): RegexExpression;
+  exactly: LiteralFunction;
 }
 
-interface ExpressionNode extends IncompleteNode {
-  oneOrMore: LiteralOverload & NodeOverloads & IncompleteNode;
+interface RegexExpression extends ModifiedExpression {
+  oneOrMore: LiteralFunction & ModifierFunction & ModifiedExpression;
 }
 
-class Expression implements ExpressionNode {
+class InternalExpression implements RegexExpression {
   public readonly regex: string;
-  public readonly wrapper?: NodeWrapper;
+  public readonly modifier?: RegexModifier;
 
-  public constructor(regex?: string, wrapper?: NodeWrapper) {
+  public constructor(regex?: string, modifier?: RegexModifier) {
     this.regex = regex ?? '';
-    this.wrapper = wrapper;
+    this.modifier = modifier;
   }
 
-  public addNode(node: string): Expression {
+  /*
+   * ========== Internals ==========
+   */
+
+  public addNode(node: string): InternalExpression {
     let newRegex = this.regex;
-    if (this.wrapper) {
-      newRegex += this.wrapper(node);
+    if (this.modifier) {
+      newRegex += this.modifier(node);
     } else {
       newRegex += node;
     }
-    return new Expression(newRegex);
+    return new InternalExpression(newRegex);
   }
 
-  public addWrapper(wrapper: NodeWrapper): Expression {
-    let newWrapper: NodeWrapper | undefined;
-    if (this.wrapper) {
-      newWrapper = (node: string) => this.wrapper?.(wrapper(node)) ?? wrapper(node);
+  public addModifier(modifier: RegexModifier): InternalExpression {
+    let newModifier: RegexModifier | undefined;
+    if (this.modifier) {
+      newModifier = (regex: string) => this.modifier?.(modifier(regex)) ?? modifier(regex);
     } else {
-      newWrapper = wrapper;
+      newModifier = modifier;
     }
-    return new Expression(this.regex, newWrapper);
+    return new InternalExpression(this.regex, newModifier);
   }
 
-  public get char(): ExpressionNode {
+  /*
+   * ========== Special Tokens ==========
+   */
+
+  public get char(): RegexExpression {
     return this.addNode('.');
   }
 
-  public exactly = (...args: LiteralArgument): ExpressionNode => {
+  /*
+   * ========== Single Input ==========
+   */
+
+  public exactly = (...args: RegexLiteral): RegexExpression => {
     const literal = getLiteralString(args);
     return this.addNode(literal);
   };
 
-  public get oneOrMore(): LiteralOverload & NodeOverloads & IncompleteNode {
-    const func = (...args: LiteralArgument | [ExpressionNode]): ExpressionNode => {
+  public get oneOrMore(): LiteralFunction & ModifierFunction & ModifiedExpression {
+    const func = (...args: RegexLiteral | [RegexExpression]): RegexExpression => {
       if (isLiteralArgument(args)) {
         const literal = getLiteralString(args);
         return this.addNode(`(?:${literal})*`);
-      } else if (args[0] instanceof Expression) {
+      } else if (args[0] instanceof InternalExpression) {
         return this.addNode(`(?:${args[0].regex})*`);
       } else {
         throw new Error('Invalid arguments');
@@ -71,11 +83,15 @@ class Expression implements ExpressionNode {
     };
     return assign(
       func,
-      this.addWrapper((node) => `(?:${node})*`)
+      this.addModifier((regex) => `(?:${regex})*`)
     );
   }
+
+  /*
+   * ========== Multiple Input ==========
+   */
 }
 
-export const exactly = new Expression().exactly as ExpressionNode['exactly'];
-export const char = new Expression().char;
-export const oneOrMore = new Expression().oneOrMore as ExpressionNode['oneOrMore'];
+export const exactly = new InternalExpression().exactly as RegexExpression['exactly'];
+export const char = new InternalExpression().char;
+export const oneOrMore = new InternalExpression().oneOrMore as RegexExpression['oneOrMore'];
