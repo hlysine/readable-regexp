@@ -1,7 +1,7 @@
 export type RegexLiteral = [string | number] | [TemplateStringsArray, ...unknown[]];
 
 export function isTemplateStringsArray(arg: unknown): arg is TemplateStringsArray {
-  return Array.isArray(arg) && Object.hasOwn(arg, 'raw');
+  return Array.isArray(arg) && 'raw' in arg;
 }
 
 export function isLiteralArgument(args: unknown[]): args is RegexLiteral {
