@@ -1,11 +1,23 @@
-import { getLiteralString, LiteralArgument } from './helper';
+import { assign, getLiteralString, isLiteralArgument, LiteralArgument } from './helper';
 
 type NodeWrapper = (node: string) => string;
 
-interface ExpressionNode {
+type LiteralOverload = {
+  (literal: string | number): ExpressionNode;
+  (template: TemplateStringsArray, ...args: unknown[]): ExpressionNode;
+};
+
+type NodeOverloads = {
+  (node: ExpressionNode): ExpressionNode;
+};
+
+interface IncompleteNode {
   get char(): ExpressionNode;
-  exactly(literal: string | number): ExpressionNode;
-  exactly(template: TemplateStringsArray, ...args: unknown[]): ExpressionNode;
+  exactly: LiteralOverload;
+}
+
+interface ExpressionNode extends IncompleteNode {
+  oneOrMore: LiteralOverload & NodeOverloads & IncompleteNode;
 }
 
 class Expression implements ExpressionNode {
@@ -45,7 +57,25 @@ class Expression implements ExpressionNode {
     const literal = getLiteralString(args);
     return this.addNode(literal);
   };
+
+  public get oneOrMore(): LiteralOverload & NodeOverloads & IncompleteNode {
+    const func = (...args: LiteralArgument | [ExpressionNode]): ExpressionNode => {
+      if (isLiteralArgument(args)) {
+        const literal = getLiteralString(args);
+        return this.addNode(`(?:${literal})*`);
+      } else if (args[0] instanceof Expression) {
+        return this.addNode(`(?:${args[0].regex})*`);
+      } else {
+        throw new Error('Invalid arguments');
+      }
+    };
+    return assign(
+      func,
+      this.addWrapper((node) => `(?:${node})*`)
+    );
+  }
 }
 
-export const exactly = new Expression().exactly;
+export const exactly = new Expression().exactly as ExpressionNode['exactly'];
 export const char = new Expression().char;
+export const oneOrMore = new Expression().oneOrMore as ExpressionNode['oneOrMore'];

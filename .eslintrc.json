@@ -17,5 +17,8 @@
     "import/resolver": {
       "typescript": {}
     }
+  },
+  "rules": {
+    "@typescript-eslint/no-non-null-assertion": "off"
   }
 }
