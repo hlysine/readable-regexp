@@ -19,6 +19,19 @@
     }
   },
   "rules": {
-    "@typescript-eslint/no-non-null-assertion": "off"
+    "@typescript-eslint/no-non-null-assertion": "off",
+    "@typescript-eslint/explicit-member-accessibility": "error",
+    "arrow-parens": ["warn", "as-needed"],
+    "@typescript-eslint/ban-types": [
+      "error",
+      {
+        "extendDefaults": true,
+        "types": {
+          "Function": false,
+          "Object": false,
+          "{}": false
+        }
+      }
+    ]
   }
 }
