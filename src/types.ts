@@ -11,7 +11,7 @@ export interface TokenFunction<TTags = unknown> {
 }
 
 export interface QuantifierFunction {
-  (node: RegexToken & CanBeQuantified): RegexToken;
+  (node: RegexToken & CanBeQuantified): RegexToken & CanBeQuantified;
 }
 
 export interface MultiInputFunction {
@@ -20,11 +20,11 @@ export interface MultiInputFunction {
 }
 
 export interface RepeatFunction {
-  (min: number, max?: number): LiteralFunction & QuantifierFunction & QuantifiedToken;
+  (min: number, max?: number): LiteralFunction<CanBeQuantified> & QuantifierFunction & QuantifiedToken;
 }
 
 export interface LimitFunction {
-  (limit: number): LiteralFunction & QuantifierFunction & QuantifiedToken;
+  (limit: number): LiteralFunction<CanBeQuantified> & QuantifierFunction & QuantifiedToken;
 }
 
 export const negatableSymbol = Symbol('negatableToken');
@@ -62,9 +62,9 @@ export interface RegexToken {
   get repeat(): RepeatFunction;
   get atLeast(): LimitFunction;
   get atMost(): LimitFunction;
-  get maybe(): LiteralFunction & QuantifierFunction & QuantifiedToken;
-  get zeroOrMore(): LiteralFunction & QuantifierFunction & QuantifiedToken;
-  get oneOrMore(): LiteralFunction & QuantifierFunction & QuantifiedToken;
+  get maybe(): LiteralFunction<CanBeQuantified> & QuantifierFunction & QuantifiedToken;
+  get zeroOrMore(): LiteralFunction<CanBeQuantified> & QuantifierFunction & QuantifiedToken;
+  get oneOrMore(): LiteralFunction<CanBeQuantified> & QuantifierFunction & QuantifiedToken;
 
   get oneOf(): MultiInputFunction & CanBeQuantified;
 }

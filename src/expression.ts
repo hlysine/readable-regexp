@@ -154,8 +154,8 @@ class RegexBuilder implements RegexToken {
       this: RegexBuilder,
       min: number,
       max?: number
-    ): LiteralFunction & QuantifierFunction & QuantifiedToken {
-      function func(this: RegexBuilder, ...args: RegexLiteral | [RegexToken]): RegexToken {
+    ): LiteralFunction<CanBeQuantified> & QuantifierFunction & QuantifiedToken {
+      function func(this: RegexBuilder, ...args: RegexLiteral | [RegexToken]): RegexToken & CanBeQuantified {
         if (isLiteralArgument(args)) {
           const literal = getLiteralString(args);
           return this.addNode(literal);
@@ -171,8 +171,11 @@ class RegexBuilder implements RegexToken {
   }
 
   public get atLeast(): LimitFunction {
-    function configure(this: RegexBuilder, limit: number): LiteralFunction & QuantifierFunction & QuantifiedToken {
-      function func(this: RegexBuilder, ...args: RegexLiteral | [RegexToken]): RegexToken {
+    function configure(
+      this: RegexBuilder,
+      limit: number
+    ): LiteralFunction<CanBeQuantified> & QuantifierFunction & QuantifiedToken {
+      function func(this: RegexBuilder, ...args: RegexLiteral | [RegexToken]): RegexToken & CanBeQuantified {
         if (isLiteralArgument(args)) {
           const literal = getLiteralString(args);
           return this.addNode(literal);
@@ -188,8 +191,11 @@ class RegexBuilder implements RegexToken {
   }
 
   public get atMost(): LimitFunction {
-    function configure(this: RegexBuilder, limit: number): LiteralFunction & QuantifierFunction & QuantifiedToken {
-      function func(this: RegexBuilder, ...args: RegexLiteral | [RegexToken]): RegexToken {
+    function configure(
+      this: RegexBuilder,
+      limit: number
+    ): LiteralFunction<CanBeQuantified> & QuantifierFunction & QuantifiedToken {
+      function func(this: RegexBuilder, ...args: RegexLiteral | [RegexToken]): RegexToken & CanBeQuantified {
         if (isLiteralArgument(args)) {
           const literal = getLiteralString(args);
           return this.addNode(literal);
@@ -204,8 +210,8 @@ class RegexBuilder implements RegexToken {
     return bind(configure, this);
   }
 
-  public get maybe(): LiteralFunction & QuantifierFunction & QuantifiedToken {
-    function func(this: RegexBuilder, ...args: RegexLiteral | [RegexToken]): RegexToken {
+  public get maybe(): LiteralFunction<CanBeQuantified> & QuantifierFunction & QuantifiedToken {
+    function func(this: RegexBuilder, ...args: RegexLiteral | [RegexToken]): RegexToken & CanBeQuantified {
       if (isLiteralArgument(args)) {
         const literal = getLiteralString(args);
         return this.addNode(literal);
@@ -218,8 +224,8 @@ class RegexBuilder implements RegexToken {
     return assign(func, this.addModifier(new SimpleQuantifier(regex => `${regex}?`)));
   }
 
-  public get zeroOrMore(): LiteralFunction & QuantifierFunction & QuantifiedToken {
-    function func(this: RegexBuilder, ...args: RegexLiteral | [RegexToken]): RegexToken {
+  public get zeroOrMore(): LiteralFunction<CanBeQuantified> & QuantifierFunction & QuantifiedToken {
+    function func(this: RegexBuilder, ...args: RegexLiteral | [RegexToken]): RegexToken & CanBeQuantified {
       if (isLiteralArgument(args)) {
         const literal = getLiteralString(args);
         return this.addNode(literal);
@@ -232,8 +238,8 @@ class RegexBuilder implements RegexToken {
     return assign(func, this.addModifier(new SimpleQuantifier(regex => `${regex}*`)));
   }
 
-  public get oneOrMore(): LiteralFunction & QuantifierFunction & QuantifiedToken {
-    function func(this: RegexBuilder, ...args: RegexLiteral | [RegexToken]): RegexToken {
+  public get oneOrMore(): LiteralFunction<CanBeQuantified> & QuantifierFunction & QuantifiedToken {
+    function func(this: RegexBuilder, ...args: RegexLiteral | [RegexToken]): RegexToken & CanBeQuantified {
       if (isLiteralArgument(args)) {
         const literal = getLiteralString(args);
         return this.addNode(literal);

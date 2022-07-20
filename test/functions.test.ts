@@ -2,6 +2,7 @@ import {
   atLeast,
   atMost,
   char,
+  digit,
   exactly,
   maybe,
   not,
@@ -10,6 +11,7 @@ import {
   repeat,
   unicode,
   whitespace,
+  word,
   zeroOrMore,
 } from '../src/index';
 
@@ -180,5 +182,28 @@ describe('oneOf', () => {
   it('is chainable', () => {
     expect(oneOf`foo``bar``baz`.char.toString()).toBe('(?:foo|bar|baz).');
     expect(oneOrMore.oneOf`foo``bar`(exactly`baz`.char).toString()).toBe('(?:(?:foo|bar|baz.))+');
+  });
+});
+
+describe('quantifiers', () => {
+  it('stacks properly', () => {
+    // @ts-expect-error - stacking quantifiers only throws in dot syntax because the two quantifiers always have the same scope, and is thus redundant
+    expect(zeroOrMore.oneOrMore.exactly`foo`.toString()).toBe('(?:(?:foo)+)*');
+    expect(zeroOrMore(oneOrMore(exactly`foo`)).toString()).toBe('(?:(?:foo)+)*');
+    expect(zeroOrMore(digit.oneOrMore(exactly`foo`)).toString()).toBe('(?:\\d(?:foo)+)*');
+  });
+});
+
+describe('integration test', () => {
+  it('validates URLs', () => {
+    const domain = oneOrMore(word).oneOrMore(exactly`.`.oneOrMore(word));
+    const ip = repeat(1, 3)(digit).repeat(3)(exactly`.`.repeat(1, 3)(digit));
+    const regex = oneOf(exactly`http`.maybe`s`)`smtp``ftp`.exactly`://`.oneOf(domain, ip);
+
+    expect(regex.toString()).toBe('(?:https?|smtp|ftp)://(?:\\w+(?:.\\w+)+|\\d{1,3}(?:.\\d{1,3}){3})');
+
+    const regexObj = regex.toRegExp();
+    expect(regexObj.test('http://example.com')).toBe(true);
+    expect(regexObj.test('http:/./example.com')).toBe(false);
   });
 });
