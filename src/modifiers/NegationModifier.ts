@@ -1,4 +1,5 @@
 import { RegexModifier } from '../types';
+import { unicodeLiteral } from '../helper';
 
 export default class NegationModifier implements RegexModifier {
   public modify(regex: string): string {
@@ -13,12 +14,12 @@ export default class NegationModifier implements RegexModifier {
       case '$':
         return `(?!${regex})`;
       default:
-        if (regex.startsWith('\\p')) {
-          return '\\P' + regex.slice(2);
+        if (unicodeLiteral.test(regex)) {
+          return `[^${regex}]`;
         } else if (regex.length === 2 && regex.startsWith('\\')) {
           return regex.toUpperCase();
         } else {
-          throw new Error('The provided token is not negatable');
+          throw new Error('The provided token is not negatable: ' + regex);
         }
     }
   }

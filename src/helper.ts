@@ -57,3 +57,7 @@ export function getAllPropertyNames(target: unknown): string[] {
 
   return props;
 }
+
+export const unicodeHex = /^[0-9a-fA-F]{4}$/;
+
+export const unicodeLiteral = /^\\u[0-9a-fA-F]{4}$/;

@@ -1,4 +1,4 @@
-import { char, exactly, not, oneOf, oneOrMore, whitespace } from '../src/index';
+import { char, exactly, not, oneOf, oneOrMore, unicode, whitespace } from '../src/index';
 
 describe('exactly', () => {
   it('accepts plain strings', () => {
@@ -7,6 +7,30 @@ describe('exactly', () => {
   });
   it('accepts template literals', () => {
     expect(exactly`foo${1}bar${2}`.toString()).toBe('foo1bar2');
+  });
+});
+
+describe('unicode', () => {
+  it('accepts literals', () => {
+    expect(unicode`12ef`.toString()).toBe('\\u12ef');
+    expect(unicode('12ef').toString()).toBe('\\u12ef');
+  });
+  it('accepts template literals', () => {
+    expect(unicode`e${1}f${2}`.toString()).toBe('\\ue1f2');
+  });
+  it('validates correctly', () => {
+    expect(unicode`12ef`.toString()).toBe('\\u12ef');
+    expect(unicode`FFFF`.toString()).toBe('\\uFFFF');
+    expect(unicode`aBcD`.toString()).toBe('\\uaBcD');
+    expect(() => unicode``).toThrow();
+    expect(() => unicode`g1h2`).toThrow();
+    expect(() => unicode`123`).toThrow();
+    expect(() => unicode`123ef`).toThrow();
+  });
+  it('can be negated and quantified', () => {
+    expect(not.unicode`12ef`.toString()).toBe('[^\\u12ef]');
+    expect(oneOrMore.unicode`12ef`.toString()).toBe('\\u12ef+');
+    expect(oneOrMore.not.unicode`12ef`.toString()).toBe('(?:[^\\u12ef])+');
   });
 });
 

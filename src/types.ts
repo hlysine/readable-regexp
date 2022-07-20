@@ -49,6 +49,7 @@ export interface RegexToken {
   get wordBoundary(): RegexToken & CanBeNegated;
 
   get exactly(): LiteralFunction<CanBeQuantified> & CanBeQuantified;
+  get unicode(): LiteralFunction<CanBeQuantified & CanBeNegated> & CanBeQuantified & CanBeNegated;
   get not(): TokenFunction<CanBeNegated> & NegatedToken & CanBeQuantified;
   get oneOrMore(): LiteralFunction & QuantifierFunction & QuantifiedToken;
 

@@ -13,7 +13,7 @@ import {
   negatableSymbol,
   quantifiableSymbol,
 } from './types';
-import { assign, bind, getLiteralString, isLiteralArgument } from './helper';
+import { assign, bind, getLiteralString, isLiteralArgument, unicodeHex } from './helper';
 import AlternationModifier from './modifiers/AlternationModifier';
 import NegationModifier from './modifiers/NegationModifier';
 import OneOrMoreQuantifier from './modifiers/OneOrMoreQuantifier';
@@ -126,6 +126,15 @@ class RegexBuilder implements RegexToken {
     return bind(func, this);
   }
 
+  public get unicode(): LiteralFunction<CanBeQuantified & CanBeNegated> & CanBeQuantified & CanBeNegated {
+    function func(this: RegexBuilder, ...args: RegexLiteral): RegexToken & CanBeQuantified & CanBeNegated {
+      const literal = getLiteralString(args);
+      if (!unicodeHex.test(literal)) throw new Error('Invalid unicode literal');
+      return this.addNode(`\\u${literal}`);
+    }
+    return bind(func, this);
+  }
+
   public get not(): TokenFunction<CanBeNegated> & NegatedToken & CanBeQuantified {
     function func(this: RegexBuilder, token: RegexToken & CanBeNegated): RegexToken & CanBeQuantified {
       if (token instanceof RegexBuilder) {
@@ -205,6 +214,7 @@ export const lineEnd = new RegexBuilder().lineEnd;
 export const wordBoundary = new RegexBuilder().wordBoundary;
 
 export const exactly = new RegexBuilder().exactly;
+export const unicode = new RegexBuilder().unicode;
 export const not = new RegexBuilder().not;
 export const oneOrMore = new RegexBuilder().oneOrMore;
 

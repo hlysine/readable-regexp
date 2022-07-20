@@ -1,10 +1,12 @@
 import { RegexModifier } from '../types';
+import { unicodeLiteral } from '../helper';
 
 const NOT_QUANTIFIABLE = new Set(['^', '$', '\\b', '\\B']);
 
 function wrapIfNeeded(regex: string): string {
   if (regex.length === 1) return regex;
   if (regex.length === 2 && regex.startsWith('\\')) return regex;
+  if (unicodeLiteral.test(regex)) return regex;
   return `(?:${regex})`;
 }
 
