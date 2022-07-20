@@ -1,4 +1,17 @@
-import { atLeast, atMost, char, exactly, not, oneOf, oneOrMore, repeat, unicode, whitespace } from '../src/index';
+import {
+  atLeast,
+  atMost,
+  char,
+  exactly,
+  maybe,
+  not,
+  oneOf,
+  oneOrMore,
+  repeat,
+  unicode,
+  whitespace,
+  zeroOrMore,
+} from '../src/index';
 
 describe('exactly', () => {
   it('accepts plain strings', () => {
@@ -97,6 +110,44 @@ describe('atMost', () => {
   });
 });
 
+describe('maybe', () => {
+  it('accepts plain strings', () => {
+    expect(maybe`foo`.toString()).toBe('(?:foo)?');
+    expect(maybe('foo').toString()).toBe('(?:foo)?');
+  });
+  it('accepts special tokens', () => {
+    expect(maybe(char).toString()).toBe('.?');
+    expect(maybe.char.toString()).toBe('.?');
+  });
+  it('accepts expressions', () => {
+    expect(maybe(exactly`foo`).toString()).toBe('(?:foo)?');
+    expect(maybe.exactly`foo`.toString()).toBe('(?:foo)?');
+  });
+  it('is chainable', () => {
+    expect(exactly`foo`.maybe.exactly`foo`.toString()).toBe('foo(?:foo)?');
+    expect(exactly('foo').maybe(exactly('foo')).toString()).toBe('foo(?:foo)?');
+  });
+});
+
+describe('zeroOrMore', () => {
+  it('accepts plain strings', () => {
+    expect(zeroOrMore`foo`.toString()).toBe('(?:foo)*');
+    expect(zeroOrMore('foo').toString()).toBe('(?:foo)*');
+  });
+  it('accepts special tokens', () => {
+    expect(zeroOrMore(char).toString()).toBe('.*');
+    expect(zeroOrMore.char.toString()).toBe('.*');
+  });
+  it('accepts expressions', () => {
+    expect(zeroOrMore(exactly`foo`).toString()).toBe('(?:foo)*');
+    expect(zeroOrMore.exactly`foo`.toString()).toBe('(?:foo)*');
+  });
+  it('is chainable', () => {
+    expect(exactly`foo`.zeroOrMore.exactly`foo`.toString()).toBe('foo(?:foo)*');
+    expect(exactly('foo').zeroOrMore(exactly('foo')).toString()).toBe('foo(?:foo)*');
+  });
+});
+
 describe('oneOrMore', () => {
   it('accepts plain strings', () => {
     expect(oneOrMore`foo`.toString()).toBe('(?:foo)+');
@@ -109,6 +160,10 @@ describe('oneOrMore', () => {
   it('accepts expressions', () => {
     expect(oneOrMore(exactly`foo`).toString()).toBe('(?:foo)+');
     expect(oneOrMore.exactly`foo`.toString()).toBe('(?:foo)+');
+  });
+  it('is chainable', () => {
+    expect(exactly`foo`.oneOrMore.exactly`foo`.toString()).toBe('foo(?:foo)+');
+    expect(exactly('foo').oneOrMore(exactly('foo')).toString()).toBe('foo(?:foo)+');
   });
 });
 

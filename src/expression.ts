@@ -18,8 +18,8 @@ import {
 import { assign, bind, getLiteralString, isLiteralArgument, unicodeHex } from './helper';
 import AlternationModifier from './modifiers/AlternationModifier';
 import NegationModifier from './modifiers/NegationModifier';
-import OneOrMoreQuantifier from './modifiers/OneOrMoreQuantifier';
 import RepeatQuantifier from './modifiers/RepeatQuantifier';
+import SimpleQuantifier from './modifiers/SimpleQuantifier';
 
 class RegexBuilder implements RegexToken {
   public readonly regex: string;
@@ -204,6 +204,34 @@ class RegexBuilder implements RegexToken {
     return bind(configure, this);
   }
 
+  public get maybe(): LiteralFunction & QuantifierFunction & QuantifiedToken {
+    function func(this: RegexBuilder, ...args: RegexLiteral | [RegexToken]): RegexToken {
+      if (isLiteralArgument(args)) {
+        const literal = getLiteralString(args);
+        return this.addNode(literal);
+      } else if (args[0] instanceof RegexBuilder) {
+        return this.addNode(args[0].regex);
+      } else {
+        throw new Error('Invalid arguments');
+      }
+    }
+    return assign(func, this.addModifier(new SimpleQuantifier(regex => `${regex}?`)));
+  }
+
+  public get zeroOrMore(): LiteralFunction & QuantifierFunction & QuantifiedToken {
+    function func(this: RegexBuilder, ...args: RegexLiteral | [RegexToken]): RegexToken {
+      if (isLiteralArgument(args)) {
+        const literal = getLiteralString(args);
+        return this.addNode(literal);
+      } else if (args[0] instanceof RegexBuilder) {
+        return this.addNode(args[0].regex);
+      } else {
+        throw new Error('Invalid arguments');
+      }
+    }
+    return assign(func, this.addModifier(new SimpleQuantifier(regex => `${regex}*`)));
+  }
+
   public get oneOrMore(): LiteralFunction & QuantifierFunction & QuantifiedToken {
     function func(this: RegexBuilder, ...args: RegexLiteral | [RegexToken]): RegexToken {
       if (isLiteralArgument(args)) {
@@ -215,7 +243,7 @@ class RegexBuilder implements RegexToken {
         throw new Error('Invalid arguments');
       }
     }
-    return assign(func, this.addModifier(new OneOrMoreQuantifier()));
+    return assign(func, this.addModifier(new SimpleQuantifier(regex => `${regex}+`)));
   }
 
   /*
@@ -277,6 +305,8 @@ export const not = new RegexBuilder().not;
 export const repeat = new RegexBuilder().repeat;
 export const atLeast = new RegexBuilder().atLeast;
 export const atMost = new RegexBuilder().atMost;
+export const maybe = new RegexBuilder().maybe;
+export const zeroOrMore = new RegexBuilder().zeroOrMore;
 export const oneOrMore = new RegexBuilder().oneOrMore;
 
 export const oneOf = new RegexBuilder().oneOf;

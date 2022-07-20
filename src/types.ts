@@ -62,6 +62,8 @@ export interface RegexToken {
   get repeat(): RepeatFunction;
   get atLeast(): LimitFunction;
   get atMost(): LimitFunction;
+  get maybe(): LiteralFunction & QuantifierFunction & QuantifiedToken;
+  get zeroOrMore(): LiteralFunction & QuantifierFunction & QuantifiedToken;
   get oneOrMore(): LiteralFunction & QuantifierFunction & QuantifiedToken;
 
   get oneOf(): MultiInputFunction & CanBeQuantified;
