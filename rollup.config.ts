@@ -1,18 +1,19 @@
 import commonjs from '@rollup/plugin-commonjs';
 import nodeResolve from '@rollup/plugin-node-resolve';
+import { OutputOptions } from 'rollup';
 import dts from 'rollup-plugin-dts';
 import esbuild from 'rollup-plugin-esbuild';
 import packageJson from './package.json';
 
 const name = packageJson.main.replace(/\.js$/, '');
 
-const bundle = (config) => ({
+const bundle = config => ({
   ...config,
   input: './src/index.ts',
   external: /node_modules/,
 });
 
-export default [
+const config: OutputOptions[] = [
   bundle({
     plugins: [nodeResolve(), commonjs(), esbuild()],
     output: [
@@ -36,3 +37,5 @@ export default [
     },
   }),
 ];
+
+export default config;

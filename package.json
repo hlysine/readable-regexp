@@ -12,8 +12,8 @@
     "src"
   ],
   "scripts": {
-    "build": "rollup -c",
-    "watch": "rollup -cw",
+    "build": "rollup --config rollup.config.ts --configPlugin rollup-plugin-esbuild",
+    "watch": "rollup --watch --config rollup.config.ts --configPlugin rollup-plugin-esbuild",
     "lint": "eslint \"src/**/*.{js,jsx,ts,tsx,json}\"",
     "lint:fix": "eslint --fix \"src/**/*.{js,jsx,ts,tsx,json}\"",
     "test": "jest"
