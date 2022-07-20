@@ -1,4 +1,4 @@
-import { char, exactly, oneOf, oneOrMore } from '../src/index';
+import { char, exactly, not, oneOf, oneOrMore, whitespace } from '../src/index';
 
 describe('exactly', () => {
   it('accepts plain strings', () => {
@@ -10,14 +10,11 @@ describe('exactly', () => {
   });
 });
 
-describe('char', () => {
-  it('works', () => {
-    expect(char.toString()).toBe('.');
-  });
+describe('not', () => {
   it('is chainable', () => {
-    expect(char.exactly`foo`.toString()).toBe('.foo');
-    expect(exactly`foo`.char.toString()).toBe('foo.');
-    expect(char.char.char.toString()).toBe('...');
+    expect(not.whitespace.exactly`foo`.toString()).toBe('\\Sfoo');
+    expect(exactly`foo`.not.whitespace.toString()).toBe('foo\\S');
+    expect(not.whitespace.not(whitespace).not.whitespace.toString()).toBe('\\S\\S\\S');
   });
 });
 

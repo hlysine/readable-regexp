@@ -1,4 +1,4 @@
-export type RegexLiteral = [string] | [TemplateStringsArray, ...unknown[]];
+import { RegexLiteral } from './types';
 
 export function isTemplateStringsArray(arg: unknown): arg is TemplateStringsArray {
   return Array.isArray(arg) && 'raw' in arg;

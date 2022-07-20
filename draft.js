@@ -12,21 +12,36 @@ const regex = oneOf`http``smtp``ftp`.maybe`s`.exactly`://`
 /*
 ===== No Input =====
 char
-word
-digit
 whitespace
-letter
-tab
+not.whitespace
+digit
+not.digit
+word
+not.word
+verticalWhitespace
+not.verticalWhitespace
 lineFeed
+not.lineFeed
 carriageReturn
+not.carriageReturn
+tab
+not.tab
+nullChar
+not.nullChar
 
 lineStart
+not.lineStart
 lineEnd
+not.lineEnd
 wordBoundary
+not.wordBoundary
 
 ===== Single Input =====
 exactly`literal`
 exactly('literal')
+
+unicode`category`
+unicode('category')
 
 not.char
 not(char)

@@ -1,37 +1,19 @@
-import { assign, getLiteralString, isLiteralArgument, RegexLiteral } from './helper';
+import { assign, getLiteralString, isLiteralArgument } from './helper';
+import {
+  LiteralFunction,
+  ModifierFunction,
+  MultiInputFunction,
+  NegatableTokenFunction,
+  negatableTokenSymbol,
+  NegatableTokenTag,
+  NegatedToken,
+  QuantifiedToken,
+  RegexLiteral,
+  RegexModifier,
+  RegexToken,
+} from './types';
 
-type LiteralFunction = {
-  (literal: string): RegexToken;
-  (template: TemplateStringsArray, ...args: unknown[]): RegexToken;
-};
-
-type ModifierFunction = {
-  (node: RegexToken): RegexToken;
-};
-
-type MultiInputFunction = {
-  (template: TemplateStringsArray, ...args: unknown[]): RegexToken & MultiInputFunction;
-  (...args: (string | RegexToken)[]): RegexToken & MultiInputFunction;
-};
-
-interface QuantifiedToken {
-  get char(): RegexToken;
-  exactly: LiteralFunction;
-  oneOf: MultiInputFunction;
-}
-
-interface RegexToken extends QuantifiedToken {
-  oneOrMore: LiteralFunction & ModifierFunction & QuantifiedToken;
-  toString(): string;
-  toRegExp(): RegExp;
-}
-
-interface RegexModifier {
-  modify(regex: string): string;
-  clone(): RegexModifier;
-}
-
-class OneOfModifier implements RegexModifier {
+class AlternationModifier implements RegexModifier {
   private readonly options: string[] = [];
 
   public add(option: string): void {
@@ -43,8 +25,8 @@ class OneOfModifier implements RegexModifier {
     return `(?:${this.options.join('|')})${regex}`;
   }
 
-  public clone(): OneOfModifier {
-    const modifier = new OneOfModifier();
+  public clone(): AlternationModifier {
+    const modifier = new AlternationModifier();
     this.options.forEach(option => modifier.add(option));
     return modifier;
   }
@@ -53,6 +35,7 @@ class OneOfModifier implements RegexModifier {
 class RegexBuilder implements RegexToken {
   public readonly regex: string;
   public readonly modifiers: RegexModifier[];
+  public readonly [negatableTokenSymbol] = true;
 
   public constructor(regex?: string, modifiers?: RegexModifier[]) {
     this.regex = regex ?? '';
@@ -107,6 +90,38 @@ class RegexBuilder implements RegexToken {
     return this.addNode('.');
   }
 
+  public get whitespace(): RegexToken & NegatableTokenTag {
+    return this.addNode('\\s');
+  }
+
+  public get digit(): RegexToken & NegatableTokenTag {
+    return this.addNode('\\d');
+  }
+
+  public get word(): RegexToken & NegatableTokenTag {
+    return this.addNode('\\w');
+  }
+
+  public get verticalWhitespace(): RegexToken & NegatableTokenTag {
+    return this.addNode('\\v');
+  }
+
+  public get lineFeed(): RegexToken & NegatableTokenTag {
+    return this.addNode('\\n');
+  }
+
+  public get carriageReturn(): RegexToken & NegatableTokenTag {
+    return this.addNode('\\r');
+  }
+
+  public get tab(): RegexToken & NegatableTokenTag {
+    return this.addNode('\\t');
+  }
+
+  public get nullChar(): RegexToken & NegatableTokenTag {
+    return this.addNode('\\0');
+  }
+
   /*
    * ========== Single Input ==========
    */
@@ -117,6 +132,40 @@ class RegexBuilder implements RegexToken {
       return this.addNode(literal);
     }
     return func.bind(this);
+  }
+
+  public get not(): NegatableTokenFunction & NegatedToken {
+    function func(this: RegexBuilder, token: RegexToken & NegatedToken): RegexToken {
+      if (token instanceof RegexBuilder) {
+        return this.addNode(token.regex);
+      } else {
+        throw new Error('Invalid arguments');
+      }
+    }
+    return assign(
+      func,
+      this.addModifier(regex => {
+        switch (regex) {
+          case '\\v':
+          case '\\n':
+          case '\\r':
+          case '\\t':
+          case '\\0':
+            return `[^${regex}]`;
+          case '^':
+          case '$':
+            return `(?!${regex})`;
+          default:
+            if (regex.startsWith('\\p')) {
+              return '\\P' + regex.slice(2);
+            } else if (regex.length === 2 && regex.startsWith('\\')) {
+              return regex.toUpperCase();
+            } else {
+              throw new Error('The provided token is not negatable');
+            }
+        }
+      })
+    );
   }
 
   public get oneOrMore(): LiteralFunction & ModifierFunction & QuantifiedToken {
@@ -145,19 +194,19 @@ class RegexBuilder implements RegexToken {
       this: RegexBuilder,
       ...args: RegexLiteral | (string | RegexToken)[]
     ): RegexToken & MultiInputFunction {
-      if (!(this.modifiers[0] instanceof OneOfModifier))
+      if (!(this.modifiers[0] instanceof AlternationModifier))
         throw new Error(`Unexpected modifier, expected OneOfModifier, but got ${this.modifiers[0]}`);
       if (isLiteralArgument(args)) {
         const literal = getLiteralString(args);
         return assign(
           func,
-          this.mutateModifier(modifier => (modifier as OneOfModifier).add(literal))
+          this.mutateModifier(modifier => (modifier as AlternationModifier).add(literal))
         );
       } else {
         return assign(
           func,
           this.mutateModifier(modifier => {
-            const mod = modifier as OneOfModifier;
+            const mod = modifier as AlternationModifier;
             args.forEach(arg => {
               if (arg instanceof RegexBuilder) {
                 mod.add(arg.regex);
@@ -171,11 +220,22 @@ class RegexBuilder implements RegexToken {
         );
       }
     }
-    return func.bind(this.addModifier(new OneOfModifier()));
+    return func.bind(this.addModifier(new AlternationModifier()));
   }
 }
 
-export const exactly = new RegexBuilder().exactly as RegexToken['exactly'];
 export const char = new RegexBuilder().char;
-export const oneOrMore = new RegexBuilder().oneOrMore as RegexToken['oneOrMore'];
+export const whitespace = new RegexBuilder().whitespace;
+export const digit = new RegexBuilder().digit;
+export const word = new RegexBuilder().word;
+export const verticalWhitespace = new RegexBuilder().verticalWhitespace;
+export const lineFeed = new RegexBuilder().lineFeed;
+export const carriageReturn = new RegexBuilder().carriageReturn;
+export const tab = new RegexBuilder().tab;
+export const nullChar = new RegexBuilder().nullChar;
+
+export const exactly = new RegexBuilder().exactly;
+export const not = new RegexBuilder().not;
+export const oneOrMore = new RegexBuilder().oneOrMore;
+
 export const oneOf = new RegexBuilder().oneOf;
