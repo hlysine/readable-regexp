@@ -9,6 +9,7 @@ import {
   RegexLiteral,
   RegexModifier,
   RegexToken,
+  RepeatFunction,
   TokenFunction,
   negatableSymbol,
   quantifiableSymbol,
@@ -17,6 +18,7 @@ import { assign, bind, getLiteralString, isLiteralArgument, unicodeHex } from '.
 import AlternationModifier from './modifiers/AlternationModifier';
 import NegationModifier from './modifiers/NegationModifier';
 import OneOrMoreQuantifier from './modifiers/OneOrMoreQuantifier';
+import RepeatQuantifier from './modifiers/RepeatQuantifier';
 
 class RegexBuilder implements RegexToken {
   public readonly regex: string;
@@ -146,6 +148,27 @@ class RegexBuilder implements RegexToken {
     return assign(func, this.addModifier(new NegationModifier()));
   }
 
+  public get repeat(): RepeatFunction {
+    function configure(
+      this: RegexBuilder,
+      min: number,
+      max?: number
+    ): LiteralFunction & QuantifierFunction & QuantifiedToken {
+      function func(this: RegexBuilder, ...args: RegexLiteral | [RegexToken]): RegexToken {
+        if (isLiteralArgument(args)) {
+          const literal = getLiteralString(args);
+          return this.addNode(literal);
+        } else if (args[0] instanceof RegexBuilder) {
+          return this.addNode(args[0].regex);
+        } else {
+          throw new Error('Invalid arguments');
+        }
+      }
+      return assign(func, this.addModifier(new RepeatQuantifier(min, max ?? min)));
+    }
+    return bind(configure, this);
+  }
+
   public get oneOrMore(): LiteralFunction & QuantifierFunction & QuantifiedToken {
     function func(this: RegexBuilder, ...args: RegexLiteral | [RegexToken]): RegexToken {
       if (isLiteralArgument(args)) {
@@ -216,6 +239,7 @@ export const wordBoundary = new RegexBuilder().wordBoundary;
 export const exactly = new RegexBuilder().exactly;
 export const unicode = new RegexBuilder().unicode;
 export const not = new RegexBuilder().not;
+export const repeat = new RegexBuilder().repeat;
 export const oneOrMore = new RegexBuilder().oneOrMore;
 
 export const oneOf = new RegexBuilder().oneOf;

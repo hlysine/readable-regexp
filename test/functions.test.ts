@@ -1,4 +1,4 @@
-import { char, exactly, not, oneOf, oneOrMore, unicode, whitespace } from '../src/index';
+import { char, exactly, not, oneOf, oneOrMore, repeat, unicode, whitespace } from '../src/index';
 
 describe('exactly', () => {
   it('accepts plain strings', () => {
@@ -43,6 +43,27 @@ describe('not', () => {
   it('does not allow non-negatable tokens', () => {
     // @ts-expect-error - not(char) is not negatable
     expect(() => not(char)).toThrow();
+  });
+});
+
+describe('repeat', () => {
+  it('accepts plain strings', () => {
+    expect(repeat(3)`foo`.toString()).toBe('(?:foo){3}');
+    expect(repeat(3)('foo').toString()).toBe('(?:foo){3}');
+    expect(repeat(3, 5)`foo`.toString()).toBe('(?:foo){3,5}');
+    expect(repeat(3, 5)('foo').toString()).toBe('(?:foo){3,5}');
+  });
+  it('accepts special tokens', () => {
+    expect(repeat(3)(char).toString()).toBe('.{3}');
+    expect(repeat(3).char.toString()).toBe('.{3}');
+    expect(repeat(3, 5)(char).toString()).toBe('.{3,5}');
+    expect(repeat(3, 5).char.toString()).toBe('.{3,5}');
+  });
+  it('accepts expressions', () => {
+    expect(repeat(3)(exactly`foo`).toString()).toBe('(?:foo){3}');
+    expect(repeat(3).exactly`foo`.toString()).toBe('(?:foo){3}');
+    expect(repeat(3, 5)(exactly`foo`).toString()).toBe('(?:foo){3,5}');
+    expect(repeat(3, 5).exactly`foo`.toString()).toBe('(?:foo){3,5}');
   });
 });
 

@@ -19,6 +19,10 @@ export interface MultiInputFunction {
   (...args: (string | RegexToken)[]): RegexToken & CanBeQuantified & MultiInputFunction;
 }
 
+export interface RepeatFunction {
+  (min: number, max?: number): LiteralFunction & QuantifierFunction & QuantifiedToken;
+}
+
 export const negatableSymbol = Symbol('negatableToken');
 export const quantifiableSymbol = Symbol('quantifiableToken');
 
@@ -51,6 +55,7 @@ export interface RegexToken {
   get exactly(): LiteralFunction<CanBeQuantified> & CanBeQuantified;
   get unicode(): LiteralFunction<CanBeQuantified & CanBeNegated> & CanBeQuantified & CanBeNegated;
   get not(): TokenFunction<CanBeNegated> & NegatedToken & CanBeQuantified;
+  get repeat(): RepeatFunction;
   get oneOrMore(): LiteralFunction & QuantifierFunction & QuantifiedToken;
 
   get oneOf(): MultiInputFunction & CanBeQuantified;
