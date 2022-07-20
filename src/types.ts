@@ -5,12 +5,8 @@ export type LiteralFunction = {
   (template: TemplateStringsArray, ...args: unknown[]): RegexToken;
 };
 
-export type ModifierFunction = {
-  (node: RegexToken): RegexToken;
-};
-
-export type NegatableTokenFunction = {
-  (node: RegexToken & NegatableTokenTag): RegexToken;
+export type TokenFunction<TTags = unknown> = {
+  (node: RegexToken & TTags): RegexToken;
 };
 
 export type MultiInputFunction = {
@@ -19,34 +15,50 @@ export type MultiInputFunction = {
 };
 
 export const negatableTokenSymbol = Symbol('negatableToken');
+export const quantifiableTokenSymbol = Symbol('quantifiableToken');
 
 export interface NegatableTokenTag {
-  [negatableTokenSymbol]: true;
+  readonly [negatableTokenSymbol]: undefined;
 }
 
-export interface NegatedToken {
-  get whitespace(): RegexToken & NegatableTokenTag;
-  get digit(): RegexToken & NegatableTokenTag;
-  get word(): RegexToken & NegatableTokenTag;
-  get verticalWhitespace(): RegexToken & NegatableTokenTag;
-  get lineFeed(): RegexToken & NegatableTokenTag;
-  get carriageReturn(): RegexToken & NegatableTokenTag;
-  get tab(): RegexToken & NegatableTokenTag;
-  get nullChar(): RegexToken & NegatableTokenTag;
+export interface QuantifiableTokenTag {
+  readonly [quantifiableTokenSymbol]: undefined;
 }
 
-export interface QuantifiedToken extends NegatedToken {
-  get char(): RegexToken;
-  exactly: LiteralFunction;
-  not: NegatableTokenFunction & NegatedToken;
-  oneOf: MultiInputFunction;
-}
-
-export interface RegexToken extends QuantifiedToken {
-  oneOrMore: LiteralFunction & ModifierFunction & QuantifiedToken;
+export interface RegexToken {
+  get char(): RegexToken & QuantifiableTokenTag;
+  get whitespace(): RegexToken & NegatableTokenTag & QuantifiableTokenTag;
+  get digit(): RegexToken & NegatableTokenTag & QuantifiableTokenTag;
+  get word(): RegexToken & NegatableTokenTag & QuantifiableTokenTag;
+  get verticalWhitespace(): RegexToken & NegatableTokenTag & QuantifiableTokenTag;
+  get lineFeed(): RegexToken & NegatableTokenTag & QuantifiableTokenTag;
+  get carriageReturn(): RegexToken & NegatableTokenTag & QuantifiableTokenTag;
+  get tab(): RegexToken & NegatableTokenTag & QuantifiableTokenTag;
+  get nullChar(): RegexToken & NegatableTokenTag & QuantifiableTokenTag;
+  get lineStart(): RegexToken & NegatableTokenTag;
+  get exactly(): LiteralFunction & QuantifiableTokenTag;
+  get not(): TokenFunction<NegatableTokenTag> & NegatedToken & QuantifiableTokenTag;
+  get oneOrMore(): LiteralFunction & TokenFunction & QuantifiedToken;
+  get oneOf(): MultiInputFunction & QuantifiableTokenTag;
   toString(): string;
   toRegExp(): RegExp;
 }
+
+export type QuantifiedNegatedToken = {
+  [key in keyof RegexToken as RegexToken[key] extends QuantifiableTokenTag & NegatableTokenTag
+    ? key
+    : never]: RegexToken[key];
+};
+
+export type QuantifiedToken = {
+  [key in keyof RegexToken as RegexToken[key] extends QuantifiableTokenTag ? key : never]: RegexToken[key];
+} & {
+  get not(): TokenFunction<NegatableTokenTag & QuantifiableTokenTag> & QuantifiedNegatedToken;
+};
+
+export type NegatedToken = {
+  [key in keyof RegexToken as RegexToken[key] extends NegatableTokenTag ? key : never]: RegexToken[key];
+};
 
 export interface RegexModifier {
   modify(regex: string): string;

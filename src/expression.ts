@@ -1,16 +1,17 @@
-import { assign, getLiteralString, isLiteralArgument } from './helper';
+import { assign, bind, getLiteralString, isLiteralArgument } from './helper';
 import {
   LiteralFunction,
-  ModifierFunction,
+  TokenFunction,
   MultiInputFunction,
-  NegatableTokenFunction,
-  negatableTokenSymbol,
   NegatableTokenTag,
   NegatedToken,
   QuantifiedToken,
   RegexLiteral,
   RegexModifier,
   RegexToken,
+  QuantifiableTokenTag,
+  negatableTokenSymbol,
+  quantifiableTokenSymbol,
 } from './types';
 
 class AlternationModifier implements RegexModifier {
@@ -35,7 +36,8 @@ class AlternationModifier implements RegexModifier {
 class RegexBuilder implements RegexToken {
   public readonly regex: string;
   public readonly modifiers: RegexModifier[];
-  public readonly [negatableTokenSymbol] = true;
+  public readonly [negatableTokenSymbol]: undefined;
+  public readonly [quantifiableTokenSymbol]: undefined;
 
   public constructor(regex?: string, modifiers?: RegexModifier[]) {
     this.regex = regex ?? '';
@@ -86,56 +88,60 @@ class RegexBuilder implements RegexToken {
    * ========== Special Tokens ==========
    */
 
-  public get char(): RegexToken {
+  public get char(): RegexToken & QuantifiableTokenTag {
     return this.addNode('.');
   }
 
-  public get whitespace(): RegexToken & NegatableTokenTag {
+  public get whitespace(): RegexToken & NegatableTokenTag & QuantifiableTokenTag {
     return this.addNode('\\s');
   }
 
-  public get digit(): RegexToken & NegatableTokenTag {
+  public get digit(): RegexToken & NegatableTokenTag & QuantifiableTokenTag {
     return this.addNode('\\d');
   }
 
-  public get word(): RegexToken & NegatableTokenTag {
+  public get word(): RegexToken & NegatableTokenTag & QuantifiableTokenTag {
     return this.addNode('\\w');
   }
 
-  public get verticalWhitespace(): RegexToken & NegatableTokenTag {
+  public get verticalWhitespace(): RegexToken & NegatableTokenTag & QuantifiableTokenTag {
     return this.addNode('\\v');
   }
 
-  public get lineFeed(): RegexToken & NegatableTokenTag {
+  public get lineFeed(): RegexToken & NegatableTokenTag & QuantifiableTokenTag {
     return this.addNode('\\n');
   }
 
-  public get carriageReturn(): RegexToken & NegatableTokenTag {
+  public get carriageReturn(): RegexToken & NegatableTokenTag & QuantifiableTokenTag {
     return this.addNode('\\r');
   }
 
-  public get tab(): RegexToken & NegatableTokenTag {
+  public get tab(): RegexToken & NegatableTokenTag & QuantifiableTokenTag {
     return this.addNode('\\t');
   }
 
-  public get nullChar(): RegexToken & NegatableTokenTag {
+  public get nullChar(): RegexToken & NegatableTokenTag & QuantifiableTokenTag {
     return this.addNode('\\0');
+  }
+
+  public get lineStart(): RegexToken & NegatableTokenTag {
+    return this.addNode('^');
   }
 
   /*
    * ========== Single Input ==========
    */
 
-  public get exactly(): LiteralFunction {
+  public get exactly(): LiteralFunction & QuantifiableTokenTag {
     function func(this: RegexBuilder, ...args: RegexLiteral): RegexToken {
       const literal = getLiteralString(args);
       return this.addNode(literal);
     }
-    return func.bind(this);
+    return bind(func, this);
   }
 
-  public get not(): NegatableTokenFunction & NegatedToken {
-    function func(this: RegexBuilder, token: RegexToken & NegatedToken): RegexToken {
+  public get not(): TokenFunction<NegatableTokenTag> & NegatedToken & QuantifiableTokenTag {
+    function func(this: RegexBuilder, token: RegexToken & NegatableTokenTag): RegexToken {
       if (token instanceof RegexBuilder) {
         return this.addNode(token.regex);
       } else {
@@ -168,7 +174,7 @@ class RegexBuilder implements RegexToken {
     );
   }
 
-  public get oneOrMore(): LiteralFunction & ModifierFunction & QuantifiedToken {
+  public get oneOrMore(): LiteralFunction & TokenFunction & QuantifiedToken {
     function func(this: RegexBuilder, ...args: RegexLiteral | [RegexToken]): RegexToken {
       if (isLiteralArgument(args)) {
         const literal = getLiteralString(args);
@@ -189,7 +195,7 @@ class RegexBuilder implements RegexToken {
    * ========== Multiple Input ==========
    */
 
-  public get oneOf(): MultiInputFunction {
+  public get oneOf(): MultiInputFunction & QuantifiableTokenTag {
     function func(
       this: RegexBuilder,
       ...args: RegexLiteral | (string | RegexToken)[]
@@ -220,7 +226,7 @@ class RegexBuilder implements RegexToken {
         );
       }
     }
-    return func.bind(this.addModifier(new AlternationModifier()));
+    return bind(func, this.addModifier(new AlternationModifier()));
   }
 }
 

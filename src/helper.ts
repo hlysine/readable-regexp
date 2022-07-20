@@ -22,6 +22,13 @@ export function getLiteralString(args: RegexLiteral): string {
   }
 }
 
+export function bind<T extends Function, U>(
+  func: T,
+  thisArg: U
+): T & { [K in keyof U]: U[K] extends symbol ? U[K] : never } {
+  return func.bind(thisArg);
+}
+
 export function assign<T extends Function, U>(target: T, source: U): T & U {
   target = target.bind(source);
 
