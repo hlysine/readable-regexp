@@ -16,6 +16,10 @@ describe('not', () => {
     expect(exactly`foo`.not.whitespace.toString()).toBe('foo\\S');
     expect(not.whitespace.not(whitespace).not.whitespace.toString()).toBe('\\S\\S\\S');
   });
+  it('does not allow non-negatable tokens', () => {
+    // @ts-expect-error - not(char) is not negatable
+    expect(() => not(char)).toThrow();
+  });
 });
 
 describe('oneOrMore', () => {
@@ -24,8 +28,8 @@ describe('oneOrMore', () => {
     expect(oneOrMore('foo').toString()).toBe('(?:foo)+');
   });
   it('accepts special tokens', () => {
-    expect(oneOrMore(char).toString()).toBe('(?:.)+');
-    expect(oneOrMore.char.toString()).toBe('(?:.)+');
+    expect(oneOrMore(char).toString()).toBe('.+');
+    expect(oneOrMore.char.toString()).toBe('.+');
   });
   it('accepts expressions', () => {
     expect(oneOrMore(exactly`foo`).toString()).toBe('(?:foo)+');

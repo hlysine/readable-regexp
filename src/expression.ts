@@ -1,43 +1,28 @@
-import { assign, bind, getLiteralString, isLiteralArgument } from './helper';
 import {
+  CanBeNegated,
+  CanBeQuantified,
   LiteralFunction,
-  TokenFunction,
   MultiInputFunction,
-  NegatableTokenTag,
   NegatedToken,
   QuantifiedToken,
+  QuantifierFunction,
   RegexLiteral,
   RegexModifier,
   RegexToken,
-  QuantifiableTokenTag,
-  negatableTokenSymbol,
-  quantifiableTokenSymbol,
+  TokenFunction,
+  negatableSymbol,
+  quantifiableSymbol,
 } from './types';
-
-class AlternationModifier implements RegexModifier {
-  private readonly options: string[] = [];
-
-  public add(option: string): void {
-    this.options.push(option);
-  }
-
-  public modify(regex: string): string {
-    if (this.options.length === 0) throw new Error('No options provided for oneOf');
-    return `(?:${this.options.join('|')})${regex}`;
-  }
-
-  public clone(): AlternationModifier {
-    const modifier = new AlternationModifier();
-    this.options.forEach(option => modifier.add(option));
-    return modifier;
-  }
-}
+import { assign, bind, getLiteralString, isLiteralArgument } from './helper';
+import AlternationModifier from './modifiers/AlternationModifier';
+import NegationModifier from './modifiers/NegationModifier';
+import OneOrMoreQuantifier from './modifiers/OneOrMoreQuantifier';
 
 class RegexBuilder implements RegexToken {
   public readonly regex: string;
   public readonly modifiers: RegexModifier[];
-  public readonly [negatableTokenSymbol]: undefined;
-  public readonly [quantifiableTokenSymbol]: undefined;
+  public readonly [negatableSymbol]: undefined;
+  public readonly [quantifiableSymbol]: undefined;
 
   public constructor(regex?: string, modifiers?: RegexModifier[]) {
     this.regex = regex ?? '';
@@ -46,7 +31,7 @@ class RegexBuilder implements RegexToken {
 
   public executeModifiers(regex?: string): string {
     if (this.modifiers.length === 0) return this.regex + (regex ?? '');
-    return this.regex + this.modifiers.reduce((regex, modifier) => modifier.modify(regex), regex ?? '');
+    return this.regex + this.modifiers.reduce((r, modifier) => modifier.modify(r), regex ?? '');
   }
 
   public toString(): string {
@@ -65,18 +50,11 @@ class RegexBuilder implements RegexToken {
     return new RegexBuilder(this.executeModifiers(node));
   }
 
-  public addModifier(modifier: RegexModifier | ((regex: string) => string)): RegexBuilder {
-    let newModifier: RegexModifier | undefined;
-    if (modifier instanceof Function) {
-      const createModifier = () => ({ modify: modifier, clone: createModifier });
-      newModifier = createModifier();
-    } else {
-      newModifier = modifier;
-    }
-    return new RegexBuilder(this.regex, [newModifier, ...this.modifiers]);
+  public addModifier(modifier: RegexModifier): RegexBuilder {
+    return new RegexBuilder(this.regex, [modifier, ...this.modifiers]);
   }
 
-  public mutateModifier(mutation: (modifier: RegexModifier) => void): RegexToken {
+  public mutateModifier(mutation: (modifier: RegexModifier) => void): RegexBuilder {
     if (this.modifiers.length === 0) return new RegexBuilder(this.regex);
 
     const newModifiers = this.modifiers.map(modifier => modifier.clone());
@@ -88,93 +66,78 @@ class RegexBuilder implements RegexToken {
    * ========== Special Tokens ==========
    */
 
-  public get char(): RegexToken & QuantifiableTokenTag {
+  public get char(): RegexToken & CanBeQuantified {
     return this.addNode('.');
   }
 
-  public get whitespace(): RegexToken & NegatableTokenTag & QuantifiableTokenTag {
+  public get whitespace(): RegexToken & CanBeNegated & CanBeQuantified {
     return this.addNode('\\s');
   }
 
-  public get digit(): RegexToken & NegatableTokenTag & QuantifiableTokenTag {
+  public get digit(): RegexToken & CanBeNegated & CanBeQuantified {
     return this.addNode('\\d');
   }
 
-  public get word(): RegexToken & NegatableTokenTag & QuantifiableTokenTag {
+  public get word(): RegexToken & CanBeNegated & CanBeQuantified {
     return this.addNode('\\w');
   }
 
-  public get verticalWhitespace(): RegexToken & NegatableTokenTag & QuantifiableTokenTag {
+  public get verticalWhitespace(): RegexToken & CanBeNegated & CanBeQuantified {
     return this.addNode('\\v');
   }
 
-  public get lineFeed(): RegexToken & NegatableTokenTag & QuantifiableTokenTag {
+  public get lineFeed(): RegexToken & CanBeNegated & CanBeQuantified {
     return this.addNode('\\n');
   }
 
-  public get carriageReturn(): RegexToken & NegatableTokenTag & QuantifiableTokenTag {
+  public get carriageReturn(): RegexToken & CanBeNegated & CanBeQuantified {
     return this.addNode('\\r');
   }
 
-  public get tab(): RegexToken & NegatableTokenTag & QuantifiableTokenTag {
+  public get tab(): RegexToken & CanBeNegated & CanBeQuantified {
     return this.addNode('\\t');
   }
 
-  public get nullChar(): RegexToken & NegatableTokenTag & QuantifiableTokenTag {
+  public get nullChar(): RegexToken & CanBeNegated & CanBeQuantified {
     return this.addNode('\\0');
   }
 
-  public get lineStart(): RegexToken & NegatableTokenTag {
+  public get lineStart(): RegexToken & CanBeNegated {
     return this.addNode('^');
+  }
+
+  public get lineEnd(): RegexToken & CanBeNegated {
+    return this.addNode('$');
+  }
+
+  public get wordBoundary(): RegexToken & CanBeNegated {
+    return this.addNode('\\b');
   }
 
   /*
    * ========== Single Input ==========
    */
 
-  public get exactly(): LiteralFunction & QuantifiableTokenTag {
-    function func(this: RegexBuilder, ...args: RegexLiteral): RegexToken {
+  public get exactly(): LiteralFunction<CanBeQuantified> & CanBeQuantified {
+    function func(this: RegexBuilder, ...args: RegexLiteral): RegexToken & CanBeQuantified {
       const literal = getLiteralString(args);
       return this.addNode(literal);
     }
     return bind(func, this);
   }
 
-  public get not(): TokenFunction<NegatableTokenTag> & NegatedToken & QuantifiableTokenTag {
-    function func(this: RegexBuilder, token: RegexToken & NegatableTokenTag): RegexToken {
+  public get not(): TokenFunction<CanBeNegated> & NegatedToken & CanBeQuantified {
+    function func(this: RegexBuilder, token: RegexToken & CanBeNegated): RegexToken & CanBeQuantified {
       if (token instanceof RegexBuilder) {
         return this.addNode(token.regex);
       } else {
         throw new Error('Invalid arguments');
       }
     }
-    return assign(
-      func,
-      this.addModifier(regex => {
-        switch (regex) {
-          case '\\v':
-          case '\\n':
-          case '\\r':
-          case '\\t':
-          case '\\0':
-            return `[^${regex}]`;
-          case '^':
-          case '$':
-            return `(?!${regex})`;
-          default:
-            if (regex.startsWith('\\p')) {
-              return '\\P' + regex.slice(2);
-            } else if (regex.length === 2 && regex.startsWith('\\')) {
-              return regex.toUpperCase();
-            } else {
-              throw new Error('The provided token is not negatable');
-            }
-        }
-      })
-    );
+    return assign(func, this.addModifier(new NegationModifier()));
   }
 
-  public get oneOrMore(): LiteralFunction & TokenFunction & QuantifiedToken {
+  public get oneOrMore(): LiteralFunction & QuantifierFunction & QuantifiedToken {
     function func(this: RegexBuilder, ...args: RegexLiteral | [RegexToken]): RegexToken {
       if (isLiteralArgument(args)) {
         const literal = getLiteralString(args);
@@ -185,21 +148,18 @@ class RegexBuilder implements RegexToken {
         throw new Error('Invalid arguments');
       }
     }
-    return assign(
-      func,
-      this.addModifier(regex => `(?:${regex})+`)
-    );
+    return assign(func, this.addModifier(new OneOrMoreQuantifier()));
   }
 
   /*
    * ========== Multiple Input ==========
    */
 
-  public get oneOf(): MultiInputFunction & QuantifiableTokenTag {
+  public get oneOf(): MultiInputFunction & CanBeQuantified {
     function func(
       this: RegexBuilder,
       ...args: RegexLiteral | (string | RegexToken)[]
-    ): RegexToken & MultiInputFunction {
+    ): RegexToken & CanBeQuantified & MultiInputFunction {
       if (!(this.modifiers[0] instanceof AlternationModifier))
         throw new Error(`Unexpected modifier, expected OneOfModifier, but got ${this.modifiers[0]}`);
       if (isLiteralArgument(args)) {
@@ -239,6 +199,10 @@ export const lineFeed = new RegexBuilder().lineFeed;
 export const carriageReturn = new RegexBuilder().carriageReturn;
 export const tab = new RegexBuilder().tab;
 export const nullChar = new RegexBuilder().nullChar;
+
+export const lineStart = new RegexBuilder().lineStart;
+export const lineEnd = new RegexBuilder().lineEnd;
+export const wordBoundary = new RegexBuilder().wordBoundary;
 
 export const exactly = new RegexBuilder().exactly;
 export const not = new RegexBuilder().not;
