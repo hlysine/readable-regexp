@@ -1,26 +1,42 @@
 import { assign, getLiteralString, isLiteralArgument, RegexLiteral } from './helper';
 
-type RegexModifier = (regex: string) => string;
-
 type LiteralFunction = {
-  (literal: string | number): RegexExpression;
-  (template: TemplateStringsArray, ...args: unknown[]): RegexExpression;
+  (literal: string): RegexToken;
+  (template: TemplateStringsArray, ...args: unknown[]): RegexToken;
 };
 
 type ModifierFunction = {
-  (node: RegexExpression): RegexExpression;
+  (node: RegexToken): RegexToken;
 };
 
-interface ModifiedExpression {
-  get char(): RegexExpression;
+type MultiInputFunction = {
+  (template: TemplateStringsArray, ...args: unknown[]): RegexToken & MultiInputFunction;
+  (...args: (string | RegexToken)[]): RegexToken & MultiInputFunction;
+};
+
+interface QuantifiedToken {
+  get char(): RegexToken;
   exactly: LiteralFunction;
+  oneOf: MultiInputFunction;
 }
 
-interface RegexExpression extends ModifiedExpression {
-  oneOrMore: LiteralFunction & ModifierFunction & ModifiedExpression;
+interface RegexToken extends QuantifiedToken {
+  oneOrMore: LiteralFunction & ModifierFunction & QuantifiedToken;
 }
 
-class InternalExpression implements RegexExpression {
+interface RegexModifier {
+  modify(regex: string): string;
+}
+
+function combineModifiers(...modifiers: RegexModifier[]): RegexModifier {
+  return {
+    modify(regex) {
+      return modifiers.reduce((regex, modifier) => modifier.modify(regex), regex);
+    },
+  };
+}
+
+class RegexBuilder implements RegexToken {
   public readonly regex: string;
   public readonly modifier?: RegexModifier;
 
@@ -30,34 +46,37 @@ class InternalExpression implements RegexExpression {
   }
 
   /*
-   * ========== Internals ==========
+   * ========== Internal Functions ==========
    */
 
-  public addNode(node: string): InternalExpression {
+  public addNode(node: string): RegexBuilder {
     let newRegex = this.regex;
     if (this.modifier) {
-      newRegex += this.modifier(node);
+      newRegex += this.modifier.modify(node);
     } else {
       newRegex += node;
     }
-    return new InternalExpression(newRegex);
+    return new RegexBuilder(newRegex);
   }
 
-  public addModifier(modifier: RegexModifier): InternalExpression {
+  public addModifier(modifier: RegexModifier | ((regex: string) => string)): RegexBuilder {
     let newModifier: RegexModifier | undefined;
-    if (this.modifier) {
-      newModifier = (regex: string) => this.modifier?.(modifier(regex)) ?? modifier(regex);
+    if (modifier instanceof Function) {
+      newModifier = { modify: modifier };
     } else {
       newModifier = modifier;
     }
-    return new InternalExpression(this.regex, newModifier);
+    if (this.modifier) {
+      newModifier = combineModifiers(newModifier, this.modifier);
+    }
+    return new RegexBuilder(this.regex, newModifier);
   }
 
   /*
    * ========== Special Tokens ==========
    */
 
-  public get char(): RegexExpression {
+  public get char(): RegexToken {
     return this.addNode('.');
   }
 
@@ -65,17 +84,17 @@ class InternalExpression implements RegexExpression {
    * ========== Single Input ==========
    */
 
-  public exactly = (...args: RegexLiteral): RegexExpression => {
+  public exactly = (...args: RegexLiteral): RegexToken => {
     const literal = getLiteralString(args);
     return this.addNode(literal);
   };
 
-  public get oneOrMore(): LiteralFunction & ModifierFunction & ModifiedExpression {
-    const func = (...args: RegexLiteral | [RegexExpression]): RegexExpression => {
+  public get oneOrMore(): LiteralFunction & ModifierFunction & QuantifiedToken {
+    const func = (...args: RegexLiteral | [RegexToken]): RegexToken => {
       if (isLiteralArgument(args)) {
         const literal = getLiteralString(args);
         return this.addNode(`(?:${literal})*`);
-      } else if (args[0] instanceof InternalExpression) {
+      } else if (args[0] instanceof RegexBuilder) {
         return this.addNode(`(?:${args[0].regex})*`);
       } else {
         throw new Error('Invalid arguments');
@@ -92,6 +111,6 @@ class InternalExpression implements RegexExpression {
    */
 }
 
-export const exactly = new InternalExpression().exactly as RegexExpression['exactly'];
-export const char = new InternalExpression().char;
-export const oneOrMore = new InternalExpression().oneOrMore as RegexExpression['oneOrMore'];
+export const exactly = new RegexBuilder().exactly as RegexToken['exactly'];
+export const char = new RegexBuilder().char;
+export const oneOrMore = new RegexBuilder().oneOrMore as RegexToken['oneOrMore'];

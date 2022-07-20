@@ -1,4 +1,4 @@
-export type RegexLiteral = [string | number] | [TemplateStringsArray, ...unknown[]];
+export type RegexLiteral = [string] | [TemplateStringsArray, ...unknown[]];
 
 export function isTemplateStringsArray(arg: unknown): arg is TemplateStringsArray {
   return Array.isArray(arg) && 'raw' in arg;
@@ -8,7 +8,7 @@ export function isLiteralArgument(args: unknown[]): args is RegexLiteral {
   if (args.length === 0) {
     return false;
   } else if (args.length === 1) {
-    return typeof args[0] === 'string' || typeof args[0] === 'number' || isTemplateStringsArray(args[0]);
+    return typeof args[0] === 'string' || isTemplateStringsArray(args[0]);
   } else {
     return isTemplateStringsArray(args[0]);
   }
