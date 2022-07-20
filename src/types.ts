@@ -23,6 +23,10 @@ export interface RepeatFunction {
   (min: number, max?: number): LiteralFunction & QuantifierFunction & QuantifiedToken;
 }
 
+export interface LimitFunction {
+  (limit: number): LiteralFunction & QuantifierFunction & QuantifiedToken;
+}
+
 export const negatableSymbol = Symbol('negatableToken');
 export const quantifiableSymbol = Symbol('quantifiableToken');
 
@@ -56,6 +60,8 @@ export interface RegexToken {
   get unicode(): LiteralFunction<CanBeQuantified & CanBeNegated> & CanBeQuantified & CanBeNegated;
   get not(): TokenFunction<CanBeNegated> & NegatedToken & CanBeQuantified;
   get repeat(): RepeatFunction;
+  get atLeast(): LimitFunction;
+  get atMost(): LimitFunction;
   get oneOrMore(): LiteralFunction & QuantifierFunction & QuantifiedToken;
 
   get oneOf(): MultiInputFunction & CanBeQuantified;

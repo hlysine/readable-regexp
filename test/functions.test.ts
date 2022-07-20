@@ -1,4 +1,4 @@
-import { char, exactly, not, oneOf, oneOrMore, repeat, unicode, whitespace } from '../src/index';
+import { atLeast, atMost, char, exactly, not, oneOf, oneOrMore, repeat, unicode, whitespace } from '../src/index';
 
 describe('exactly', () => {
   it('accepts plain strings', () => {
@@ -64,6 +64,36 @@ describe('repeat', () => {
     expect(repeat(3).exactly`foo`.toString()).toBe('(?:foo){3}');
     expect(repeat(3, 5)(exactly`foo`).toString()).toBe('(?:foo){3,5}');
     expect(repeat(3, 5).exactly`foo`.toString()).toBe('(?:foo){3,5}');
+  });
+});
+
+describe('atLeast', () => {
+  it('accepts plain strings', () => {
+    expect(atLeast(3)`foo`.toString()).toBe('(?:foo){3,}');
+    expect(atLeast(3)('foo').toString()).toBe('(?:foo){3,}');
+  });
+  it('accepts special tokens', () => {
+    expect(atLeast(3)(char).toString()).toBe('.{3,}');
+    expect(atLeast(3).char.toString()).toBe('.{3,}');
+  });
+  it('accepts expressions', () => {
+    expect(atLeast(3)(exactly`foo`).toString()).toBe('(?:foo){3,}');
+    expect(atLeast(3).exactly`foo`.toString()).toBe('(?:foo){3,}');
+  });
+});
+
+describe('atMost', () => {
+  it('accepts plain strings', () => {
+    expect(atMost(3)`foo`.toString()).toBe('(?:foo){,3}');
+    expect(atMost(3)('foo').toString()).toBe('(?:foo){,3}');
+  });
+  it('accepts special tokens', () => {
+    expect(atMost(3)(char).toString()).toBe('.{,3}');
+    expect(atMost(3).char.toString()).toBe('.{,3}');
+  });
+  it('accepts expressions', () => {
+    expect(atMost(3)(exactly`foo`).toString()).toBe('(?:foo){,3}');
+    expect(atMost(3).exactly`foo`.toString()).toBe('(?:foo){,3}');
   });
 });
 

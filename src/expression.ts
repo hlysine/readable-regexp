@@ -1,6 +1,7 @@
 import {
   CanBeNegated,
   CanBeQuantified,
+  LimitFunction,
   LiteralFunction,
   MultiInputFunction,
   NegatedToken,
@@ -169,6 +170,40 @@ class RegexBuilder implements RegexToken {
     return bind(configure, this);
   }
 
+  public get atLeast(): LimitFunction {
+    function configure(this: RegexBuilder, limit: number): LiteralFunction & QuantifierFunction & QuantifiedToken {
+      function func(this: RegexBuilder, ...args: RegexLiteral | [RegexToken]): RegexToken {
+        if (isLiteralArgument(args)) {
+          const literal = getLiteralString(args);
+          return this.addNode(literal);
+        } else if (args[0] instanceof RegexBuilder) {
+          return this.addNode(args[0].regex);
+        } else {
+          throw new Error('Invalid arguments');
+        }
+      }
+      return assign(func, this.addModifier(new RepeatQuantifier(limit, null)));
+    }
+    return bind(configure, this);
+  }
+
+  public get atMost(): LimitFunction {
+    function configure(this: RegexBuilder, limit: number): LiteralFunction & QuantifierFunction & QuantifiedToken {
+      function func(this: RegexBuilder, ...args: RegexLiteral | [RegexToken]): RegexToken {
+        if (isLiteralArgument(args)) {
+          const literal = getLiteralString(args);
+          return this.addNode(literal);
+        } else if (args[0] instanceof RegexBuilder) {
+          return this.addNode(args[0].regex);
+        } else {
+          throw new Error('Invalid arguments');
+        }
+      }
+      return assign(func, this.addModifier(new RepeatQuantifier(null, limit)));
+    }
+    return bind(configure, this);
+  }
+
   public get oneOrMore(): LiteralFunction & QuantifierFunction & QuantifiedToken {
     function func(this: RegexBuilder, ...args: RegexLiteral | [RegexToken]): RegexToken {
       if (isLiteralArgument(args)) {
@@ -240,6 +275,8 @@ export const exactly = new RegexBuilder().exactly;
 export const unicode = new RegexBuilder().unicode;
 export const not = new RegexBuilder().not;
 export const repeat = new RegexBuilder().repeat;
+export const atLeast = new RegexBuilder().atLeast;
+export const atMost = new RegexBuilder().atMost;
 export const oneOrMore = new RegexBuilder().oneOrMore;
 
 export const oneOf = new RegexBuilder().oneOf;
