@@ -1,4 +1,4 @@
-import { negatableTokens, unicodeLiteral } from '../helper';
+import { isBracketGroup, isCharacterGroup, negatableTokens, unicodeLiteral } from '../helper';
 import { RegexModifier } from '../types';
 
 export default class NegationModifier implements RegexModifier {
@@ -18,6 +18,14 @@ export default class NegationModifier implements RegexModifier {
           return `[^${regex}]`;
         } else if (negatableTokens.test(regex)) {
           return regex.toUpperCase();
+        } else if (isCharacterGroup(regex) && !regex.startsWith('[^')) {
+          return `[^${regex.substring(1, regex.length - 1)}]`;
+        } else if (isBracketGroup(regex) && (regex.startsWith('(?=') || regex.startsWith('(?<='))) {
+          if (regex.startsWith('(?=')) {
+            return `(?!${regex.substring(3, regex.length - 1)})`;
+          } else {
+            return `(?<!${regex.substring(4, regex.length - 1)})`;
+          }
         } else {
           throw new Error('The provided token is not negatable: ' + regex);
         }

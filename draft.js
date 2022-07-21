@@ -130,11 +130,11 @@ charIn`a-zA-Z0-9=&`(whitespace)
 charIn('a-zA-Z0-9=&', whitespace)
 charIn('a-zA-Z0-9=&')(whitespace)
 
-charNotIn`a-zA-Z0-9=&`
-charNotIn('a-zA-Z0-9=&')
-charNotIn`a-zA-Z0-9=&`(whitespace)
-charNotIn('a-zA-Z0-9=&', whitespace)
-charNotIn('a-zA-Z0-9=&')(whitespace)
+notCharIn`a-zA-Z0-9=&`
+notCharIn('a-zA-Z0-9=&')
+notCharIn`a-zA-Z0-9=&`(whitespace)
+notCharIn('a-zA-Z0-9=&', whitespace)
+notCharIn('a-zA-Z0-9=&')(whitespace)
 
 oneOf`option1``option2``option3`
 oneOf('option1', 'option2', 'option3')

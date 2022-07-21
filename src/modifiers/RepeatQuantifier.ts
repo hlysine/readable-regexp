@@ -4,8 +4,8 @@ export default class RepeatQuantifier extends QuantityModifier {
   private readonly min: number | null;
   private readonly max: number | null;
 
-  public constructor(min: number | null, max: number | null) {
-    super();
+  public constructor(min: number | null, max: number | null, lazy = false) {
+    super(lazy);
     this.min = min;
     this.max = max;
     if (this.min !== null && this.max !== null && this.min > this.max) {
@@ -30,6 +30,6 @@ export default class RepeatQuantifier extends QuantityModifier {
   }
 
   public clone(): RepeatQuantifier {
-    return new RepeatQuantifier(this.min, this.max);
+    return new RepeatQuantifier(this.min, this.max, this.lazy);
   }
 }

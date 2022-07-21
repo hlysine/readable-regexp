@@ -3,8 +3,8 @@ import QuantityModifier from './QuantityModifier';
 export default class SimpleQuantifier extends QuantityModifier {
   private readonly quantifier: (regex: string) => string;
 
-  public constructor(quantifier: (regex: string) => string) {
-    super();
+  public constructor(quantifier: (regex: string) => string, lazy = false) {
+    super(lazy);
     this.quantifier = quantifier;
   }
 
@@ -13,6 +13,6 @@ export default class SimpleQuantifier extends QuantityModifier {
   }
 
   public clone(): SimpleQuantifier {
-    return new SimpleQuantifier(this.quantifier);
+    return new SimpleQuantifier(this.quantifier, this.lazy);
   }
 }

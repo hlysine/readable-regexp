@@ -6,6 +6,7 @@ import {
   capture,
   captureAs,
   char,
+  charIn,
   digit,
   exactly,
   group,
@@ -13,6 +14,7 @@ import {
   not,
   notAhead,
   notBehind,
+  notCharIn,
   oneOf,
   oneOrMore,
   ref,
@@ -63,7 +65,7 @@ describe('unicode', () => {
   it('can be negated and quantified', () => {
     expect(not.unicode`12ef`.toString()).toBe('[^\\u12ef]');
     expect(oneOrMore.unicode`12ef`.toString()).toBe('\\u12ef+');
-    expect(oneOrMore.not.unicode`12ef`.toString()).toBe('(?:[^\\u12ef])+');
+    expect(oneOrMore.not.unicode`12ef`.toString()).toBe('[^\\u12ef]+');
   });
 });
 
@@ -122,6 +124,14 @@ describe('repeat', () => {
     // @ts-expect-error - repeat is not negatable
     expect(() => not(repeat(3, 5)`foo`).toString()).toThrow();
   });
+  it('supports lazily', () => {
+    expect(repeat(3, 5).lazily`foo`.toString()).toBe('(?:foo){3,5}?');
+    expect(
+      repeat(3, 5)
+        .lazily(exactly`foo`)
+        .toString()
+    ).toBe('(?:foo){3,5}?');
+  });
 });
 
 describe('atLeast', () => {
@@ -148,6 +158,14 @@ describe('atLeast', () => {
     // @ts-expect-error - atLeast is not negatable
     expect(() => not(atLeast(3)`foo`).toString()).toThrow();
   });
+  it('supports lazily', () => {
+    expect(atLeast(3).lazily`foo`.toString()).toBe('(?:foo){3,}?');
+    expect(
+      atLeast(3)
+        .lazily(exactly`foo`)
+        .toString()
+    ).toBe('(?:foo){3,}?');
+  });
 });
 
 describe('atMost', () => {
@@ -173,6 +191,14 @@ describe('atMost', () => {
     expect(() => not.atMost(3)`foo`.toString()).toThrow();
     // @ts-expect-error - atMost is not negatable
     expect(() => not(atMost(3)`foo`).toString()).toThrow();
+  });
+  it('supports lazily', () => {
+    expect(atMost(3).lazily`foo`.toString()).toBe('(?:foo){,3}?');
+    expect(
+      atMost(3)
+        .lazily(exactly`foo`)
+        .toString()
+    ).toBe('(?:foo){,3}?');
   });
 });
 
@@ -204,6 +230,10 @@ describe('maybe', () => {
     // @ts-expect-error - maybe is not negatable
     expect(() => not(maybe`foo`).toString()).toThrow();
   });
+  it('supports lazily', () => {
+    expect(maybe.lazily`foo`.toString()).toBe('(?:foo)??');
+    expect(maybe.lazily(exactly`foo`).toString()).toBe('(?:foo)??');
+  });
 });
 
 describe('zeroOrMore', () => {
@@ -233,6 +263,10 @@ describe('zeroOrMore', () => {
     expect(() => not.zeroOrMore`foo`.toString()).toThrow();
     // @ts-expect-error - zeroOrMore is not negatable
     expect(() => not(zeroOrMore`foo`).toString()).toThrow();
+  });
+  it('supports lazily', () => {
+    expect(zeroOrMore.lazily`foo`.toString()).toBe('(?:foo)*?');
+    expect(zeroOrMore.lazily(exactly`foo`).toString()).toBe('(?:foo)*?');
   });
 });
 
@@ -264,6 +298,18 @@ describe('oneOrMore', () => {
     // @ts-expect-error - oneOrMore is not negatable
     expect(() => not(oneOrMore`foo`).toString()).toThrow();
   });
+  it('supports lazily', () => {
+    expect(oneOrMore.lazily`foo`.toString()).toBe('(?:foo)+?');
+    expect(oneOrMore.lazily(exactly`foo`).toString()).toBe('(?:foo)+?');
+  });
+});
+
+describe('lazily', () => {
+  it('cannot be used alone', () => {
+    expect(maybe.lazily`bar`.toString()).toBe('(?:bar)??');
+    // @ts-expect-error - lazily can only be used with a quantifier
+    expect(() => exactly`foo`.lazily`bar`).toThrow();
+  });
 });
 
 describe('capture', () => {
@@ -284,8 +330,8 @@ describe('capture', () => {
     expect(exactly('foo').capture(exactly('foo')).toString()).toBe('foo(foo)');
   });
   it('can be quantified', () => {
-    expect(oneOrMore.capture`foo`.toString()).toBe('(?:(foo))+');
-    expect(oneOrMore(capture`foo`).toString()).toBe('(?:(foo))+');
+    expect(oneOrMore.capture`foo`.toString()).toBe('(foo)+');
+    expect(oneOrMore(capture`foo`).toString()).toBe('(foo)+');
   });
   it('cannot be negated', () => {
     // @ts-expect-error - capture is not negatable
@@ -326,8 +372,8 @@ describe('captureAs', () => {
     expect(() => captureAs```foo`.toString()).toThrow();
   });
   it('can be quantified', () => {
-    expect(oneOrMore.captureAs`bar``foo`.toString()).toBe('(?:(?<bar>foo))+');
-    expect(oneOrMore(captureAs`bar``foo`).toString()).toBe('(?:(?<bar>foo))+');
+    expect(oneOrMore.captureAs`bar``foo`.toString()).toBe('(?<bar>foo)+');
+    expect(oneOrMore(captureAs`bar``foo`).toString()).toBe('(?<bar>foo)+');
   });
   it('cannot be negated', () => {
     // @ts-expect-error - captureAs is not negatable
@@ -389,8 +435,8 @@ describe('group', () => {
     expect(exactly('foo').group(exactly('foo')).toString()).toBe('foo(?:foo)');
   });
   it('can be quantified', () => {
-    expect(oneOrMore.group`foo`.toString()).toBe('(?:(?:foo))+');
-    expect(oneOrMore(group`foo`).toString()).toBe('(?:(?:foo))+');
+    expect(oneOrMore.group`foo`.toString()).toBe('(?:foo)+');
+    expect(oneOrMore(group`foo`).toString()).toBe('(?:foo)+');
   });
   it('cannot be negated', () => {
     // @ts-expect-error - group is not negatable
@@ -422,11 +468,9 @@ describe('ahead', () => {
     expect(oneOrMore.ahead`foo`.toString()).toBe('(?:(?=foo))+');
     expect(oneOrMore(ahead`foo`).toString()).toBe('(?:(?=foo))+');
   });
-  it('cannot be negated', () => {
-    // @ts-expect-error - ahead is not negatable
-    expect(() => not.ahead`foo`.toString()).toThrow();
-    // @ts-expect-error - ahead is not negatable
-    expect(() => not(ahead`foo`).toString()).toThrow();
+  it('can be negated', () => {
+    expect(not.ahead`foo`.toString()).toBe('(?!foo)');
+    expect(not(ahead`foo`).toString()).toBe('(?!foo)');
   });
 });
 
@@ -452,11 +496,9 @@ describe('behind', () => {
     expect(oneOrMore.behind`foo`.toString()).toBe('(?:(?<=foo))+');
     expect(oneOrMore(behind`foo`).toString()).toBe('(?:(?<=foo))+');
   });
-  it('cannot be negated', () => {
-    // @ts-expect-error - behind is not negatable
-    expect(() => not.behind`foo`.toString()).toThrow();
-    // @ts-expect-error - behind is not negatable
-    expect(() => not(behind`foo`).toString()).toThrow();
+  it('can be negated', () => {
+    expect(not.behind`foo`.toString()).toBe('(?<!foo)');
+    expect(not(behind`foo`).toString()).toBe('(?<!foo)');
   });
 });
 
@@ -532,17 +574,77 @@ describe('oneOf', () => {
   });
   it('is chainable', () => {
     expect(oneOf`foo``bar``baz`.char.toString()).toBe('(?:foo|bar|baz).');
-    expect(oneOrMore.oneOf`foo``bar`(exactly`baz`.char).toString()).toBe('(?:(?:foo|bar|baz.))+');
+    expect(oneOrMore.oneOf`foo``bar`(exactly`baz`.char).toString()).toBe('(?:foo|bar|baz.)+');
   });
   it('can be quantified', () => {
-    expect(oneOrMore.oneOf`foo``bar``baz`.toString()).toBe('(?:(?:foo|bar|baz))+');
-    expect(oneOrMore(oneOf`foo``bar``baz`).toString()).toBe('(?:(?:foo|bar|baz))+');
+    expect(oneOrMore.oneOf`foo``bar``baz`.toString()).toBe('(?:foo|bar|baz)+');
+    expect(oneOrMore(oneOf`foo``bar``baz`).toString()).toBe('(?:foo|bar|baz)+');
   });
   it('cannot be negated', () => {
     // @ts-expect-error - oneOf is not negatable
     expect(() => not.oneOf`foo``bar``baz`.toString()).toThrow();
     // @ts-expect-error - oneOf is not negatable
     expect(() => not(oneOf`foo``bar``baz`).toString()).toThrow();
+  });
+});
+
+describe('charIn', () => {
+  it('accepts plain strings', () => {
+    expect(charIn`abc`.toString()).toBe('[abc]');
+    expect(charIn('abc').toString()).toBe('[abc]');
+  });
+  it('works with multiple values', () => {
+    expect(charIn`abc``A-Z``0-9`.toString()).toBe('[abcA-Z0-9]');
+    expect(charIn('0-9', 'A-Z', exactly`abc`).toString()).toBe('[0-9A-Zabc]');
+    expect(charIn('abc')('def')(exactly`GHI`).toString()).toBe('[abcdefGHI]');
+  });
+  it('escapes properly', () => {
+    expect(charIn`-abc``0-9``def-`.toString()).toBe('[-abc0-9def-]');
+    expect(charIn`0-9``-abc``def-`.toString()).toBe('[0-9\\-abcdef-]');
+    expect(charIn`[]`.toString()).toBe('[[\\]]');
+    expect(charIn`^a[b]`.toString()).toBe('[\\^a[b\\]]');
+  });
+  it('is chainable and quantifiable', () => {
+    expect(charIn`a``b``c`.char.toString()).toBe('[abc].');
+    expect(oneOrMore.charIn`a``b`(exactly`c`.word).toString()).toBe('[abc\\w]+');
+    expect(oneOrMore.charIn`a``b``c`(word).toString()).toBe('[abc\\w]+');
+    expect(oneOrMore.charIn`abc${word}${digit}`.toString()).toBe('[abc\\w\\d]+');
+    expect(oneOrMore.charIn`abc${unicode`0123`}${unicode`fe3d`}`.toString()).toBe('[abc\\u0123\\ufe3d]+');
+  });
+  it('can be negated', () => {
+    expect(not.charIn`abc``A-Z``0-9`.toString()).toBe('[^abcA-Z0-9]');
+    expect(not(charIn`abc``A-Z``0-9`).toString()).toBe('[^abcA-Z0-9]');
+  });
+});
+
+describe('notCharIn', () => {
+  it('accepts plain strings', () => {
+    expect(notCharIn`abc`.toString()).toBe('[^abc]');
+    expect(notCharIn('abc').toString()).toBe('[^abc]');
+  });
+  it('works with multiple values', () => {
+    expect(notCharIn`abc``A-Z``0-9`.toString()).toBe('[^abcA-Z0-9]');
+    expect(notCharIn('0-9', 'A-Z', exactly`abc`).toString()).toBe('[^0-9A-Zabc]');
+    expect(notCharIn('abc')('def')(exactly`GHI`).toString()).toBe('[^abcdefGHI]');
+  });
+  it('escapes properly', () => {
+    expect(notCharIn`-abc``0-9``def-`.toString()).toBe('[^-abc0-9def-]');
+    expect(notCharIn`0-9``-abc``def-`.toString()).toBe('[^0-9\\-abcdef-]');
+    expect(notCharIn`[]`.toString()).toBe('[^[\\]]');
+    expect(notCharIn`^a[b]`.toString()).toBe('[^\\^a[b\\]]');
+  });
+  it('is chainable and quantifiable', () => {
+    expect(notCharIn`a``b``c`.char.toString()).toBe('[^abc].');
+    expect(oneOrMore.notCharIn`a``b`(exactly`c`.word).toString()).toBe('[^abc\\w]+');
+    expect(oneOrMore.notCharIn`a``b``c`(word).toString()).toBe('[^abc\\w]+');
+    expect(oneOrMore.notCharIn`abc${word}${digit}`.toString()).toBe('[^abc\\w\\d]+');
+    expect(oneOrMore.notCharIn`abc${unicode`0123`}${unicode`fe3d`}`.toString()).toBe('[^abc\\u0123\\ufe3d]+');
+  });
+  it('cannot be negated', () => {
+    // @ts-expect-error - notCharIn is not negatable
+    expect(() => not.notCharIn`abc``A-Z``0-9`.toString()).toThrow();
+    // @ts-expect-error - notCharIn is not negatable
+    expect(() => not(notCharIn`abc``A-Z``0-9`).toString()).toThrow();
   });
 });
 

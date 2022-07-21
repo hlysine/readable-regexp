@@ -18,9 +18,9 @@ export interface GroupFunction {
   (node: RegexToken): RegexToken & CanBeQuantified;
 }
 
-export interface MultiInputFunction {
-  (template: TemplateStringsArray, ...args: unknown[]): RegexToken & CanBeQuantified & MultiInputFunction;
-  (...args: (string | RegexToken)[]): RegexToken & CanBeQuantified & MultiInputFunction;
+export interface AlternationFunction {
+  (template: TemplateStringsArray, ...args: unknown[]): RegexToken & CanBeQuantified & AlternationFunction;
+  (...args: (string | RegexToken)[]): RegexToken & CanBeQuantified & AlternationFunction;
 }
 
 export interface NamedCaptureFunction {
@@ -34,6 +34,11 @@ export interface RepeatFunction {
 
 export interface LimitFunction {
   (limit: number): LiteralFunction<CanBeQuantified> & QuantifierFunction & QuantifiedToken;
+}
+
+export interface CharGroupFunction<TOut = unknown> {
+  (template: TemplateStringsArray, ...args: unknown[]): RegexToken & CanBeQuantified & TOut & CharGroupFunction<TOut>;
+  (...args: (string | RegexToken)[]): RegexToken & CanBeQuantified & TOut & CharGroupFunction<TOut>;
 }
 
 export const negatableSymbol = Symbol('negatableToken');
@@ -60,40 +65,46 @@ export interface RegexToken {
   get carriageReturn(): RegexToken & CanBeNegated & CanBeQuantified;
   get tab(): RegexToken & CanBeNegated & CanBeQuantified;
   get nullChar(): RegexToken & CanBeNegated & CanBeQuantified;
-
   get lineStart(): RegexToken & CanBeNegated;
   get lineEnd(): RegexToken & CanBeNegated;
   get wordBoundary(): RegexToken & CanBeNegated;
-
   get exactly(): LiteralFunction<CanBeQuantified> & CanBeQuantified;
   get unicode(): LiteralFunction<CanBeQuantified & CanBeNegated> & CanBeQuantified & CanBeNegated;
+  get charIn(): CharGroupFunction<CanBeNegated> & CanBeQuantified & CanBeNegated;
+  get notCharIn(): CharGroupFunction & CanBeQuantified;
   get not(): TokenFunction<CanBeNegated> & NegatedToken & CanBeQuantified;
+
   get repeat(): RepeatFunction;
   get atLeast(): LimitFunction;
   get atMost(): LimitFunction;
   get maybe(): LiteralFunction<CanBeQuantified> & QuantifierFunction & QuantifiedToken;
   get zeroOrMore(): LiteralFunction<CanBeQuantified> & QuantifierFunction & QuantifiedToken;
   get oneOrMore(): LiteralFunction<CanBeQuantified> & QuantifierFunction & QuantifiedToken;
+
   get capture(): LiteralFunction<CanBeQuantified> & GroupFunction & RegexToken & CanBeQuantified;
   get captureAs(): NamedCaptureFunction & CanBeQuantified;
   get ref(): LiteralFunction<CanBeQuantified> & CanBeQuantified;
   get group(): LiteralFunction<CanBeQuantified> & GroupFunction & RegexToken & CanBeQuantified;
-  get ahead(): LiteralFunction<CanBeQuantified> & GroupFunction & RegexToken;
-  get behind(): LiteralFunction<CanBeQuantified> & GroupFunction & RegexToken;
+  get ahead(): LiteralFunction<CanBeQuantified & CanBeNegated> & GroupFunction & RegexToken & CanBeNegated;
+  get behind(): LiteralFunction<CanBeQuantified & CanBeNegated> & GroupFunction & RegexToken & CanBeNegated;
   get notAhead(): LiteralFunction<CanBeQuantified> & GroupFunction & RegexToken;
   get notBehind(): LiteralFunction<CanBeQuantified> & GroupFunction & RegexToken;
-
-  get oneOf(): MultiInputFunction & CanBeQuantified;
+  get oneOf(): AlternationFunction & CanBeQuantified;
 }
 
 export type QuantifiedNegatedToken = {
   [key in keyof RegexToken as RegexToken[key] extends CanBeQuantified & CanBeNegated ? key : never]: RegexToken[key];
 };
 
-export type QuantifiedToken = {
-  [key in keyof RegexToken as RegexToken[key] extends CanBeQuantified ? key : never]: RegexToken[key];
+export type QuantifiedToken<TExclude extends string = never> = {
+  [key in keyof RegexToken as RegexToken[key] extends CanBeQuantified
+    ? key extends TExclude
+      ? never
+      : key
+    : never]: RegexToken[key];
 } & {
   get not(): TokenFunction<CanBeNegated & CanBeQuantified> & QuantifiedNegatedToken;
+  get lazily(): LiteralFunction<CanBeQuantified> & QuantifierFunction & QuantifiedToken<'lazily'> & CanBeQuantified;
 };
 
 export type NegatedToken = {
