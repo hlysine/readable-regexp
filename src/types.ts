@@ -28,12 +28,12 @@ export interface NamedCaptureFunction {
   (template: TemplateStringsArray, ...args: unknown[]): LiteralFunction<CanBeQuantified> & GroupFunction & RegexToken;
 }
 
-export interface RepeatFunction {
-  (min: number, max?: number): LiteralFunction<CanBeQuantified> & QuantifierFunction & QuantifiedToken;
+export interface RepeatFunction<TExclude extends string = never> {
+  (min: number, max?: number): LiteralFunction<CanBeQuantified> & QuantifierFunction & QuantifiedToken<TExclude>;
 }
 
-export interface LimitFunction {
-  (limit: number): LiteralFunction<CanBeQuantified> & QuantifierFunction & QuantifiedToken;
+export interface LimitFunction<TExclude extends string = never> {
+  (limit: number): LiteralFunction<CanBeQuantified> & QuantifierFunction & QuantifiedToken<TExclude>;
 }
 
 export interface CharGroupFunction<TOut = unknown> {
@@ -75,11 +75,17 @@ export interface RegexToken {
   get not(): TokenFunction<CanBeNegated> & NegatedToken & CanBeQuantified;
 
   get repeat(): RepeatFunction;
+  get repeatLazily(): RepeatFunction<'lazily'>;
   get atLeast(): LimitFunction;
+  get atLeastLazily(): LimitFunction<'lazily'>;
   get atMost(): LimitFunction;
+  get atMostLazily(): LimitFunction<'lazily'>;
   get maybe(): LiteralFunction<CanBeQuantified> & QuantifierFunction & QuantifiedToken;
+  get maybeLazily(): LiteralFunction<CanBeQuantified> & QuantifierFunction & QuantifiedToken<'lazily'>;
   get zeroOrMore(): LiteralFunction<CanBeQuantified> & QuantifierFunction & QuantifiedToken;
+  get zeroOrMoreLazily(): LiteralFunction<CanBeQuantified> & QuantifierFunction & QuantifiedToken<'lazily'>;
   get oneOrMore(): LiteralFunction<CanBeQuantified> & QuantifierFunction & QuantifiedToken;
+  get oneOrMoreLazily(): LiteralFunction<CanBeQuantified> & QuantifierFunction & QuantifiedToken<'lazily'>;
 
   get capture(): LiteralFunction<CanBeQuantified> & GroupFunction & RegexToken & CanBeQuantified;
   get captureAs(): NamedCaptureFunction & CanBeQuantified;
@@ -96,6 +102,11 @@ export type QuantifiedNegatedToken = {
   [key in keyof RegexToken as RegexToken[key] extends CanBeQuantified & CanBeNegated ? key : never]: RegexToken[key];
 };
 
+export interface ExtraQuantifiedToken {
+  get not(): TokenFunction<CanBeNegated & CanBeQuantified> & QuantifiedNegatedToken;
+  get lazily(): LiteralFunction<CanBeQuantified> & QuantifierFunction & QuantifiedToken<'lazily'> & CanBeQuantified;
+}
+
 export type QuantifiedToken<TExclude extends string = never> = {
   [key in keyof RegexToken as RegexToken[key] extends CanBeQuantified
     ? key extends TExclude
@@ -103,8 +114,7 @@ export type QuantifiedToken<TExclude extends string = never> = {
       : key
     : never]: RegexToken[key];
 } & {
-  get not(): TokenFunction<CanBeNegated & CanBeQuantified> & QuantifiedNegatedToken;
-  get lazily(): LiteralFunction<CanBeQuantified> & QuantifierFunction & QuantifiedToken<'lazily'> & CanBeQuantified;
+  [key in keyof ExtraQuantifiedToken as key extends TExclude ? never : key]: ExtraQuantifiedToken[key];
 };
 
 export type NegatedToken = {

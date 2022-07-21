@@ -3,18 +3,14 @@ import {
   CanBeNegated,
   CanBeQuantified,
   CharGroupFunction,
+  ExtraQuantifiedToken,
   GroupFunction,
-  LimitFunction,
   LiteralFunction,
-  NamedCaptureFunction,
-  NegatedToken,
   QuantifiedToken,
   QuantifierFunction,
   RegexLiteral,
   RegexModifier,
   RegexToken,
-  RepeatFunction,
-  TokenFunction,
   negatableSymbol,
   quantifiableSymbol,
 } from './types';
@@ -114,55 +110,55 @@ class RegexBuilder implements RegexToken {
    * ========== Special Tokens ==========
    */
 
-  public get char(): RegexToken & CanBeQuantified {
+  public get char(): RegexToken['char'] {
     return this.addNode('.');
   }
 
-  public get whitespace(): RegexToken & CanBeNegated & CanBeQuantified {
+  public get whitespace(): RegexToken['whitespace'] {
     return this.addNode('\\s');
   }
 
-  public get digit(): RegexToken & CanBeNegated & CanBeQuantified {
+  public get digit(): RegexToken['digit'] {
     return this.addNode('\\d');
   }
 
-  public get word(): RegexToken & CanBeNegated & CanBeQuantified {
+  public get word(): RegexToken['word'] {
     return this.addNode('\\w');
   }
 
-  public get verticalWhitespace(): RegexToken & CanBeNegated & CanBeQuantified {
+  public get verticalWhitespace(): RegexToken['verticalWhitespace'] {
     return this.addNode('\\v');
   }
 
-  public get lineFeed(): RegexToken & CanBeNegated & CanBeQuantified {
+  public get lineFeed(): RegexToken['lineFeed'] {
     return this.addNode('\\n');
   }
 
-  public get carriageReturn(): RegexToken & CanBeNegated & CanBeQuantified {
+  public get carriageReturn(): RegexToken['carriageReturn'] {
     return this.addNode('\\r');
   }
 
-  public get tab(): RegexToken & CanBeNegated & CanBeQuantified {
+  public get tab(): RegexToken['tab'] {
     return this.addNode('\\t');
   }
 
-  public get nullChar(): RegexToken & CanBeNegated & CanBeQuantified {
+  public get nullChar(): RegexToken['nullChar'] {
     return this.addNode('\\0');
   }
 
-  public get lineStart(): RegexToken & CanBeNegated {
+  public get lineStart(): RegexToken['lineStart'] {
     return this.addNode('^');
   }
 
-  public get lineEnd(): RegexToken & CanBeNegated {
+  public get lineEnd(): RegexToken['lineEnd'] {
     return this.addNode('$');
   }
 
-  public get wordBoundary(): RegexToken & CanBeNegated {
+  public get wordBoundary(): RegexToken['wordBoundary'] {
     return this.addNode('\\b');
   }
 
-  public get exactly(): LiteralFunction<CanBeQuantified> & CanBeQuantified {
+  public get exactly(): RegexToken['exactly'] {
     function func(this: RegexBuilder, ...args: RegexLiteral): RegexToken & CanBeQuantified {
       const literal = getLiteralString(args);
       return this.addNode(literal);
@@ -170,7 +166,7 @@ class RegexBuilder implements RegexToken {
     return bind(func, this);
   }
 
-  public get unicode(): LiteralFunction<CanBeQuantified & CanBeNegated> & CanBeQuantified & CanBeNegated {
+  public get unicode(): RegexToken['unicode'] {
     function func(this: RegexBuilder, ...args: RegexLiteral): RegexToken & CanBeQuantified & CanBeNegated {
       const literal = getLiteralString(args);
       if (!unicodeHex.test(literal)) throw new Error('Invalid unicode literal');
@@ -179,7 +175,7 @@ class RegexBuilder implements RegexToken {
     return bind(func, this);
   }
 
-  public get charIn(): CharGroupFunction<CanBeNegated> & CanBeQuantified & CanBeNegated {
+  public get charIn(): RegexToken['charIn'] {
     function func(
       this: RegexBuilder,
       ...args: RegexLiteral | (string | RegexToken)[]
@@ -213,7 +209,7 @@ class RegexBuilder implements RegexToken {
     return bind(func, this.addModifier(new CharacterGroupModifier(false)));
   }
 
-  public get notCharIn(): CharGroupFunction & CanBeQuantified {
+  public get notCharIn(): RegexToken['notCharIn'] {
     function func(
       this: RegexBuilder,
       ...args: RegexLiteral | (string | RegexToken)[]
@@ -247,7 +243,7 @@ class RegexBuilder implements RegexToken {
     return bind(func, this.addModifier(new CharacterGroupModifier(true)));
   }
 
-  public get not(): TokenFunction<CanBeNegated> & NegatedToken & CanBeQuantified {
+  public get not(): RegexToken['not'] {
     function func(this: RegexBuilder, token: RegexToken & CanBeNegated): RegexToken & CanBeQuantified {
       if (RegexBuilder.isRegexBuilder(token)) {
         return this.addNode(token.executeModifiers());
@@ -262,7 +258,7 @@ class RegexBuilder implements RegexToken {
    * ========== Quantifiers ==========
    */
 
-  public get repeat(): RepeatFunction {
+  public get repeat(): RegexToken['repeat'] {
     function configure(
       this: RegexBuilder,
       min: number,
@@ -283,7 +279,18 @@ class RegexBuilder implements RegexToken {
     return bind(configure, this);
   }
 
-  public get atLeast(): LimitFunction {
+  public get repeatLazily(): RegexToken['repeatLazily'] {
+    function configure(
+      this: RegexBuilder,
+      min: number,
+      max?: number
+    ): LiteralFunction<CanBeQuantified> & QuantifierFunction & QuantifiedToken<'lazily'> {
+      return this.repeat(min, max).lazily;
+    }
+    return bind(configure, this);
+  }
+
+  public get atLeast(): RegexToken['atLeast'] {
     function configure(
       this: RegexBuilder,
       limit: number
@@ -303,7 +310,17 @@ class RegexBuilder implements RegexToken {
     return bind(configure, this);
   }
 
-  public get atMost(): LimitFunction {
+  public get atLeastLazily(): RegexToken['atLeastLazily'] {
+    function configure(
+      this: RegexBuilder,
+      limit: number
+    ): LiteralFunction<CanBeQuantified> & QuantifierFunction & QuantifiedToken<'lazily'> {
+      return this.atLeast(limit).lazily;
+    }
+    return bind(configure, this);
+  }
+
+  public get atMost(): RegexToken['atMost'] {
     function configure(
       this: RegexBuilder,
       limit: number
@@ -323,7 +340,17 @@ class RegexBuilder implements RegexToken {
     return bind(configure, this);
   }
 
-  public get maybe(): LiteralFunction<CanBeQuantified> & QuantifierFunction & QuantifiedToken {
+  public get atMostLazily(): RegexToken['atMostLazily'] {
+    function configure(
+      this: RegexBuilder,
+      limit: number
+    ): LiteralFunction<CanBeQuantified> & QuantifierFunction & QuantifiedToken<'lazily'> {
+      return this.atMost(limit).lazily;
+    }
+    return bind(configure, this);
+  }
+
+  public get maybe(): RegexToken['maybe'] {
     function func(this: RegexBuilder, ...args: RegexLiteral | [RegexToken]): RegexToken & CanBeQuantified {
       if (isLiteralArgument(args)) {
         const literal = getLiteralString(args);
@@ -337,7 +364,11 @@ class RegexBuilder implements RegexToken {
     return assign(func, this.addModifier(new SimpleQuantifier(regex => `${regex}?`)));
   }
 
-  public get zeroOrMore(): LiteralFunction<CanBeQuantified> & QuantifierFunction & QuantifiedToken {
+  public get maybeLazily(): RegexToken['maybeLazily'] {
+    return this.maybe.lazily;
+  }
+
+  public get zeroOrMore(): RegexToken['zeroOrMore'] {
     function func(this: RegexBuilder, ...args: RegexLiteral | [RegexToken]): RegexToken & CanBeQuantified {
       if (isLiteralArgument(args)) {
         const literal = getLiteralString(args);
@@ -351,7 +382,11 @@ class RegexBuilder implements RegexToken {
     return assign(func, this.addModifier(new SimpleQuantifier(regex => `${regex}*`)));
   }
 
-  public get oneOrMore(): LiteralFunction<CanBeQuantified> & QuantifierFunction & QuantifiedToken {
+  public get zeroOrMoreLazily(): RegexToken['zeroOrMoreLazily'] {
+    return this.zeroOrMore.lazily;
+  }
+
+  public get oneOrMore(): RegexToken['oneOrMore'] {
     function func(this: RegexBuilder, ...args: RegexLiteral | [RegexToken]): RegexToken & CanBeQuantified {
       if (isLiteralArgument(args)) {
         const literal = getLiteralString(args);
@@ -365,10 +400,11 @@ class RegexBuilder implements RegexToken {
     return assign(func, this.addModifier(new SimpleQuantifier(regex => `${regex}+`)));
   }
 
-  public get lazily(): LiteralFunction<CanBeQuantified> &
-    QuantifierFunction &
-    QuantifiedToken<'lazily'> &
-    CanBeQuantified {
+  public get oneOrMoreLazily(): RegexToken['oneOrMoreLazily'] {
+    return this.oneOrMore.lazily;
+  }
+
+  public get lazily(): ExtraQuantifiedToken['lazily'] {
     function func(this: RegexBuilder, ...args: RegexLiteral | [RegexToken]): RegexToken & CanBeQuantified {
       if (isLiteralArgument(args)) {
         const literal = getLiteralString(args);
@@ -392,7 +428,7 @@ class RegexBuilder implements RegexToken {
    * ========== Groups ==========
    */
 
-  public get capture(): LiteralFunction<CanBeQuantified> & GroupFunction & RegexToken & CanBeQuantified {
+  public get capture(): RegexToken['capture'] {
     function func(this: RegexBuilder, ...args: RegexLiteral | [RegexToken]): RegexToken & CanBeQuantified {
       if (isLiteralArgument(args)) {
         const literal = getLiteralString(args);
@@ -406,7 +442,7 @@ class RegexBuilder implements RegexToken {
     return assign(func, this.addModifier(new CaptureModifier()));
   }
 
-  public get captureAs(): NamedCaptureFunction & CanBeQuantified {
+  public get captureAs(): RegexToken['captureAs'] {
     function configure(
       this: RegexBuilder,
       ...configArgs: RegexLiteral
@@ -435,7 +471,7 @@ class RegexBuilder implements RegexToken {
     return bind(configure, this);
   }
 
-  public get ref(): LiteralFunction<CanBeQuantified> & CanBeQuantified {
+  public get ref(): RegexToken['ref'] {
     function func(this: RegexBuilder, ...args: RegexLiteral): RegexToken & CanBeQuantified {
       const literal = getLiteralString(args);
       if (!captureName.test(literal))
@@ -445,7 +481,7 @@ class RegexBuilder implements RegexToken {
     return bind(func, this);
   }
 
-  public get group(): LiteralFunction<CanBeQuantified> & GroupFunction & RegexToken & CanBeQuantified {
+  public get group(): RegexToken['group'] {
     function func(this: RegexBuilder, ...args: RegexLiteral | [RegexToken]): RegexToken & CanBeQuantified {
       if (isLiteralArgument(args)) {
         const literal = getLiteralString(args);
@@ -459,7 +495,7 @@ class RegexBuilder implements RegexToken {
     return assign(func, this.addModifier(new GroupModifier(GroupType.NonCapture)));
   }
 
-  public get ahead(): LiteralFunction<CanBeQuantified & CanBeNegated> & GroupFunction & RegexToken & CanBeNegated {
+  public get ahead(): RegexToken['ahead'] {
     function func(
       this: RegexBuilder,
       ...args: RegexLiteral | [RegexToken]
@@ -476,7 +512,7 @@ class RegexBuilder implements RegexToken {
     return assign(func, this.addModifier(new GroupModifier(GroupType.PositiveLookahead)));
   }
 
-  public get behind(): LiteralFunction<CanBeQuantified & CanBeNegated> & GroupFunction & RegexToken & CanBeNegated {
+  public get behind(): RegexToken['behind'] {
     function func(
       this: RegexBuilder,
       ...args: RegexLiteral | [RegexToken]
@@ -493,7 +529,7 @@ class RegexBuilder implements RegexToken {
     return assign(func, this.addModifier(new GroupModifier(GroupType.PositiveLookbehind)));
   }
 
-  public get notAhead(): LiteralFunction<CanBeQuantified> & GroupFunction & RegexToken {
+  public get notAhead(): RegexToken['notAhead'] {
     function func(this: RegexBuilder, ...args: RegexLiteral | [RegexToken]): RegexToken & CanBeQuantified {
       if (isLiteralArgument(args)) {
         const literal = getLiteralString(args);
@@ -507,7 +543,7 @@ class RegexBuilder implements RegexToken {
     return assign(func, this.addModifier(new GroupModifier(GroupType.NegativeLookahead)));
   }
 
-  public get notBehind(): LiteralFunction<CanBeQuantified> & GroupFunction & RegexToken {
+  public get notBehind(): RegexToken['notBehind'] {
     function func(this: RegexBuilder, ...args: RegexLiteral | [RegexToken]): RegexToken & CanBeQuantified {
       if (isLiteralArgument(args)) {
         const literal = getLiteralString(args);
@@ -521,7 +557,7 @@ class RegexBuilder implements RegexToken {
     return assign(func, this.addModifier(new GroupModifier(GroupType.NegativeLookbehind)));
   }
 
-  public get oneOf(): AlternationFunction & CanBeQuantified {
+  public get oneOf(): RegexToken['oneOf'] {
     function func(
       this: RegexBuilder,
       ...args: RegexLiteral | (string | RegexToken)[]
@@ -575,11 +611,17 @@ export const notCharIn = new RegexBuilder().notCharIn;
 export const not = new RegexBuilder().not;
 
 export const repeat = new RegexBuilder().repeat;
+export const repeatLazily = new RegexBuilder().repeatLazily;
 export const atLeast = new RegexBuilder().atLeast;
+export const atLeastLazily = new RegexBuilder().atLeastLazily;
 export const atMost = new RegexBuilder().atMost;
+export const atMostLazily = new RegexBuilder().atMostLazily;
 export const maybe = new RegexBuilder().maybe;
+export const maybeLazily = new RegexBuilder().maybeLazily;
 export const zeroOrMore = new RegexBuilder().zeroOrMore;
+export const zeroOrMoreLazily = new RegexBuilder().zeroOrMoreLazily;
 export const oneOrMore = new RegexBuilder().oneOrMore;
+export const oneOrMoreLazily = new RegexBuilder().oneOrMoreLazily;
 
 export const capture = new RegexBuilder().capture;
 export const captureAs = new RegexBuilder().captureAs;

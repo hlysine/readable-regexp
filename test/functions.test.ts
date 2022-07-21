@@ -1,7 +1,9 @@
 import {
   ahead,
   atLeast,
+  atLeastLazily,
   atMost,
+  atMostLazily,
   behind,
   capture,
   captureAs,
@@ -11,18 +13,22 @@ import {
   exactly,
   group,
   maybe,
+  maybeLazily,
   not,
   notAhead,
   notBehind,
   notCharIn,
   oneOf,
   oneOrMore,
+  oneOrMoreLazily,
   ref,
   repeat,
+  repeatLazily,
   unicode,
   whitespace,
   word,
   zeroOrMore,
+  zeroOrMoreLazily,
 } from '../src/index';
 
 describe('exactly', () => {
@@ -131,6 +137,7 @@ describe('repeat', () => {
         .lazily(exactly`foo`)
         .toString()
     ).toBe('(?:foo){3,5}?');
+    expect(repeatLazily(3, 5)`foo`.toString()).toBe('(?:foo){3,5}?');
   });
 });
 
@@ -165,6 +172,7 @@ describe('atLeast', () => {
         .lazily(exactly`foo`)
         .toString()
     ).toBe('(?:foo){3,}?');
+    expect(atLeastLazily(3)`foo`.toString()).toBe('(?:foo){3,}?');
   });
 });
 
@@ -199,6 +207,7 @@ describe('atMost', () => {
         .lazily(exactly`foo`)
         .toString()
     ).toBe('(?:foo){,3}?');
+    expect(atMostLazily(3)`foo`.toString()).toBe('(?:foo){,3}?');
   });
 });
 
@@ -233,6 +242,7 @@ describe('maybe', () => {
   it('supports lazily', () => {
     expect(maybe.lazily`foo`.toString()).toBe('(?:foo)??');
     expect(maybe.lazily(exactly`foo`).toString()).toBe('(?:foo)??');
+    expect(maybeLazily`foo`.toString()).toBe('(?:foo)??');
   });
 });
 
@@ -267,6 +277,7 @@ describe('zeroOrMore', () => {
   it('supports lazily', () => {
     expect(zeroOrMore.lazily`foo`.toString()).toBe('(?:foo)*?');
     expect(zeroOrMore.lazily(exactly`foo`).toString()).toBe('(?:foo)*?');
+    expect(zeroOrMoreLazily`foo`.toString()).toBe('(?:foo)*?');
   });
 });
 
@@ -301,6 +312,7 @@ describe('oneOrMore', () => {
   it('supports lazily', () => {
     expect(oneOrMore.lazily`foo`.toString()).toBe('(?:foo)+?');
     expect(oneOrMore.lazily(exactly`foo`).toString()).toBe('(?:foo)+?');
+    expect(oneOrMoreLazily`foo`.toString()).toBe('(?:foo)+?');
   });
 });
 
@@ -309,6 +321,12 @@ describe('lazily', () => {
     expect(maybe.lazily`bar`.toString()).toBe('(?:bar)??');
     // @ts-expect-error - lazily can only be used with a quantifier
     expect(() => exactly`foo`.lazily`bar`).toThrow();
+  });
+  it('cannot be repeated', () => {
+    // @ts-expect-error - lazily should only be used once
+    expect(repeatLazily(3, 5).lazily`foo`.toString()).toBe('(?:foo){3,5}?');
+    // @ts-expect-error - lazily should only be used once
+    expect(repeat(3, 5).lazily.lazily`foo`.toString()).toBe('(?:foo){3,5}?');
   });
 });
 
