@@ -1,13 +1,21 @@
 import {
+  ahead,
   atLeast,
   atMost,
+  behind,
+  capture,
+  captureAs,
   char,
   digit,
   exactly,
+  group,
   maybe,
   not,
+  notAhead,
+  notBehind,
   oneOf,
   oneOrMore,
+  ref,
   repeat,
   unicode,
   whitespace,
@@ -22,6 +30,16 @@ describe('exactly', () => {
   });
   it('accepts template literals', () => {
     expect(exactly`foo${1}bar${2}`.toString()).toBe('foo1bar2');
+  });
+  it('can be quantified', () => {
+    expect(oneOrMore.exactly`foo`.toString()).toBe('(?:foo)+');
+    expect(oneOrMore(exactly('foo')).toString()).toBe('(?:foo)+');
+  });
+  it('cannot be negated', () => {
+    // @ts-expect-error - repeat is not negatable
+    expect(() => not.exactly`foo`.toString()).toThrow();
+    // @ts-expect-error - repeat is not negatable
+    expect(() => not(exactly('foo')).toString()).toThrow();
   });
 });
 
@@ -59,6 +77,16 @@ describe('not', () => {
     // @ts-expect-error - not(char) is not negatable
     expect(() => not(char)).toThrow();
   });
+  it('can be quantified', () => {
+    expect(oneOrMore.not.word.toString()).toBe('\\W+');
+    expect(oneOrMore(not(word)).toString()).toBe('\\W+');
+  });
+  it('cannot be negated', () => {
+    // @ts-expect-error - repeat is not negatable
+    expect(() => not.not.word.toString()).toThrow();
+    // @ts-expect-error - repeat is not negatable
+    expect(() => not(not(word)).toString()).toThrow();
+  });
 });
 
 describe('repeat', () => {
@@ -80,6 +108,20 @@ describe('repeat', () => {
     expect(repeat(3, 5)(exactly`foo`).toString()).toBe('(?:foo){3,5}');
     expect(repeat(3, 5).exactly`foo`.toString()).toBe('(?:foo){3,5}');
   });
+  it('validates quantifier range', () => {
+    expect(() => repeat(5, 3)`foo`.toString()).toThrow();
+  });
+  it('cannot be quantified in dot syntax', () => {
+    // @ts-expect-error - stacking quantifiers only cause error in dot syntax
+    expect(oneOrMore.repeat(3, 5)`foo`.toString()).toBe('(?:(?:foo){3,5})+');
+    expect(oneOrMore(repeat(3, 5)`foo`).toString()).toBe('(?:(?:foo){3,5})+');
+  });
+  it('cannot be negated', () => {
+    // @ts-expect-error - repeat is not negatable
+    expect(() => not.repeat(3, 5)`foo`.toString()).toThrow();
+    // @ts-expect-error - repeat is not negatable
+    expect(() => not(repeat(3, 5)`foo`).toString()).toThrow();
+  });
 });
 
 describe('atLeast', () => {
@@ -95,6 +137,17 @@ describe('atLeast', () => {
     expect(atLeast(3)(exactly`foo`).toString()).toBe('(?:foo){3,}');
     expect(atLeast(3).exactly`foo`.toString()).toBe('(?:foo){3,}');
   });
+  it('cannot be quantified in dot syntax', () => {
+    // @ts-expect-error - stacking quantifiers only cause error in dot syntax
+    expect(oneOrMore.atLeast(3)`foo`.toString()).toBe('(?:(?:foo){3,})+');
+    expect(oneOrMore(atLeast(3)`foo`).toString()).toBe('(?:(?:foo){3,})+');
+  });
+  it('cannot be negated', () => {
+    // @ts-expect-error - atLeast is not negatable
+    expect(() => not.atLeast(3)`foo`.toString()).toThrow();
+    // @ts-expect-error - atLeast is not negatable
+    expect(() => not(atLeast(3)`foo`).toString()).toThrow();
+  });
 });
 
 describe('atMost', () => {
@@ -109,6 +162,17 @@ describe('atMost', () => {
   it('accepts expressions', () => {
     expect(atMost(3)(exactly`foo`).toString()).toBe('(?:foo){,3}');
     expect(atMost(3).exactly`foo`.toString()).toBe('(?:foo){,3}');
+  });
+  it('cannot be quantified in dot syntax', () => {
+    // @ts-expect-error - stacking quantifiers only cause error in dot syntax
+    expect(oneOrMore.atMost(3)`foo`.toString()).toBe('(?:(?:foo){,3})+');
+    expect(oneOrMore(atMost(3)`foo`).toString()).toBe('(?:(?:foo){,3})+');
+  });
+  it('cannot be negated', () => {
+    // @ts-expect-error - atMost is not negatable
+    expect(() => not.atMost(3)`foo`.toString()).toThrow();
+    // @ts-expect-error - atMost is not negatable
+    expect(() => not(atMost(3)`foo`).toString()).toThrow();
   });
 });
 
@@ -129,6 +193,17 @@ describe('maybe', () => {
     expect(exactly`foo`.maybe.exactly`foo`.toString()).toBe('foo(?:foo)?');
     expect(exactly('foo').maybe(exactly('foo')).toString()).toBe('foo(?:foo)?');
   });
+  it('cannot be quantified in dot syntax', () => {
+    // @ts-expect-error - stacking quantifiers only cause error in dot syntax
+    expect(oneOrMore.maybe`foo`.toString()).toBe('(?:(?:foo)?)+');
+    expect(oneOrMore(maybe`foo`).toString()).toBe('(?:(?:foo)?)+');
+  });
+  it('cannot be negated', () => {
+    // @ts-expect-error - maybe is not negatable
+    expect(() => not.maybe`foo`.toString()).toThrow();
+    // @ts-expect-error - maybe is not negatable
+    expect(() => not(maybe`foo`).toString()).toThrow();
+  });
 });
 
 describe('zeroOrMore', () => {
@@ -147,6 +222,17 @@ describe('zeroOrMore', () => {
   it('is chainable', () => {
     expect(exactly`foo`.zeroOrMore.exactly`foo`.toString()).toBe('foo(?:foo)*');
     expect(exactly('foo').zeroOrMore(exactly('foo')).toString()).toBe('foo(?:foo)*');
+  });
+  it('cannot be quantified in dot syntax', () => {
+    // @ts-expect-error - stacking quantifiers only cause error in dot syntax
+    expect(oneOrMore.zeroOrMore`foo`.toString()).toBe('(?:(?:foo)*)+');
+    expect(oneOrMore(zeroOrMore`foo`).toString()).toBe('(?:(?:foo)*)+');
+  });
+  it('cannot be negated', () => {
+    // @ts-expect-error - zeroOrMore is not negatable
+    expect(() => not.zeroOrMore`foo`.toString()).toThrow();
+    // @ts-expect-error - zeroOrMore is not negatable
+    expect(() => not(zeroOrMore`foo`).toString()).toThrow();
   });
 });
 
@@ -167,6 +253,271 @@ describe('oneOrMore', () => {
     expect(exactly`foo`.oneOrMore.exactly`foo`.toString()).toBe('foo(?:foo)+');
     expect(exactly('foo').oneOrMore(exactly('foo')).toString()).toBe('foo(?:foo)+');
   });
+  it('cannot be quantified in dot syntax', () => {
+    // @ts-expect-error - stacking quantifiers only cause error in dot syntax
+    expect(oneOrMore.oneOrMore`foo`.toString()).toBe('(?:(?:foo)+)+');
+    expect(oneOrMore(oneOrMore`foo`).toString()).toBe('(?:(?:foo)+)+');
+  });
+  it('cannot be negated', () => {
+    // @ts-expect-error - oneOrMore is not negatable
+    expect(() => not.oneOrMore`foo`.toString()).toThrow();
+    // @ts-expect-error - oneOrMore is not negatable
+    expect(() => not(oneOrMore`foo`).toString()).toThrow();
+  });
+});
+
+describe('capture', () => {
+  it('accepts plain strings', () => {
+    expect(capture`foo`.toString()).toBe('(foo)');
+    expect(capture('foo').toString()).toBe('(foo)');
+  });
+  it('accepts special tokens', () => {
+    expect(capture(char).toString()).toBe('(.)');
+    expect(capture.char.toString()).toBe('(.)');
+  });
+  it('accepts expressions', () => {
+    expect(capture(exactly`foo`).toString()).toBe('(foo)');
+    expect(capture.exactly`foo`.toString()).toBe('(foo)');
+  });
+  it('is chainable', () => {
+    expect(exactly`foo`.capture.exactly`foo`.toString()).toBe('foo(foo)');
+    expect(exactly('foo').capture(exactly('foo')).toString()).toBe('foo(foo)');
+  });
+  it('can be quantified', () => {
+    expect(oneOrMore.capture`foo`.toString()).toBe('(?:(foo))+');
+    expect(oneOrMore(capture`foo`).toString()).toBe('(?:(foo))+');
+  });
+  it('cannot be negated', () => {
+    // @ts-expect-error - capture is not negatable
+    expect(() => not.capture`foo`.toString()).toThrow();
+    // @ts-expect-error - capture is not negatable
+    expect(() => not(capture`foo`).toString()).toThrow();
+  });
+});
+
+describe('captureAs', () => {
+  it('accepts plain strings', () => {
+    expect(captureAs`bar``foo`.toString()).toBe('(?<bar>foo)');
+    expect(captureAs`bar`('foo').toString()).toBe('(?<bar>foo)');
+    expect(captureAs('bar')`foo`.toString()).toBe('(?<bar>foo)');
+    expect(captureAs('bar')('foo').toString()).toBe('(?<bar>foo)');
+  });
+  it('accepts special tokens', () => {
+    expect(captureAs`bar`(char).toString()).toBe('(?<bar>.)');
+    expect(captureAs`bar`.char.toString()).toBe('(?<bar>.)');
+    expect(captureAs('bar')(char).toString()).toBe('(?<bar>.)');
+    expect(captureAs('bar').char.toString()).toBe('(?<bar>.)');
+  });
+  it('accepts expressions', () => {
+    expect(captureAs`bar`(exactly`foo`).toString()).toBe('(?<bar>foo)');
+    expect(captureAs`bar`.exactly`foo`.toString()).toBe('(?<bar>foo)');
+    expect(captureAs('bar')(exactly`foo`).toString()).toBe('(?<bar>foo)');
+    expect(captureAs('bar').exactly`foo`.toString()).toBe('(?<bar>foo)');
+  });
+  it('is chainable', () => {
+    expect(exactly`foo`.captureAs`bar`.exactly`foo`.toString()).toBe('foo(?<bar>foo)');
+    expect(exactly('foo').captureAs`bar`(exactly('foo')).toString()).toBe('foo(?<bar>foo)');
+  });
+  it('validates correctly', () => {
+    expect(captureAs`bar``foo`.toString()).toBe('(?<bar>foo)');
+    expect(captureAs`Bar_123``foo`.toString()).toBe('(?<Bar_123>foo)');
+    expect(captureAs`_bAR123``foo`.toString()).toBe('(?<_bAR123>foo)');
+    expect(() => captureAs`123bar``foo`.toString()).toThrow();
+    expect(() => captureAs```foo`.toString()).toThrow();
+  });
+  it('can be quantified', () => {
+    expect(oneOrMore.captureAs`bar``foo`.toString()).toBe('(?:(?<bar>foo))+');
+    expect(oneOrMore(captureAs`bar``foo`).toString()).toBe('(?:(?<bar>foo))+');
+  });
+  it('cannot be negated', () => {
+    // @ts-expect-error - captureAs is not negatable
+    expect(() => not.captureAs`bar``foo`.toString()).toThrow();
+    // @ts-expect-error - captureAs is not negatable
+    expect(() => not(captureAs`bar``foo`).toString()).toThrow();
+  });
+});
+
+describe('ref', () => {
+  it('accepts literals', () => {
+    expect(ref`bar`).toHaveProperty('regex', '\\k<bar>');
+    expect(ref('bar')).toHaveProperty('regex', '\\k<bar>');
+  });
+  it('accepts template literals', () => {
+    expect(ref`e${1}f${2}`.captureAs`e${1}f${2}``foo`.toString()).toBe('\\k<e1f2>(?<e1f2>foo)');
+  });
+  it('validates correctly', () => {
+    expect(ref`Foo`).toHaveProperty('regex', '\\k<Foo>');
+    expect(ref`foo_123`).toHaveProperty('regex', '\\k<foo_123>');
+    expect(ref`_foo123_`).toHaveProperty('regex', '\\k<_foo123_>');
+    expect(() => ref``).toThrow();
+    expect(() => ref`123`).toThrow();
+    expect(() => ref`123ef`).toThrow();
+  });
+  it('validates references', () => {
+    expect(ref`bar`.captureAs`bar``foo`.toString()).toBe('\\k<bar>(?<bar>foo)');
+    expect(() => ref`baz`.toString()).toThrow();
+    expect(() => ref`baz`.captureAs`bar``foo`.toString()).toThrow();
+    expect(() => ref`bar`.ref`baz`.captureAs`bar``foo`.toString()).toThrow();
+  });
+  it('can be quantified', () => {
+    expect(oneOrMore.ref`bar`).toHaveProperty('regex', '(?:\\k<bar>)+');
+    expect(oneOrMore(ref`bar`)).toHaveProperty('regex', '(?:\\k<bar>)+');
+  });
+  it('cannot be negated', () => {
+    // @ts-expect-error - ref is not negatable
+    expect(() => not.ref`foo`).toThrow();
+    // @ts-expect-error - ref is not negatable
+    expect(() => not(ref`foo`)).toThrow();
+  });
+});
+
+describe('group', () => {
+  it('accepts plain strings', () => {
+    expect(group`foo`.toString()).toBe('(?:foo)');
+    expect(group('foo').toString()).toBe('(?:foo)');
+  });
+  it('accepts special tokens', () => {
+    expect(group(char).toString()).toBe('(?:.)');
+    expect(group.char.toString()).toBe('(?:.)');
+  });
+  it('accepts expressions', () => {
+    expect(group(exactly`foo`).toString()).toBe('(?:foo)');
+    expect(group.exactly`foo`.toString()).toBe('(?:foo)');
+  });
+  it('is chainable', () => {
+    expect(exactly`foo`.group.exactly`foo`.toString()).toBe('foo(?:foo)');
+    expect(exactly('foo').group(exactly('foo')).toString()).toBe('foo(?:foo)');
+  });
+  it('can be quantified', () => {
+    expect(oneOrMore.group`foo`.toString()).toBe('(?:(?:foo))+');
+    expect(oneOrMore(group`foo`).toString()).toBe('(?:(?:foo))+');
+  });
+  it('cannot be negated', () => {
+    // @ts-expect-error - group is not negatable
+    expect(() => not.group`foo`.toString()).toThrow();
+    // @ts-expect-error - group is not negatable
+    expect(() => not(group`foo`).toString()).toThrow();
+  });
+});
+
+describe('ahead', () => {
+  it('accepts plain strings', () => {
+    expect(ahead`foo`.toString()).toBe('(?=foo)');
+    expect(ahead('foo').toString()).toBe('(?=foo)');
+  });
+  it('accepts special tokens', () => {
+    expect(ahead(char).toString()).toBe('(?=.)');
+    expect(ahead.char.toString()).toBe('(?=.)');
+  });
+  it('accepts expressions', () => {
+    expect(ahead(exactly`foo`).toString()).toBe('(?=foo)');
+    expect(ahead.exactly`foo`.toString()).toBe('(?=foo)');
+  });
+  it('is chainable', () => {
+    expect(exactly`foo`.ahead.exactly`foo`.toString()).toBe('foo(?=foo)');
+    expect(exactly('foo').ahead(exactly('foo')).toString()).toBe('foo(?=foo)');
+  });
+  it('can be quantified', () => {
+    // @ts-expect-error - lookarounds are not quantifiable by themselves
+    expect(oneOrMore.ahead`foo`.toString()).toBe('(?:(?=foo))+');
+    expect(oneOrMore(ahead`foo`).toString()).toBe('(?:(?=foo))+');
+  });
+  it('cannot be negated', () => {
+    // @ts-expect-error - ahead is not negatable
+    expect(() => not.ahead`foo`.toString()).toThrow();
+    // @ts-expect-error - ahead is not negatable
+    expect(() => not(ahead`foo`).toString()).toThrow();
+  });
+});
+
+describe('behind', () => {
+  it('accepts plain strings', () => {
+    expect(behind`foo`.toString()).toBe('(?<=foo)');
+    expect(behind('foo').toString()).toBe('(?<=foo)');
+  });
+  it('accepts special tokens', () => {
+    expect(behind(char).toString()).toBe('(?<=.)');
+    expect(behind.char.toString()).toBe('(?<=.)');
+  });
+  it('accepts expressions', () => {
+    expect(behind(exactly`foo`).toString()).toBe('(?<=foo)');
+    expect(behind.exactly`foo`.toString()).toBe('(?<=foo)');
+  });
+  it('is chainable', () => {
+    expect(exactly`foo`.behind.exactly`foo`.toString()).toBe('foo(?<=foo)');
+    expect(exactly('foo').behind(exactly('foo')).toString()).toBe('foo(?<=foo)');
+  });
+  it('can be quantified', () => {
+    // @ts-expect-error - lookarounds are not quantifiable by themselves
+    expect(oneOrMore.behind`foo`.toString()).toBe('(?:(?<=foo))+');
+    expect(oneOrMore(behind`foo`).toString()).toBe('(?:(?<=foo))+');
+  });
+  it('cannot be negated', () => {
+    // @ts-expect-error - behind is not negatable
+    expect(() => not.behind`foo`.toString()).toThrow();
+    // @ts-expect-error - behind is not negatable
+    expect(() => not(behind`foo`).toString()).toThrow();
+  });
+});
+
+describe('notAhead', () => {
+  it('accepts plain strings', () => {
+    expect(notAhead`foo`.toString()).toBe('(?!foo)');
+    expect(notAhead('foo').toString()).toBe('(?!foo)');
+  });
+  it('accepts special tokens', () => {
+    expect(notAhead(char).toString()).toBe('(?!.)');
+    expect(notAhead.char.toString()).toBe('(?!.)');
+  });
+  it('accepts expressions', () => {
+    expect(notAhead(exactly`foo`).toString()).toBe('(?!foo)');
+    expect(notAhead.exactly`foo`.toString()).toBe('(?!foo)');
+  });
+  it('is chainable', () => {
+    expect(exactly`foo`.notAhead.exactly`foo`.toString()).toBe('foo(?!foo)');
+    expect(exactly('foo').notAhead(exactly('foo')).toString()).toBe('foo(?!foo)');
+  });
+  it('can be quantified', () => {
+    // @ts-expect-error - lookarounds are not quantifiable by themselves
+    expect(oneOrMore.notAhead`foo`.toString()).toBe('(?:(?!foo))+');
+    expect(oneOrMore(notAhead`foo`).toString()).toBe('(?:(?!foo))+');
+  });
+  it('cannot be negated', () => {
+    // @ts-expect-error - notAhead is not negatable
+    expect(() => not.notAhead`foo`.toString()).toThrow();
+    // @ts-expect-error - notAhead is not negatable
+    expect(() => not(notAhead`foo`).toString()).toThrow();
+  });
+});
+
+describe('notBehind', () => {
+  it('accepts plain strings', () => {
+    expect(notBehind`foo`.toString()).toBe('(?<!foo)');
+    expect(notBehind('foo').toString()).toBe('(?<!foo)');
+  });
+  it('accepts special tokens', () => {
+    expect(notBehind(char).toString()).toBe('(?<!.)');
+    expect(notBehind.char.toString()).toBe('(?<!.)');
+  });
+  it('accepts expressions', () => {
+    expect(notBehind(exactly`foo`).toString()).toBe('(?<!foo)');
+    expect(notBehind.exactly`foo`.toString()).toBe('(?<!foo)');
+  });
+  it('is chainable', () => {
+    expect(exactly`foo`.notBehind.exactly`foo`.toString()).toBe('foo(?<!foo)');
+    expect(exactly('foo').notBehind(exactly('foo')).toString()).toBe('foo(?<!foo)');
+  });
+  it('can be quantified', () => {
+    // @ts-expect-error - lookarounds are not quantifiable by themselves
+    expect(oneOrMore.notBehind`foo`.toString()).toBe('(?:(?<!foo))+');
+    expect(oneOrMore(notBehind`foo`).toString()).toBe('(?:(?<!foo))+');
+  });
+  it('cannot be negated', () => {
+    // @ts-expect-error - notBehind is not negatable
+    expect(() => not.notBehind`foo`.toString()).toThrow();
+    // @ts-expect-error - notBehind is not negatable
+    expect(() => not(notBehind`foo`).toString()).toThrow();
+  });
 });
 
 describe('oneOf', () => {
@@ -183,11 +534,22 @@ describe('oneOf', () => {
     expect(oneOf`foo``bar``baz`.char.toString()).toBe('(?:foo|bar|baz).');
     expect(oneOrMore.oneOf`foo``bar`(exactly`baz`.char).toString()).toBe('(?:(?:foo|bar|baz.))+');
   });
+  it('can be quantified', () => {
+    expect(oneOrMore.oneOf`foo``bar``baz`.toString()).toBe('(?:(?:foo|bar|baz))+');
+    expect(oneOrMore(oneOf`foo``bar``baz`).toString()).toBe('(?:(?:foo|bar|baz))+');
+  });
+  it('cannot be negated', () => {
+    // @ts-expect-error - oneOf is not negatable
+    expect(() => not.oneOf`foo``bar``baz`.toString()).toThrow();
+    // @ts-expect-error - oneOf is not negatable
+    expect(() => not(oneOf`foo``bar``baz`).toString()).toThrow();
+  });
 });
 
 describe('quantifiers', () => {
   it('stacks properly', () => {
-    // @ts-expect-error - stacking quantifiers only throws in dot syntax because the two quantifiers always have the same scope, and is thus redundant
+    // @ts-expect-error - stacking quantifiers only cause error in dot syntax
+    // because the two quantifiers always have the same scope, and is thus redundant
     expect(zeroOrMore.oneOrMore.exactly`foo`.toString()).toBe('(?:(?:foo)+)*');
     expect(zeroOrMore(oneOrMore(exactly`foo`)).toString()).toBe('(?:(?:foo)+)*');
     expect(zeroOrMore(digit.oneOrMore(exactly`foo`)).toString()).toBe('(?:\\d(?:foo)+)*');

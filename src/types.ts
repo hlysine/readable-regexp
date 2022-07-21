@@ -14,9 +14,18 @@ export interface QuantifierFunction {
   (node: RegexToken & CanBeQuantified): RegexToken & CanBeQuantified;
 }
 
+export interface GroupFunction {
+  (node: RegexToken): RegexToken & CanBeQuantified;
+}
+
 export interface MultiInputFunction {
   (template: TemplateStringsArray, ...args: unknown[]): RegexToken & CanBeQuantified & MultiInputFunction;
   (...args: (string | RegexToken)[]): RegexToken & CanBeQuantified & MultiInputFunction;
+}
+
+export interface NamedCaptureFunction {
+  (name: string): LiteralFunction<CanBeQuantified> & GroupFunction & RegexToken;
+  (template: TemplateStringsArray, ...args: unknown[]): LiteralFunction<CanBeQuantified> & GroupFunction & RegexToken;
 }
 
 export interface RepeatFunction {
@@ -65,6 +74,14 @@ export interface RegexToken {
   get maybe(): LiteralFunction<CanBeQuantified> & QuantifierFunction & QuantifiedToken;
   get zeroOrMore(): LiteralFunction<CanBeQuantified> & QuantifierFunction & QuantifiedToken;
   get oneOrMore(): LiteralFunction<CanBeQuantified> & QuantifierFunction & QuantifiedToken;
+  get capture(): LiteralFunction<CanBeQuantified> & GroupFunction & RegexToken & CanBeQuantified;
+  get captureAs(): NamedCaptureFunction & CanBeQuantified;
+  get ref(): LiteralFunction<CanBeQuantified> & CanBeQuantified;
+  get group(): LiteralFunction<CanBeQuantified> & GroupFunction & RegexToken & CanBeQuantified;
+  get ahead(): LiteralFunction<CanBeQuantified> & GroupFunction & RegexToken;
+  get behind(): LiteralFunction<CanBeQuantified> & GroupFunction & RegexToken;
+  get notAhead(): LiteralFunction<CanBeQuantified> & GroupFunction & RegexToken;
+  get notBehind(): LiteralFunction<CanBeQuantified> & GroupFunction & RegexToken;
 
   get oneOf(): MultiInputFunction & CanBeQuantified;
 }

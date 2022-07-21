@@ -8,6 +8,9 @@ export default class RepeatQuantifier extends QuantityModifier {
     super();
     this.min = min;
     this.max = max;
+    if (this.min !== null && this.max !== null && this.min > this.max) {
+      throw new Error('Quantifier range is out of order');
+    }
   }
 
   protected quantify(regex: string): string {

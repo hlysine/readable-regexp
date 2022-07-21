@@ -1,5 +1,5 @@
+import { negatableTokens, unicodeLiteral } from '../helper';
 import { RegexModifier } from '../types';
-import { unicodeLiteral } from '../helper';
 
 export default class NegationModifier implements RegexModifier {
   public modify(regex: string): string {
@@ -16,7 +16,7 @@ export default class NegationModifier implements RegexModifier {
       default:
         if (unicodeLiteral.test(regex)) {
           return `[^${regex}]`;
-        } else if (regex.length === 2 && regex.startsWith('\\')) {
+        } else if (negatableTokens.test(regex)) {
           return regex.toUpperCase();
         } else {
           throw new Error('The provided token is not negatable: ' + regex);

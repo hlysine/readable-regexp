@@ -61,3 +61,7 @@ export function getAllPropertyNames(target: unknown): string[] {
 export const unicodeHex = /^[0-9a-fA-F]{4}$/;
 
 export const unicodeLiteral = /^\\u[0-9a-fA-F]{4}$/;
+
+export const captureName = /^[a-zA-Z_][a-zA-Z0-9_]*$/;
+
+export const negatableTokens = /^\\[sdwb]$/;
