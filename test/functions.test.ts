@@ -49,6 +49,14 @@ describe('exactly', () => {
     // @ts-expect-error - repeat is not negatable
     expect(() => not(exactly('foo')).toString()).toThrow();
   });
+  it('throws for invalid argument', () => {
+    // @ts-expect-error - testing invalid arguments
+    expect(() => exactly(1)).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => exactly()).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => exactly('a', 'b')).toThrow();
+  });
 });
 
 describe('unicode', () => {
@@ -73,6 +81,14 @@ describe('unicode', () => {
     expect(oneOrMore.unicode`12ef`.toString()).toBe('\\u12ef+');
     expect(oneOrMore.not.unicode`12ef`.toString()).toBe('[^\\u12ef]+');
   });
+  it('throws for invalid argument', () => {
+    // @ts-expect-error - testing invalid arguments
+    expect(() => unicode(1)).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => unicode()).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => unicode('a', 'b')).toThrow();
+  });
 });
 
 describe('not', () => {
@@ -94,6 +110,16 @@ describe('not', () => {
     expect(() => not.not.word.toString()).toThrow();
     // @ts-expect-error - repeat is not negatable
     expect(() => not(not(word)).toString()).toThrow();
+  });
+  it('throws for invalid argument', () => {
+    // @ts-expect-error - testing invalid arguments
+    expect(() => not('abc')).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => not(1)).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => not()).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => not('a', 'b')).toThrow();
   });
 });
 
@@ -139,6 +165,20 @@ describe('repeat', () => {
     ).toBe('(?:foo){3,5}?');
     expect(repeatLazily(3, 5)`foo`.toString()).toBe('(?:foo){3,5}?');
   });
+  it('throws for invalid argument', () => {
+    // @ts-expect-error - testing invalid arguments
+    expect(() => repeat()).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => repeat('1')).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => repeat('a', 'b')).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => repeat(3, 5)()).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => repeat(3, 5)(1)).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => repeat(3, 5)('a', 'b')).toThrow();
+  });
 });
 
 describe('atLeast', () => {
@@ -173,6 +213,20 @@ describe('atLeast', () => {
         .toString()
     ).toBe('(?:foo){3,}?');
     expect(atLeastLazily(3)`foo`.toString()).toBe('(?:foo){3,}?');
+  });
+  it('throws for invalid argument', () => {
+    // @ts-expect-error - testing invalid arguments
+    expect(() => atLeast()).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => atLeast('1')).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => atLeast('a', 'b')).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => atLeast(3)()).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => atLeast(3)(1)).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => atLeast(3)('a', 'b')).toThrow();
   });
 });
 
@@ -209,6 +263,20 @@ describe('atMost', () => {
     ).toBe('(?:foo){,3}?');
     expect(atMostLazily(3)`foo`.toString()).toBe('(?:foo){,3}?');
   });
+  it('throws for invalid argument', () => {
+    // @ts-expect-error - testing invalid arguments
+    expect(() => atMost()).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => atMost('1')).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => atMost('a', 'b')).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => atMost(3)()).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => atMost(3)(1)).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => atMost(3)('a', 'b')).toThrow();
+  });
 });
 
 describe('maybe', () => {
@@ -243,6 +311,14 @@ describe('maybe', () => {
     expect(maybe.lazily`foo`.toString()).toBe('(?:foo)??');
     expect(maybe.lazily(exactly`foo`).toString()).toBe('(?:foo)??');
     expect(maybeLazily`foo`.toString()).toBe('(?:foo)??');
+  });
+  it('throws for invalid argument', () => {
+    // @ts-expect-error - testing invalid arguments
+    expect(() => maybe()).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => maybe(1)).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => maybe('a', 'b')).toThrow();
   });
 });
 
@@ -279,6 +355,14 @@ describe('zeroOrMore', () => {
     expect(zeroOrMore.lazily(exactly`foo`).toString()).toBe('(?:foo)*?');
     expect(zeroOrMoreLazily`foo`.toString()).toBe('(?:foo)*?');
   });
+  it('throws for invalid argument', () => {
+    // @ts-expect-error - testing invalid arguments
+    expect(() => zeroOrMore()).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => zeroOrMore(1)).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => zeroOrMore('a', 'b')).toThrow();
+  });
 });
 
 describe('oneOrMore', () => {
@@ -314,6 +398,14 @@ describe('oneOrMore', () => {
     expect(oneOrMore.lazily(exactly`foo`).toString()).toBe('(?:foo)+?');
     expect(oneOrMoreLazily`foo`.toString()).toBe('(?:foo)+?');
   });
+  it('throws for invalid argument', () => {
+    // @ts-expect-error - testing invalid arguments
+    expect(() => oneOrMore()).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => oneOrMore(1)).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => oneOrMore('a', 'b')).toThrow();
+  });
 });
 
 describe('lazily', () => {
@@ -327,6 +419,14 @@ describe('lazily', () => {
     expect(repeatLazily(3, 5).lazily`foo`.toString()).toBe('(?:foo){3,5}?');
     // @ts-expect-error - lazily should only be used once
     expect(repeat(3, 5).lazily.lazily`foo`.toString()).toBe('(?:foo){3,5}?');
+  });
+  it('throws for invalid argument', () => {
+    // @ts-expect-error - testing invalid arguments
+    expect(() => oneOrMore.lazily()).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => oneOrMore.lazily(1)).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => oneOrMore.lazily('a', 'b')).toThrow();
   });
 });
 
@@ -356,6 +456,13 @@ describe('capture', () => {
     expect(() => not.capture`foo`.toString()).toThrow();
     // @ts-expect-error - capture is not negatable
     expect(() => not(capture`foo`).toString()).toThrow();
+  });
+  it('throws for invalid argument', () => {
+    expect(capture().toString()).toBe('()');
+    // @ts-expect-error - testing invalid arguments
+    expect(() => capture(1)).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => capture('a', 'b')).toThrow();
   });
 });
 
@@ -399,12 +506,29 @@ describe('captureAs', () => {
     // @ts-expect-error - captureAs is not negatable
     expect(() => not(captureAs`bar``foo`).toString()).toThrow();
   });
+  it('throws for invalid argument', () => {
+    // @ts-expect-error - testing invalid arguments
+    expect(() => captureAs()).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => captureAs(1)).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => captureAs('a', 'b')).toThrow();
+
+    expect(captureAs`foo`().toString()).toBe('(?<foo>)');
+    // @ts-expect-error - testing invalid arguments
+    expect(() => captureAs`foo`(1)).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => captureAs`foo`('a', 'b')).toThrow();
+  });
 });
 
 describe('ref', () => {
   it('accepts literals', () => {
     expect(ref`bar`).toHaveProperty('regex', '\\k<bar>');
     expect(ref('bar')).toHaveProperty('regex', '\\k<bar>');
+  });
+  it('accepts numbers', () => {
+    expect(ref(1)).toHaveProperty('regex', '\\1');
   });
   it('accepts template literals', () => {
     expect(ref`e${1}f${2}`.captureAs`e${1}f${2}``foo`.toString()).toBe('\\k<e1f2>(?<e1f2>foo)');
@@ -413,25 +537,40 @@ describe('ref', () => {
     expect(ref`Foo`).toHaveProperty('regex', '\\k<Foo>');
     expect(ref`foo_123`).toHaveProperty('regex', '\\k<foo_123>');
     expect(ref`_foo123_`).toHaveProperty('regex', '\\k<_foo123_>');
+    expect(ref(10)).toHaveProperty('regex', '\\10');
     expect(() => ref``).toThrow();
     expect(() => ref`123`).toThrow();
     expect(() => ref`123ef`).toThrow();
+    expect(() => ref(-1)).toThrow();
+    expect(() => ref(0)).toThrow();
   });
   it('validates references', () => {
     expect(ref`bar`.captureAs`bar``foo`.toString()).toBe('\\k<bar>(?<bar>foo)');
+    expect(ref(2).capture`foo`.capture`foo2`.toString()).toBe('\\2(foo)(foo2)');
+    expect(ref(2).captureAs`bar``foo`.captureAs`bar2``foo2`.toString()).toBe('\\2(?<bar>foo)(?<bar2>foo2)');
     expect(() => ref`baz`.toString()).toThrow();
     expect(() => ref`baz`.captureAs`bar``foo`.toString()).toThrow();
     expect(() => ref`bar`.ref`baz`.captureAs`bar``foo`.toString()).toThrow();
+    expect(() => ref(2).captureAs`bar``foo`.toString()).toThrow();
+    expect(() => ref(2).capture`foo`.toString()).toThrow();
   });
   it('can be quantified', () => {
     expect(oneOrMore.ref`bar`).toHaveProperty('regex', '(?:\\k<bar>)+');
     expect(oneOrMore(ref`bar`)).toHaveProperty('regex', '(?:\\k<bar>)+');
+    expect(oneOrMore.ref(1)).toHaveProperty('regex', '\\1+');
+    expect(oneOrMore(ref(12))).toHaveProperty('regex', '(?:\\12)+');
   });
   it('cannot be negated', () => {
     // @ts-expect-error - ref is not negatable
     expect(() => not.ref`foo`).toThrow();
     // @ts-expect-error - ref is not negatable
     expect(() => not(ref`foo`)).toThrow();
+  });
+  it('throws for invalid argument', () => {
+    // @ts-expect-error - testing invalid arguments
+    expect(() => ref()).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => ref('a', 'b')).toThrow();
   });
 });
 
@@ -462,6 +601,13 @@ describe('group', () => {
     // @ts-expect-error - group is not negatable
     expect(() => not(group`foo`).toString()).toThrow();
   });
+  it('throws for invalid argument', () => {
+    expect(group().toString()).toBe('(?:)');
+    // @ts-expect-error - testing invalid arguments
+    expect(() => group(1)).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => group('a', 'b')).toThrow();
+  });
 });
 
 describe('ahead', () => {
@@ -490,6 +636,13 @@ describe('ahead', () => {
     expect(not.ahead`foo`.toString()).toBe('(?!foo)');
     expect(not(ahead`foo`).toString()).toBe('(?!foo)');
   });
+  it('throws for invalid argument', () => {
+    expect(ahead().toString()).toBe('(?=)');
+    // @ts-expect-error - testing invalid arguments
+    expect(() => ahead(1)).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => ahead('a', 'b')).toThrow();
+  });
 });
 
 describe('behind', () => {
@@ -517,6 +670,13 @@ describe('behind', () => {
   it('can be negated', () => {
     expect(not.behind`foo`.toString()).toBe('(?<!foo)');
     expect(not(behind`foo`).toString()).toBe('(?<!foo)');
+  });
+  it('throws for invalid argument', () => {
+    expect(behind().toString()).toBe('(?<=)');
+    // @ts-expect-error - testing invalid arguments
+    expect(() => behind(1)).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => behind('a', 'b')).toThrow();
   });
 });
 
@@ -548,6 +708,13 @@ describe('notAhead', () => {
     // @ts-expect-error - notAhead is not negatable
     expect(() => not(notAhead`foo`).toString()).toThrow();
   });
+  it('throws for invalid argument', () => {
+    expect(notAhead().toString()).toBe('(?!)');
+    // @ts-expect-error - testing invalid arguments
+    expect(() => notAhead(1)).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => notAhead('a', 'b')).toThrow();
+  });
 });
 
 describe('notBehind', () => {
@@ -578,6 +745,13 @@ describe('notBehind', () => {
     // @ts-expect-error - notBehind is not negatable
     expect(() => not(notBehind`foo`).toString()).toThrow();
   });
+  it('throws for invalid argument', () => {
+    expect(notBehind().toString()).toBe('(?<!)');
+    // @ts-expect-error - testing invalid arguments
+    expect(() => notBehind(1)).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => notBehind('a', 'b')).toThrow();
+  });
 });
 
 describe('oneOf', () => {
@@ -603,6 +777,14 @@ describe('oneOf', () => {
     expect(() => not.oneOf`foo``bar``baz`.toString()).toThrow();
     // @ts-expect-error - oneOf is not negatable
     expect(() => not(oneOf`foo``bar``baz`).toString()).toThrow();
+  });
+  it('throws for invalid argument', () => {
+    expect(oneOf().toString()).toBe('(?:)');
+    expect(oneOf``.toString()).toBe('(?:)');
+    // @ts-expect-error - testing invalid arguments
+    expect(() => oneOf(1)).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => oneOf('a', 1, 12)).toThrow();
   });
 });
 
@@ -632,6 +814,14 @@ describe('charIn', () => {
   it('can be negated', () => {
     expect(not.charIn`abc``A-Z``0-9`.toString()).toBe('[^abcA-Z0-9]');
     expect(not(charIn`abc``A-Z``0-9`).toString()).toBe('[^abcA-Z0-9]');
+  });
+  it('throws for invalid argument', () => {
+    expect(charIn().toString()).toBe('[]');
+    expect(charIn``.toString()).toBe('[]');
+    // @ts-expect-error - testing invalid arguments
+    expect(() => charIn(1)).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => charIn('a', 1, 12)).toThrow();
   });
 });
 
@@ -663,6 +853,14 @@ describe('notCharIn', () => {
     expect(() => not.notCharIn`abc``A-Z``0-9`.toString()).toThrow();
     // @ts-expect-error - notCharIn is not negatable
     expect(() => not(notCharIn`abc``A-Z``0-9`).toString()).toThrow();
+  });
+  it('throws for invalid argument', () => {
+    expect(notCharIn().toString()).toBe('[^]');
+    expect(notCharIn``.toString()).toBe('[^]');
+    // @ts-expect-error - testing invalid arguments
+    expect(() => notCharIn(1)).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => notCharIn('a', 1, 12)).toThrow();
   });
 });
 

@@ -22,12 +22,12 @@ export default abstract class QuantityModifier implements RegexModifier {
     this.lazy = lazy;
   }
 
-  public modify(regex: string): string {
+  public modify(regex: string): [string, string?] {
     if (NOT_QUANTIFIABLE.has(regex)) {
       throw new Error('The provided token is not quantifiable');
     }
     // todo: only wrap in group if necessary
-    return this.quantify(wrapIfNeeded(regex)) + (this.lazy ? '?' : '');
+    return [this.quantify(wrapIfNeeded(regex)) + (this.lazy ? '?' : '')];
   }
 
   protected abstract quantify(regex: string): string;

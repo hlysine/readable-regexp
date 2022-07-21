@@ -27,12 +27,17 @@ import SimpleQuantifier from './modifiers/SimpleQuantifier';
 class RegexBuilder implements RegexToken {
   public readonly regex: string;
   public readonly modifiers: RegexModifier[];
-  public readonly backreferences: string[];
-  public readonly namedGroups: string[];
+  public readonly backreferences: (string | number)[];
+  public readonly namedGroups: (string | number)[];
   public readonly [negatableSymbol]: undefined;
   public readonly [quantifiableSymbol]: undefined;
 
-  public constructor(regex?: string, modifiers?: RegexModifier[], backreferences?: string[], namedGroups?: string[]) {
+  public constructor(
+    regex?: string,
+    modifiers?: RegexModifier[],
+    backreferences?: (string | number)[],
+    namedGroups?: (string | number)[]
+  ) {
     this.regex = regex ?? '';
     this.modifiers = modifiers ?? [];
     this.backreferences = backreferences ?? [];
@@ -40,7 +45,11 @@ class RegexBuilder implements RegexToken {
   }
 
   public toString(): string {
-    const invalidRefs = this.backreferences.filter(r => !this.namedGroups.includes(r));
+    const indexedGroups = this.namedGroups.filter(r => typeof r === 'number').length;
+    const invalidRefs = this.backreferences.filter(r => {
+      if (typeof r === 'number') return r > indexedGroups;
+      else return !this.namedGroups.includes(r);
+    });
     if (invalidRefs.length > 0) {
       throw new Error('The following backreferences are not defined: ' + invalidRefs.join(', '));
     }
@@ -64,7 +73,18 @@ class RegexBuilder implements RegexToken {
 
   public executeModifiers(regex?: string): string {
     if (this.modifiers.length === 0) return this.regex + (regex ?? '');
-    return this.regex + this.modifiers.reduce((r, modifier) => modifier.modify(r), regex ?? '');
+    return (
+      this.regex +
+      this.modifiers
+        .reduce(
+          (r, modifier) => {
+            const [processed, trailing] = modifier.modify(r[0]);
+            return [processed, (trailing ?? '') + r[1]];
+          },
+          [regex ?? '', '']
+        )
+        .join('')
+    );
   }
 
   public addNode(node: string, modifyBuilder?: (regex: RegexBuilder) => void): RegexBuilder {
@@ -160,6 +180,7 @@ class RegexBuilder implements RegexToken {
 
   public get exactly(): RegexToken['exactly'] {
     function func(this: RegexBuilder, ...args: RegexLiteral): RegexToken & CanBeQuantified {
+      if (!isLiteralArgument(args)) throw new Error('Invalid arguments for exactly');
       const literal = getLiteralString(args);
       return this.addNode(literal);
     }
@@ -210,37 +231,7 @@ class RegexBuilder implements RegexToken {
   }
 
   public get notCharIn(): RegexToken['notCharIn'] {
-    function func(
-      this: RegexBuilder,
-      ...args: RegexLiteral | (string | RegexToken)[]
-    ): RegexToken & CanBeQuantified & CharGroupFunction {
-      if (!(this.modifiers[0] instanceof CharacterGroupModifier))
-        throw new Error(`Unexpected modifier, expected CharacterGroupModifier, but got ${this.modifiers[0]}`);
-      if (isLiteralArgument(args)) {
-        const literal = getLiteralString(args);
-        return assign(
-          func,
-          this.mutateModifier(modifier => (modifier as CharacterGroupModifier).add(literal))
-        );
-      } else {
-        return assign(
-          func,
-          this.mutateModifier(modifier => {
-            const mod = modifier as CharacterGroupModifier;
-            args.forEach(arg => {
-              if (RegexBuilder.isRegexBuilder(arg)) {
-                mod.add(arg.executeModifiers());
-              } else if (typeof arg === 'string') {
-                mod.add(arg);
-              } else {
-                throw new Error('Invalid arguments for notCharIn');
-              }
-            });
-          })
-        );
-      }
-    }
-    return bind(func, this.addModifier(new CharacterGroupModifier(true)));
+    return this.not.charIn;
   }
 
   public get not(): RegexToken['not'] {
@@ -429,8 +420,10 @@ class RegexBuilder implements RegexToken {
    */
 
   public get capture(): RegexToken['capture'] {
-    function func(this: RegexBuilder, ...args: RegexLiteral | [RegexToken]): RegexToken & CanBeQuantified {
-      if (isLiteralArgument(args)) {
+    function func(this: RegexBuilder, ...args: RegexLiteral | [RegexToken?]): RegexToken & CanBeQuantified {
+      if (args.length === 0) {
+        return this.addNode('');
+      } else if (isLiteralArgument(args)) {
         const literal = getLiteralString(args);
         return this.addNode(literal);
       } else if (RegexBuilder.isRegexBuilder(args[0])) {
@@ -439,7 +432,10 @@ class RegexBuilder implements RegexToken {
         throw new Error('Invalid arguments for capture');
       }
     }
-    return assign(func, this.addModifier(new CaptureModifier()));
+    return assign(
+      func,
+      this.addModifier(new CaptureModifier(), builder => builder.namedGroups.push(0))
+    );
   }
 
   public get captureAs(): RegexToken['captureAs'] {
@@ -453,8 +449,10 @@ class RegexBuilder implements RegexToken {
       const name = getLiteralString(configArgs);
       if (!captureName.test(name))
         throw new Error('Invalid capture name. It must be alpha numeric and must not begin with a digit');
-      function func(this: RegexBuilder, ...args: RegexLiteral | [RegexToken]): RegexToken & CanBeQuantified {
-        if (isLiteralArgument(args)) {
+      function func(this: RegexBuilder, ...args: RegexLiteral | [RegexToken?]): RegexToken & CanBeQuantified {
+        if (args.length === 0) {
+          return this.addNode('');
+        } else if (isLiteralArgument(args)) {
           const literal = getLiteralString(args);
           return this.addNode(literal);
         } else if (RegexBuilder.isRegexBuilder(args[0])) {
@@ -465,25 +463,35 @@ class RegexBuilder implements RegexToken {
       }
       return assign(
         func,
-        this.addModifier(new CaptureModifier(name), builder => builder.namedGroups.push(name))
+        this.addModifier(new CaptureModifier(name), builder => builder.namedGroups.push(name, 0))
       );
     }
     return bind(configure, this);
   }
 
   public get ref(): RegexToken['ref'] {
-    function func(this: RegexBuilder, ...args: RegexLiteral): RegexToken & CanBeQuantified {
-      const literal = getLiteralString(args);
-      if (!captureName.test(literal))
-        throw new Error('Invalid capture name. It must be alpha numeric and must not begin with a digit');
-      return this.addNode(`\\k<${literal}>`, builder => builder.backreferences.push(literal));
+    function func(this: RegexBuilder, ...args: RegexLiteral | [number]): RegexToken & CanBeQuantified {
+      if (args.length === 1 && typeof args[0] === 'number') {
+        const index = args[0];
+        if (index <= 0) throw new Error('Invalid group index in ref');
+        return this.addNode(`\\${args[0]}`, builder => builder.backreferences.push(index));
+      } else if (isLiteralArgument(args)) {
+        const literal = getLiteralString(args);
+        if (!captureName.test(literal))
+          throw new Error('Invalid capture name. It must be alpha numeric and must not begin with a digit');
+        return this.addNode(`\\k<${literal}>`, builder => builder.backreferences.push(literal));
+      } else {
+        throw new Error('Invalid arguments for ref');
+      }
     }
     return bind(func, this);
   }
 
   public get group(): RegexToken['group'] {
-    function func(this: RegexBuilder, ...args: RegexLiteral | [RegexToken]): RegexToken & CanBeQuantified {
-      if (isLiteralArgument(args)) {
+    function func(this: RegexBuilder, ...args: RegexLiteral | [RegexToken?]): RegexToken & CanBeQuantified {
+      if (args.length === 0) {
+        return this.addNode('');
+      } else if (isLiteralArgument(args)) {
         const literal = getLiteralString(args);
         return this.addNode(literal);
       } else if (RegexBuilder.isRegexBuilder(args[0])) {
@@ -498,9 +506,11 @@ class RegexBuilder implements RegexToken {
   public get ahead(): RegexToken['ahead'] {
     function func(
       this: RegexBuilder,
-      ...args: RegexLiteral | [RegexToken]
+      ...args: RegexLiteral | [RegexToken?]
     ): RegexToken & CanBeQuantified & CanBeNegated {
-      if (isLiteralArgument(args)) {
+      if (args.length === 0) {
+        return this.addNode('');
+      } else if (isLiteralArgument(args)) {
         const literal = getLiteralString(args);
         return this.addNode(literal);
       } else if (RegexBuilder.isRegexBuilder(args[0])) {
@@ -515,9 +525,11 @@ class RegexBuilder implements RegexToken {
   public get behind(): RegexToken['behind'] {
     function func(
       this: RegexBuilder,
-      ...args: RegexLiteral | [RegexToken]
+      ...args: RegexLiteral | [RegexToken?]
     ): RegexToken & CanBeQuantified & CanBeNegated {
-      if (isLiteralArgument(args)) {
+      if (args.length === 0) {
+        return this.addNode('');
+      } else if (isLiteralArgument(args)) {
         const literal = getLiteralString(args);
         return this.addNode(literal);
       } else if (RegexBuilder.isRegexBuilder(args[0])) {
@@ -530,31 +542,11 @@ class RegexBuilder implements RegexToken {
   }
 
   public get notAhead(): RegexToken['notAhead'] {
-    function func(this: RegexBuilder, ...args: RegexLiteral | [RegexToken]): RegexToken & CanBeQuantified {
-      if (isLiteralArgument(args)) {
-        const literal = getLiteralString(args);
-        return this.addNode(literal);
-      } else if (RegexBuilder.isRegexBuilder(args[0])) {
-        return this.addNode(args[0].executeModifiers());
-      } else {
-        throw new Error('Invalid arguments for group');
-      }
-    }
-    return assign(func, this.addModifier(new GroupModifier(GroupType.NegativeLookahead)));
+    return this.not.ahead;
   }
 
   public get notBehind(): RegexToken['notBehind'] {
-    function func(this: RegexBuilder, ...args: RegexLiteral | [RegexToken]): RegexToken & CanBeQuantified {
-      if (isLiteralArgument(args)) {
-        const literal = getLiteralString(args);
-        return this.addNode(literal);
-      } else if (RegexBuilder.isRegexBuilder(args[0])) {
-        return this.addNode(args[0].executeModifiers());
-      } else {
-        throw new Error('Invalid arguments for group');
-      }
-    }
-    return assign(func, this.addModifier(new GroupModifier(GroupType.NegativeLookbehind)));
+    return this.not.behind;
   }
 
   public get oneOf(): RegexToken['oneOf'] {

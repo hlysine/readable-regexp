@@ -8,8 +8,16 @@ export default class RepeatQuantifier extends QuantityModifier {
     super(lazy);
     this.min = min;
     this.max = max;
+    if (min !== null && typeof min !== 'number') {
+      throw new Error('min is invalid');
+    }
+    if (max !== null && typeof max !== 'number') {
+      throw new Error('max is invalid');
+    }
     if (this.min !== null && this.max !== null && this.min > this.max) {
       throw new Error('Quantifier range is out of order');
+    } else if (this.min === null && this.max === null) {
+      throw new Error('No min or max provided for RepeatQuantifier');
     }
   }
 

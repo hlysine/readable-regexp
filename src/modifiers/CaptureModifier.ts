@@ -7,9 +7,9 @@ export default class CaptureModifier implements RegexModifier {
     this.name = name;
   }
 
-  public modify(regex: string): string {
-    if (this.name === undefined) return `(${regex})`;
-    return `(?<${this.name}>${regex})`;
+  public modify(regex: string): [string, string?] {
+    if (this.name === undefined) return [`(${regex})`];
+    return [`(?<${this.name}>${regex})`];
   }
 
   public clone(): CaptureModifier {

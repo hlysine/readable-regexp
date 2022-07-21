@@ -15,18 +15,18 @@ export default class GroupModifier implements RegexModifier {
     this.groupType = groupType;
   }
 
-  public modify(regex: string): string {
+  public modify(regex: string): [string, string?] {
     switch (this.groupType) {
       case GroupType.NonCapture:
-        return `(?:${regex})`;
+        return [`(?:${regex})`];
       case GroupType.PositiveLookahead:
-        return `(?=${regex})`;
+        return [`(?=${regex})`];
       case GroupType.NegativeLookahead:
-        return `(?!${regex})`;
+        return [`(?!${regex})`];
       case GroupType.PositiveLookbehind:
-        return `(?<=${regex})`;
+        return [`(?<=${regex})`];
       case GroupType.NegativeLookbehind:
-        return `(?<!${regex})`;
+        return [`(?<!${regex})`];
       default:
         throw new Error('Unknown group type: ' + this.groupType);
     }

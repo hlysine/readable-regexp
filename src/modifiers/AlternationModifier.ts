@@ -7,9 +7,9 @@ export default class AlternationModifier implements RegexModifier {
     this.options.push(option);
   }
 
-  public modify(regex: string): string {
-    if (this.options.length === 0) throw new Error('No options provided for oneOf');
-    return `(?:${this.options.join('|')})${regex}`;
+  public modify(regex: string): [string, string] {
+    if (this.options.length === 0) return ['(?:)', regex];
+    return [`(?:${this.options.join('|')})`, regex];
   }
 
   public clone(): AlternationModifier {

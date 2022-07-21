@@ -35,9 +35,10 @@ export default class CharacterGroupModifier implements RegexModifier {
     this.options.push(option);
   }
 
-  public modify(regex: string): string {
-    if (this.options.length === 0)
-      throw new Error('No options provided for ' + (this.negative ? 'charNotIn' : 'charIn'));
+  public modify(regex: string): [string, string?] {
+    if (this.options.length === 0) {
+      return [this.negative ? '[^]' : '[]', regex];
+    }
     let combined = this.options.map(escapeForCharGroup).join('');
     if (combined.startsWith('\\-')) {
       combined = '-' + combined.substring(2);
@@ -45,7 +46,7 @@ export default class CharacterGroupModifier implements RegexModifier {
     if (combined.endsWith('\\-')) {
       combined = combined.substring(0, combined.length - 2) + '-';
     }
-    return `[${this.negative ? '^' : ''}${combined}]${regex}`;
+    return [`[${this.negative ? '^' : ''}${combined}]`, regex];
   }
 
   public clone(): CharacterGroupModifier {

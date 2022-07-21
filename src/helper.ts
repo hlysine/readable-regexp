@@ -31,7 +31,7 @@ export function isLiteralArgument(args: unknown[]): args is RegexLiteral {
  */
 export function getLiteralString(args: RegexLiteral): string {
   if (args.length === 1) {
-    return String(args[0]);
+    return String(args[0]); // also handles the case when the argument is a template string with one string
   } else {
     return (args[0] as TemplateStringsArray).map((text, i) => (i > 0 ? args[i] : '') + text).join('');
   }
@@ -68,24 +68,6 @@ export function assign<T extends Function, U>(target: T, source: U): T & U {
   } while ((source = Object.getPrototypeOf(source)) && source !== Object.prototype);
 
   return target as T & U;
-}
-
-/**
- * Get all property names of an object, including those in the prototype chain of the object.
- * @param target The object to get the property names of.
- * @returns An array of property names.
- */
-export function getAllPropertyNames<T>(target: T): (keyof T)[] {
-  const props: string[] = [];
-  do {
-    Object.getOwnPropertyNames(target).forEach(prop => {
-      if (!props.includes(prop)) {
-        props.push(prop);
-      }
-    });
-  } while ((target = Object.getPrototypeOf(target)));
-
-  return props as (keyof T)[];
 }
 
 export function isCharacterGroup(regex: string): boolean {

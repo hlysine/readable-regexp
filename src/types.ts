@@ -5,6 +5,10 @@ export interface LiteralFunction<TOut = unknown> {
   (template: TemplateStringsArray, ...args: unknown[]): RegexToken & TOut;
 }
 
+export interface NumberFunction<TOut = unknown> {
+  (num: number): RegexToken & TOut;
+}
+
 export interface TokenFunction<TTags = unknown> {
   (node: RegexToken & CanBeQuantified & TTags): RegexToken & CanBeQuantified;
   (node: RegexToken & TTags): RegexToken;
@@ -15,7 +19,7 @@ export interface QuantifierFunction {
 }
 
 export interface GroupFunction {
-  (node: RegexToken): RegexToken & CanBeQuantified;
+  (node?: RegexToken): RegexToken & CanBeQuantified;
 }
 
 export interface AlternationFunction {
@@ -89,7 +93,7 @@ export interface RegexToken {
 
   get capture(): LiteralFunction<CanBeQuantified> & GroupFunction & RegexToken & CanBeQuantified;
   get captureAs(): NamedCaptureFunction & CanBeQuantified;
-  get ref(): LiteralFunction<CanBeQuantified> & CanBeQuantified;
+  get ref(): LiteralFunction<CanBeQuantified> & NumberFunction<CanBeQuantified> & CanBeQuantified;
   get group(): LiteralFunction<CanBeQuantified> & GroupFunction & RegexToken & CanBeQuantified;
   get ahead(): LiteralFunction<CanBeQuantified & CanBeNegated> & GroupFunction & RegexToken & CanBeNegated;
   get behind(): LiteralFunction<CanBeQuantified & CanBeNegated> & GroupFunction & RegexToken & CanBeNegated;
@@ -122,6 +126,11 @@ export type NegatedToken = {
 };
 
 export interface RegexModifier {
-  modify(regex: string): string;
+  /**
+   * Process a regex token.
+   * Returns a tuple where the first element is passed to the next modifier,
+   * and the second element finishes processing and is appended to the end.
+   */
+  modify(regex: string): [string, string?];
   clone(): RegexModifier;
 }
