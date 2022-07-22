@@ -1,7 +1,7 @@
 name: CI
 on: [push]
 jobs:
-  build:
+  check:
     name: Build, lint, and test on Node ${{ matrix.node }} and ${{ matrix.os }}
 
     runs-on: ${{ matrix.os }}
@@ -30,3 +30,20 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      - name: Coveralls Parallel
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          flag-name: run-${{ matrix.node }}-${{ matrix.os }}
+          parallel: true
+
+  finish:
+    needs: check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Coveralls Finished
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          parallel-finished: true
