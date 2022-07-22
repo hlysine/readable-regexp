@@ -880,7 +880,7 @@ describe('integration test', () => {
     const ip = repeat(1, 3)(digit).repeat(3)(exactly`.`.repeat(1, 3)(digit));
     const regex = oneOf(exactly`http`.maybe`s`)`smtp``ftp`.exactly`://`.oneOf(domain, ip);
 
-    expect(regex.toString()).toBe('(?:https?|smtp|ftp)://(?:\\w+(?:.\\w+)+|\\d{1,3}(?:.\\d{1,3}){3})');
+    expect(regex.toString()).toBe('(?:https?|smtp|ftp)://(?:\\w+(?:\\.\\w+)+|\\d{1,3}(?:\\.\\d{1,3}){3})');
 
     const regexObj = regex.toRegExp();
     expect(regexObj.test('http://example.com')).toBe(true);

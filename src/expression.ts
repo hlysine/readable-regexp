@@ -189,7 +189,7 @@ class RegexBuilder implements RegexToken {
 
   public get unicode(): RegexToken['unicode'] {
     function func(this: RegexBuilder, ...args: RegexLiteral): RegexToken & CanBeQuantified & CanBeNegated {
-      const literal = getLiteralString(args);
+      const literal = getLiteralString(args, false);
       if (!unicodeHex.test(literal)) throw new Error('Invalid unicode literal');
       return this.addNode(`\\u${literal}`);
     }
@@ -204,7 +204,7 @@ class RegexBuilder implements RegexToken {
       if (!(this.modifiers[0] instanceof CharacterGroupModifier))
         throw new Error(`Unexpected modifier, expected CharacterGroupModifier, but got ${this.modifiers[0]}`);
       if (isLiteralArgument(args)) {
-        const literal = getLiteralString(args);
+        const literal = getLiteralString(args, false);
         return assign(
           func,
           this.mutateModifier(modifier => (modifier as CharacterGroupModifier).add(literal))
@@ -476,7 +476,7 @@ class RegexBuilder implements RegexToken {
         if (index <= 0) throw new Error('Invalid group index in ref');
         return this.addNode(`\\${args[0]}`, builder => builder.backreferences.push(index));
       } else if (isLiteralArgument(args)) {
-        const literal = getLiteralString(args);
+        const literal = getLiteralString(args, false);
         if (!captureName.test(literal))
           throw new Error('Invalid capture name. It must be alpha numeric and must not begin with a digit');
         return this.addNode(`\\k<${literal}>`, builder => builder.backreferences.push(literal));
@@ -584,43 +584,45 @@ class RegexBuilder implements RegexToken {
   }
 }
 
-export const char = new RegexBuilder().char;
-export const whitespace = new RegexBuilder().whitespace;
-export const digit = new RegexBuilder().digit;
-export const word = new RegexBuilder().word;
-export const verticalWhitespace = new RegexBuilder().verticalWhitespace;
-export const lineFeed = new RegexBuilder().lineFeed;
-export const carriageReturn = new RegexBuilder().carriageReturn;
-export const tab = new RegexBuilder().tab;
-export const nullChar = new RegexBuilder().nullChar;
-export const lineStart = new RegexBuilder().lineStart;
-export const lineEnd = new RegexBuilder().lineEnd;
-export const wordBoundary = new RegexBuilder().wordBoundary;
-export const exactly = new RegexBuilder().exactly;
-export const unicode = new RegexBuilder().unicode;
-export const charIn = new RegexBuilder().charIn;
-export const notCharIn = new RegexBuilder().notCharIn;
-export const not = new RegexBuilder().not;
+const root = new RegexBuilder();
 
-export const repeat = new RegexBuilder().repeat;
-export const repeatLazily = new RegexBuilder().repeatLazily;
-export const atLeast = new RegexBuilder().atLeast;
-export const atLeastLazily = new RegexBuilder().atLeastLazily;
-export const atMost = new RegexBuilder().atMost;
-export const atMostLazily = new RegexBuilder().atMostLazily;
-export const maybe = new RegexBuilder().maybe;
-export const maybeLazily = new RegexBuilder().maybeLazily;
-export const zeroOrMore = new RegexBuilder().zeroOrMore;
-export const zeroOrMoreLazily = new RegexBuilder().zeroOrMoreLazily;
-export const oneOrMore = new RegexBuilder().oneOrMore;
-export const oneOrMoreLazily = new RegexBuilder().oneOrMoreLazily;
+export const char = root.char;
+export const whitespace = root.whitespace;
+export const digit = root.digit;
+export const word = root.word;
+export const verticalWhitespace = root.verticalWhitespace;
+export const lineFeed = root.lineFeed;
+export const carriageReturn = root.carriageReturn;
+export const tab = root.tab;
+export const nullChar = root.nullChar;
+export const lineStart = root.lineStart;
+export const lineEnd = root.lineEnd;
+export const wordBoundary = root.wordBoundary;
+export const exactly = root.exactly;
+export const unicode = root.unicode;
+export const charIn = root.charIn;
+export const notCharIn = root.notCharIn;
+export const not = root.not;
 
-export const capture = new RegexBuilder().capture;
-export const captureAs = new RegexBuilder().captureAs;
-export const ref = new RegexBuilder().ref;
-export const group = new RegexBuilder().group;
-export const ahead = new RegexBuilder().ahead;
-export const behind = new RegexBuilder().behind;
-export const notAhead = new RegexBuilder().notAhead;
-export const notBehind = new RegexBuilder().notBehind;
-export const oneOf = new RegexBuilder().oneOf;
+export const repeat = root.repeat;
+export const repeatLazily = root.repeatLazily;
+export const atLeast = root.atLeast;
+export const atLeastLazily = root.atLeastLazily;
+export const atMost = root.atMost;
+export const atMostLazily = root.atMostLazily;
+export const maybe = root.maybe;
+export const maybeLazily = root.maybeLazily;
+export const zeroOrMore = root.zeroOrMore;
+export const zeroOrMoreLazily = root.zeroOrMoreLazily;
+export const oneOrMore = root.oneOrMore;
+export const oneOrMoreLazily = root.oneOrMoreLazily;
+
+export const capture = root.capture;
+export const captureAs = root.captureAs;
+export const ref = root.ref;
+export const group = root.group;
+export const ahead = root.ahead;
+export const behind = root.behind;
+export const notAhead = root.notAhead;
+export const notBehind = root.notBehind;
+export const oneOf = root.oneOf;

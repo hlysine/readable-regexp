@@ -27,14 +27,17 @@ export function isLiteralArgument(args: unknown[]): args is RegexLiteral {
 /**
  * Get the literal string from a string or template string array.
  * @param args Arguments passed to the function, either a string or a template string.
+ * @param escape Whether to escape the string.
  * @returns The literal string.
  */
-export function getLiteralString(args: RegexLiteral): string {
+export function getLiteralString(args: RegexLiteral, escape = true): string {
+  let ret: string;
   if (args.length === 1) {
-    return String(args[0]); // also handles the case when the argument is a template string with one string
+    ret = String(args[0]); // also handles the case when the argument is a template string with one string
   } else {
-    return (args[0] as TemplateStringsArray).map((text, i) => (i > 0 ? args[i] : '') + text).join('');
+    ret = (args[0] as TemplateStringsArray).map((text, i) => (i > 0 ? args[i] : '') + text).join('');
   }
+  return escape ? escapeRegex(ret) : ret;
 }
 
 /**
@@ -120,6 +123,10 @@ export function isBracketGroup(regex: string): boolean {
   }
 
   return false;
+}
+
+export function escapeRegex(text: string): string {
+  return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
 }
 
 export const unicodeHex = /^[0-9a-fA-F]{4}$/;
