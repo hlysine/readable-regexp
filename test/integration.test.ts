@@ -1,6 +1,16 @@
-import { captureAs, exactly, lineStart, oneOrMore, word } from '../src/index';
+import { capture, captureAs, exactly, lineStart, match, oneOrMore, word, zeroOrMore } from '../src/index';
 
 describe('integration test', () => {
+  it('parse point', () => {
+    const num = capture.oneOf(oneOrMore.digit, zeroOrMore.digit.exactly`.`.oneOrMore.digit);
+    const regex = match(num).exactly`,`.maybe` `.match(num);
+
+    expect(regex.toString()).toBe('(\\d+|\\d*\\.\\d+)\\,\\ ?(\\d+|\\d*\\.\\d+)');
+
+    const regexObj = regex.toRegExp();
+    expect(regexObj.test('12.4, .56')).toBe(true);
+    expect(regexObj.test('12., 4.')).toBe(false);
+  });
   it('validates URLs', () => {
     const protocol = captureAs`protocol`.oneOf(exactly`http`.maybe`s`)`smtp``ftp`;
     const domain = captureAs`domain`(oneOrMore.charIn(word, '-').oneOrMore(exactly`.`.oneOrMore.charIn(word, '-')));
