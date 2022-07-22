@@ -12,6 +12,8 @@ import {
   digit,
   exactly,
   group,
+  lineStart,
+  match,
   maybe,
   maybeLazily,
   not,
@@ -553,11 +555,43 @@ describe('ref', () => {
     expect(ref`bar`.captureAs`bar``foo`.toString()).toBe('\\k<bar>(?<bar>foo)');
     expect(ref(2).capture`foo`.capture`foo2`.toString()).toBe('\\2(foo)(foo2)');
     expect(ref(2).captureAs`bar``foo`.captureAs`bar2``foo2`.toString()).toBe('\\2(?<bar>foo)(?<bar2>foo2)');
+    expect(
+      ref(2)
+        .match(captureAs`bar``foo`.captureAs`bar2``foo2`)
+        .toString()
+    ).toBe('\\2(?<bar>foo)(?<bar2>foo2)');
+    expect(
+      ref(2)
+        .oneOf(captureAs`bar``foo`, captureAs`bar2``foo2`)
+        .toString()
+    ).toBe('\\2(?:(?<bar>foo)|(?<bar2>foo2))');
+    expect(
+      ref(2)
+        .ahead(captureAs`bar``foo`.captureAs`bar2``foo2`)
+        .toString()
+    ).toBe('\\2(?=(?<bar>foo)(?<bar2>foo2))');
+    expect(captureAs`bar``foo`.ahead(ref(1)).toString()).toBe('(?<bar>foo)(?=\\1)');
     expect(() => ref`baz`.toString()).toThrow();
     expect(() => ref`baz`.captureAs`bar``foo`.toString()).toThrow();
     expect(() => ref`bar`.ref`baz`.captureAs`bar``foo`.toString()).toThrow();
     expect(() => ref(2).captureAs`bar``foo`.toString()).toThrow();
     expect(() => ref(2).capture`foo`.toString()).toThrow();
+    expect(() =>
+      ref(3)
+        .match(captureAs`bar``foo`.captureAs`bar2``foo2`)
+        .toString()
+    ).toThrow();
+    expect(() =>
+      ref(3)
+        .oneOf(captureAs`bar``foo`, captureAs`bar2``foo2`)
+        .toString()
+    ).toThrow();
+    expect(() =>
+      ref(3)
+        .ahead(captureAs`bar``foo`.captureAs`bar2``foo2`)
+        .toString()
+    ).toThrow();
+    expect(() => captureAs`bar``foo`.ahead(ref(2)).toString()).toThrow();
   });
   it('can be quantified', () => {
     expect(oneOrMore.ref`bar`).toHaveProperty('regex', '(?:\\k<bar>)+');
@@ -793,6 +827,38 @@ describe('oneOf', () => {
   });
 });
 
+describe('match', () => {
+  it('accepts expressions', () => {
+    expect(match(exactly`foo`).toString()).toBe('foo');
+  });
+  it('is chainable', () => {
+    expect(match(exactly`foo`).char.toString()).toBe('foo.');
+    expect(oneOrMore.match(exactly`baz`.char).toString()).toBe('(?:baz.)+');
+  });
+  it('verifies quantifiers', () => {
+    // @ts-expect-error - match content is not quantifiable
+    expect(() => oneOrMore.match(lineStart).toString()).toThrow();
+    // @ts-expect-error - match content is not quantifiable
+    expect(() => oneOrMore(match(lineStart)).toString()).toThrow();
+  });
+  it('cannot be negated', () => {
+    // @ts-expect-error - match is not negatable
+    expect(() => not.match(exactly`foo`).toString()).toThrow();
+    // @ts-expect-error - match is not negatable
+    expect(() => not(match(exactly`foo`)).toString()).toThrow();
+  });
+  it('throws for invalid argument', () => {
+    // @ts-expect-error - testing invalid arguments
+    expect(() => match().toString()).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => match``.toString()).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => match(1)).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => match('a', 1, 12)).toThrow();
+  });
+});
+
 describe('charIn', () => {
   it('accepts plain strings', () => {
     expect(charIn`abc`.toString()).toBe('[abc]');
@@ -882,20 +948,6 @@ describe('quantifiers', () => {
     expect(oneOrMore.capture(exactly`[])`).toString()).toBe('(\\[\\]\\))+');
     expect(oneOrMore.capture.charIn`)[]`.toString()).toBe('([)[\\]])+');
     expect(oneOrMore(capture.charIn`)[]`.capture.exactly`([])`).toString()).toBe('(?:([)[\\]])(\\(\\[\\]\\)))+');
-    expect(oneOrMore.capture.group.ahead.exactly`[])`.toString()).toBe('((?:(?=\\[\\]\\))))+');
-  });
-});
-
-describe('integration test', () => {
-  it('validates URLs', () => {
-    const domain = oneOrMore(word).oneOrMore(exactly`.`.oneOrMore(word));
-    const ip = repeat(1, 3)(digit).repeat(3)(exactly`.`.repeat(1, 3)(digit));
-    const regex = oneOf(exactly`http`.maybe`s`)`smtp``ftp`.exactly`://`.oneOf(domain, ip);
-
-    expect(regex.toString()).toBe('(?:https?|smtp|ftp)://(?:\\w+(?:\\.\\w+)+|\\d{1,3}(?:\\.\\d{1,3}){3})');
-
-    const regexObj = regex.toRegExp();
-    expect(regexObj.test('http://example.com')).toBe(true);
-    expect(regexObj.test('http:/./example.com')).toBe(false);
+    expect(oneOrMore.capture.group.ahead.exactly`[])`.toString()).toBe('((?=\\[\\]\\)))+');
   });
 });

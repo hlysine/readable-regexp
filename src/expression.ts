@@ -87,13 +87,24 @@ class RegexBuilder implements RegexToken {
     );
   }
 
-  public addNode(node: string, modifyBuilder?: (regex: RegexBuilder) => void): RegexBuilder {
-    const builder = new RegexBuilder(
-      this.executeModifiers(node),
-      undefined,
-      this.backreferences.slice(),
-      this.namedGroups.slice()
-    );
+  public addNode(node: string | RegexBuilder, modifyBuilder?: (regex: RegexBuilder) => void): RegexBuilder {
+    let builder: RegexBuilder;
+    if (typeof node === 'string') {
+      builder = new RegexBuilder(
+        this.executeModifiers(node),
+        undefined,
+        this.backreferences.slice(),
+        this.namedGroups.slice()
+      );
+    } else {
+      builder = new RegexBuilder(
+        this.executeModifiers(node.executeModifiers()),
+        undefined,
+        [...this.backreferences, ...node.backreferences],
+        [...this.namedGroups, ...node.namedGroups]
+      );
+    }
+
     if (modifyBuilder) modifyBuilder(builder);
     return builder;
   }
@@ -237,7 +248,7 @@ class RegexBuilder implements RegexToken {
   public get not(): RegexToken['not'] {
     function func(this: RegexBuilder, token: RegexToken & CanBeNegated): RegexToken & CanBeQuantified {
       if (RegexBuilder.isRegexBuilder(token)) {
-        return this.addNode(token.executeModifiers());
+        return this.addNode(token);
       } else {
         throw new Error('Invalid arguments for not');
       }
@@ -260,7 +271,7 @@ class RegexBuilder implements RegexToken {
           const literal = getLiteralString(args);
           return this.addNode(literal);
         } else if (RegexBuilder.isRegexBuilder(args[0])) {
-          return this.addNode(args[0].executeModifiers());
+          return this.addNode(args[0]);
         } else {
           throw new Error('Invalid arguments for repeat');
         }
@@ -291,7 +302,7 @@ class RegexBuilder implements RegexToken {
           const literal = getLiteralString(args);
           return this.addNode(literal);
         } else if (RegexBuilder.isRegexBuilder(args[0])) {
-          return this.addNode(args[0].executeModifiers());
+          return this.addNode(args[0]);
         } else {
           throw new Error('Invalid arguments for atLeast');
         }
@@ -321,7 +332,7 @@ class RegexBuilder implements RegexToken {
           const literal = getLiteralString(args);
           return this.addNode(literal);
         } else if (RegexBuilder.isRegexBuilder(args[0])) {
-          return this.addNode(args[0].executeModifiers());
+          return this.addNode(args[0]);
         } else {
           throw new Error('Invalid arguments for atMost');
         }
@@ -347,7 +358,7 @@ class RegexBuilder implements RegexToken {
         const literal = getLiteralString(args);
         return this.addNode(literal);
       } else if (RegexBuilder.isRegexBuilder(args[0])) {
-        return this.addNode(args[0].executeModifiers());
+        return this.addNode(args[0]);
       } else {
         throw new Error('Invalid arguments for maybe');
       }
@@ -365,7 +376,7 @@ class RegexBuilder implements RegexToken {
         const literal = getLiteralString(args);
         return this.addNode(literal);
       } else if (RegexBuilder.isRegexBuilder(args[0])) {
-        return this.addNode(args[0].executeModifiers());
+        return this.addNode(args[0]);
       } else {
         throw new Error('Invalid arguments for zeroOrMore');
       }
@@ -383,7 +394,7 @@ class RegexBuilder implements RegexToken {
         const literal = getLiteralString(args);
         return this.addNode(literal);
       } else if (RegexBuilder.isRegexBuilder(args[0])) {
-        return this.addNode(args[0].executeModifiers());
+        return this.addNode(args[0]);
       } else {
         throw new Error('Invalid arguments for oneOrMore');
       }
@@ -401,7 +412,7 @@ class RegexBuilder implements RegexToken {
         const literal = getLiteralString(args);
         return this.addNode(literal);
       } else if (RegexBuilder.isRegexBuilder(args[0])) {
-        return this.addNode(args[0].executeModifiers());
+        return this.addNode(args[0]);
       } else {
         throw new Error('Invalid arguments for oneOrMore');
       }
@@ -427,7 +438,7 @@ class RegexBuilder implements RegexToken {
         const literal = getLiteralString(args);
         return this.addNode(literal);
       } else if (RegexBuilder.isRegexBuilder(args[0])) {
-        return this.addNode(args[0].executeModifiers());
+        return this.addNode(args[0]);
       } else {
         throw new Error('Invalid arguments for capture');
       }
@@ -456,7 +467,7 @@ class RegexBuilder implements RegexToken {
           const literal = getLiteralString(args);
           return this.addNode(literal);
         } else if (RegexBuilder.isRegexBuilder(args[0])) {
-          return this.addNode(args[0].executeModifiers());
+          return this.addNode(args[0]);
         } else {
           throw new Error('Invalid arguments for captureAs');
         }
@@ -495,7 +506,7 @@ class RegexBuilder implements RegexToken {
         const literal = getLiteralString(args);
         return this.addNode(literal);
       } else if (RegexBuilder.isRegexBuilder(args[0])) {
-        return this.addNode(args[0].executeModifiers());
+        return this.addNode(args[0]);
       } else {
         throw new Error('Invalid arguments for group');
       }
@@ -514,7 +525,7 @@ class RegexBuilder implements RegexToken {
         const literal = getLiteralString(args);
         return this.addNode(literal);
       } else if (RegexBuilder.isRegexBuilder(args[0])) {
-        return this.addNode(args[0].executeModifiers());
+        return this.addNode(args[0]);
       } else {
         throw new Error('Invalid arguments for group');
       }
@@ -533,7 +544,7 @@ class RegexBuilder implements RegexToken {
         const literal = getLiteralString(args);
         return this.addNode(literal);
       } else if (RegexBuilder.isRegexBuilder(args[0])) {
-        return this.addNode(args[0].executeModifiers());
+        return this.addNode(args[0]);
       } else {
         throw new Error('Invalid arguments for group');
       }
@@ -565,22 +576,43 @@ class RegexBuilder implements RegexToken {
       } else {
         return assign(
           func,
-          this.mutateModifier(modifier => {
-            const mod = modifier as AlternationModifier;
-            args.forEach(arg => {
-              if (RegexBuilder.isRegexBuilder(arg)) {
-                mod.add(arg.executeModifiers());
-              } else if (typeof arg === 'string') {
-                mod.add(arg);
-              } else {
-                throw new Error('Invalid arguments for oneOf');
-              }
-            });
-          })
+          this.mutateModifier(
+            modifier => {
+              const mod = modifier as AlternationModifier;
+              args.forEach(arg => {
+                if (RegexBuilder.isRegexBuilder(arg)) {
+                  mod.add(arg.executeModifiers());
+                } else if (typeof arg === 'string') {
+                  mod.add(arg);
+                } else {
+                  throw new Error('Invalid arguments for oneOf');
+                }
+              });
+            },
+            builder =>
+              args.forEach(arg => {
+                if (RegexBuilder.isRegexBuilder(arg)) {
+                  builder.backreferences.push(...arg.backreferences);
+                  builder.namedGroups.push(...arg.namedGroups);
+                }
+              })
+          )
         );
       }
     }
     return bind(func, this.addModifier(new AlternationModifier()));
+  }
+
+  /*
+   * ========== Custom ==========
+   */
+
+  public get match(): RegexToken['match'] {
+    function func(this: RegexBuilder, token: RegexToken): RegexToken & CanBeQuantified {
+      if (!RegexBuilder.isRegexBuilder(token)) throw new Error('Invalid arguments for match');
+      return this.addNode(token);
+    }
+    return bind(func, this);
   }
 }
 
@@ -626,3 +658,5 @@ export const behind = root.behind;
 export const notAhead = root.notAhead;
 export const notBehind = root.notBehind;
 export const oneOf = root.oneOf;
+
+export const match = root.match;

@@ -126,7 +126,7 @@ export function isBracketGroup(regex: string): boolean {
 }
 
 export function escapeRegex(text: string): string {
-  return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+  return text.replace(/[-[/\]{}()*+?.,\\^$|#\s]/g, '\\$&');
 }
 
 export const unicodeHex = /^[0-9a-fA-F]{4}$/;

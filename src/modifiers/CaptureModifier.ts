@@ -1,4 +1,5 @@
 import { RegexModifier } from '../types';
+import { isBracketGroup } from '../helper';
 
 export default class CaptureModifier implements RegexModifier {
   private readonly name: string | undefined;
@@ -8,6 +9,10 @@ export default class CaptureModifier implements RegexModifier {
   }
 
   public modify(regex: string): [string, string?] {
+    if (isBracketGroup(regex) && regex.startsWith('(?:')) {
+      if (this.name === undefined) return ['(' + regex.substring(3)];
+      return [`(?<${this.name}>` + regex.substring(3)];
+    }
     if (this.name === undefined) return [`(${regex})`];
     return [`(?<${this.name}>${regex})`];
   }

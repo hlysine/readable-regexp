@@ -100,6 +100,8 @@ export interface RegexToken {
   get notAhead(): LiteralFunction<CanBeQuantified> & GroupFunction & RegexToken;
   get notBehind(): LiteralFunction<CanBeQuantified> & GroupFunction & RegexToken;
   get oneOf(): AlternationFunction & CanBeQuantified;
+
+  get match(): TokenFunction & CanBeQuantified;
 }
 
 export type QuantifiedNegatedToken = {
@@ -109,6 +111,7 @@ export type QuantifiedNegatedToken = {
 export interface ExtraQuantifiedToken {
   get not(): TokenFunction<CanBeNegated & CanBeQuantified> & QuantifiedNegatedToken;
   get lazily(): LiteralFunction<CanBeQuantified> & QuantifierFunction & QuantifiedToken<'lazily'> & CanBeQuantified;
+  get match(): TokenFunction<CanBeQuantified>;
 }
 
 export type QuantifiedToken<TExclude extends string = never> = {
