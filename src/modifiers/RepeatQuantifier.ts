@@ -1,36 +1,36 @@
 import QuantityModifier from './QuantityModifier';
 
 export default class RepeatQuantifier extends QuantityModifier {
-  private readonly min: number | null;
-  private readonly max: number | null;
+  private readonly min?: number;
+  private readonly max?: number;
 
-  public constructor(min: number | null, max: number | null, lazy = false) {
+  public constructor(min?: number, max?: number, lazy = false) {
     super(lazy);
     this.min = min;
     this.max = max;
-    if (min !== null && typeof min !== 'number') {
+    if (min !== undefined && typeof min !== 'number') {
       throw new Error('min is invalid');
     }
-    if (max !== null && typeof max !== 'number') {
+    if (max !== undefined && typeof max !== 'number') {
       throw new Error('max is invalid');
     }
-    if (this.min !== null && this.max !== null && this.min > this.max) {
+    if (this.min !== undefined && this.max !== undefined && this.min > this.max) {
       throw new Error('Quantifier range is out of order');
-    } else if (this.min === null && this.max === null) {
+    } else if (this.min === undefined && this.max === undefined) {
       throw new Error('No min or max provided for RepeatQuantifier');
     }
   }
 
   protected quantify(regex: string): string {
-    if (this.min !== null && this.max !== null) {
+    if (this.min !== undefined && this.max !== undefined) {
       if (this.min === this.max) {
         return `${regex}{${this.min}}`;
       } else {
         return `${regex}{${this.min},${this.max}}`;
       }
-    } else if (this.min !== null) {
+    } else if (this.min !== undefined) {
       return `${regex}{${this.min},}`;
-    } else if (this.max !== null) {
+    } else if (this.max !== undefined) {
       return `${regex}{,${this.max}}`;
     } else {
       throw new Error('No min or max provided for RepeatQuantifier');

@@ -296,7 +296,7 @@ class RegexBuilder implements RegexToken {
           throw new Error('Invalid arguments for atLeast');
         }
       }
-      return assign(func, this.addModifier(new RepeatQuantifier(limit, null)));
+      return assign(func, this.addModifier(new RepeatQuantifier(limit, undefined)));
     }
     return bind(configure, this);
   }
@@ -326,7 +326,7 @@ class RegexBuilder implements RegexToken {
           throw new Error('Invalid arguments for atMost');
         }
       }
-      return assign(func, this.addModifier(new RepeatQuantifier(null, limit)));
+      return assign(func, this.addModifier(new RepeatQuantifier(undefined, limit)));
     }
     return bind(configure, this);
   }

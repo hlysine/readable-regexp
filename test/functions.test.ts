@@ -144,6 +144,7 @@ describe('repeat', () => {
   });
   it('validates quantifier range', () => {
     expect(() => repeat(5, 3)`foo`.toString()).toThrow();
+    expect(repeat(3, 3)`foo`.toString()).toBe('(?:foo){3}');
   });
   it('cannot be quantified in dot syntax', () => {
     // @ts-expect-error - stacking quantifiers only cause error in dot syntax
@@ -172,6 +173,10 @@ describe('repeat', () => {
     expect(() => repeat('1')).toThrow();
     // @ts-expect-error - testing invalid arguments
     expect(() => repeat('a', 'b')).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => repeat(undefined, undefined)`foo`.toString()).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => repeat(null, null)`foo`.toString()).toThrow();
     // @ts-expect-error - testing invalid arguments
     expect(() => repeat(3, 5)()).toThrow();
     // @ts-expect-error - testing invalid arguments
@@ -803,6 +808,7 @@ describe('charIn', () => {
     expect(charIn`0-9``-abc``def-`.toString()).toBe('[0-9\\-abcdef-]');
     expect(charIn`[]`.toString()).toBe('[[\\]]');
     expect(charIn`^a[b]`.toString()).toBe('[\\^a[b\\]]');
+    expect(charIn`(])`.toString()).toBe('[(\\])]');
   });
   it('is chainable and quantifiable', () => {
     expect(charIn`a``b``c`.char.toString()).toBe('[abc].');
@@ -871,6 +877,12 @@ describe('quantifiers', () => {
     expect(zeroOrMore.oneOrMore.exactly`foo`.toString()).toBe('(?:(?:foo)+)*');
     expect(zeroOrMore(oneOrMore(exactly`foo`)).toString()).toBe('(?:(?:foo)+)*');
     expect(zeroOrMore(digit.oneOrMore(exactly`foo`)).toString()).toBe('(?:\\d(?:foo)+)*');
+  });
+  it('adds brackets properly', () => {
+    expect(oneOrMore.capture(exactly`[])`).toString()).toBe('(\\[\\]\\))+');
+    expect(oneOrMore.capture.charIn`)[]`.toString()).toBe('([)[\\]])+');
+    expect(oneOrMore(capture.charIn`)[]`.capture.exactly`([])`).toString()).toBe('(?:([)[\\]])(\\(\\[\\]\\)))+');
+    expect(oneOrMore.capture.group.ahead.exactly`[])`.toString()).toBe('((?:(?=\\[\\]\\))))+');
   });
 });
 
