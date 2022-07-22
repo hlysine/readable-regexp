@@ -7,9 +7,14 @@ Create readable Regular Expressions with concise and flexible syntax.
 
 ## Installation
 
-Simply install readable-regexp with your preferred package manager:
-
 ```bash
 npm install readable-regexp
+```
+
+```bash
 yarn add readable-regexp
 ```
+
+## Usage
+
+Under construction...
