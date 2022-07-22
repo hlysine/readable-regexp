@@ -1,4 +1,4 @@
-import { RegexLiteral } from './types';
+import { RegExpLiteral } from './types';
 
 /**
  * Check whether a given value is a template strings array.
@@ -14,7 +14,7 @@ export function isTemplateStringsArray(arg: unknown): arg is TemplateStringsArra
  * @param args The argument to check.
  * @returns Whether the argument contains exactly one string in string or template form.
  */
-export function isLiteralArgument(args: unknown[]): args is RegexLiteral {
+export function isLiteralArgument(args: unknown[]): args is RegExpLiteral {
   if (args.length === 0) {
     return false;
   } else if (args.length === 1) {
@@ -30,14 +30,14 @@ export function isLiteralArgument(args: unknown[]): args is RegexLiteral {
  * @param escape Whether to escape the string.
  * @returns The literal string.
  */
-export function getLiteralString(args: RegexLiteral, escape = true): string {
+export function getLiteralString(args: RegExpLiteral, escape = true): string {
   let ret: string;
   if (args.length === 1) {
     ret = String(args[0]); // also handles the case when the argument is a template string with one string
   } else {
     ret = (args[0] as TemplateStringsArray).map((text, i) => (i > 0 ? args[i] : '') + text).join('');
   }
-  return escape ? escapeRegex(ret) : ret;
+  return escape ? escapeRegExp(ret) : ret;
 }
 
 /**
@@ -73,36 +73,36 @@ export function assign<T extends Function, U>(target: T, source: U): T & U {
   return target as T & U;
 }
 
-export function isCharacterGroup(regex: string): boolean {
-  if (!regex.startsWith('[')) {
+export function isCharacterGroup(regExp: string): boolean {
+  if (!regExp.startsWith('[')) {
     return false;
   }
 
   let charEscaped = false;
-  for (let i = 1; i < regex.length; i++) {
-    const char = regex[i];
+  for (let i = 1; i < regExp.length; i++) {
+    const char = regExp[i];
     if (charEscaped) {
       charEscaped = false;
     } else if (char === '\\') {
       charEscaped = true;
     } else if (char === ']') {
-      return i === regex.length - 1;
+      return i === regExp.length - 1;
     }
   }
 
   return false;
 }
 
-export function isBracketGroup(regex: string): boolean {
-  if (!regex.startsWith('(')) {
+export function isBracketGroup(regExp: string): boolean {
+  if (!regExp.startsWith('(')) {
     return false;
   }
 
   let layer = 1;
   let inCharGroup = false;
   let charEscaped = false;
-  for (let i = 1; i < regex.length; i++) {
-    const char = regex[i];
+  for (let i = 1; i < regExp.length; i++) {
+    const char = regExp[i];
     if (charEscaped) {
       charEscaped = false;
     } else if (char === '\\') {
@@ -118,14 +118,14 @@ export function isBracketGroup(regex: string): boolean {
     }
 
     if (layer === 0) {
-      return i === regex.length - 1;
+      return i === regExp.length - 1;
     }
   }
 
   return false;
 }
 
-export function escapeRegex(text: string): string {
+export function escapeRegExp(text: string): string {
   return text.replace(/[-[/\]{}()*+?.,\\^$|#\s]/g, '\\$&');
 }
 

@@ -21,17 +21,17 @@ export default class RepeatQuantifier extends QuantityModifier {
     }
   }
 
-  protected quantify(regex: string): string {
+  protected quantify(regExp: string): string {
     if (this.min !== undefined && this.max !== undefined) {
       if (this.min === this.max) {
-        return `${regex}{${this.min}}`;
+        return `${regExp}{${this.min}}`;
       } else {
-        return `${regex}{${this.min},${this.max}}`;
+        return `${regExp}{${this.min},${this.max}}`;
       }
     } else if (this.min !== undefined) {
-      return `${regex}{${this.min},}`;
+      return `${regExp}{${this.min},}`;
     } else if (this.max !== undefined) {
-      return `${regex}{,${this.max}}`;
+      return `${regExp}{,${this.max}}`;
     } else {
       throw new Error('No min or max provided for RepeatQuantifier');
     }

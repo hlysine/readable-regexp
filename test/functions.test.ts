@@ -533,20 +533,20 @@ describe('captureAs', () => {
 
 describe('ref', () => {
   it('accepts literals', () => {
-    expect(ref`bar`).toHaveProperty('regex', '\\k<bar>');
-    expect(ref('bar')).toHaveProperty('regex', '\\k<bar>');
+    expect(ref`bar`).toHaveProperty('regExp', '\\k<bar>');
+    expect(ref('bar')).toHaveProperty('regExp', '\\k<bar>');
   });
   it('accepts numbers', () => {
-    expect(ref(1)).toHaveProperty('regex', '\\1');
+    expect(ref(1)).toHaveProperty('regExp', '\\1');
   });
   it('accepts template literals', () => {
     expect(ref`e${1}f${2}`.captureAs`e${1}f${2}``foo`.toString()).toBe('\\k<e1f2>(?<e1f2>foo)');
   });
   it('validates correctly', () => {
-    expect(ref`Foo`).toHaveProperty('regex', '\\k<Foo>');
-    expect(ref`foo_123`).toHaveProperty('regex', '\\k<foo_123>');
-    expect(ref`_foo123_`).toHaveProperty('regex', '\\k<_foo123_>');
-    expect(ref(10)).toHaveProperty('regex', '\\10');
+    expect(ref`Foo`).toHaveProperty('regExp', '\\k<Foo>');
+    expect(ref`foo_123`).toHaveProperty('regExp', '\\k<foo_123>');
+    expect(ref`_foo123_`).toHaveProperty('regExp', '\\k<_foo123_>');
+    expect(ref(10)).toHaveProperty('regExp', '\\10');
     expect(() => ref``).toThrow();
     expect(() => ref`123`).toThrow();
     expect(() => ref`123ef`).toThrow();
@@ -596,10 +596,10 @@ describe('ref', () => {
     expect(() => captureAs`bar``foo`.ahead(ref(2)).toString()).toThrow();
   });
   it('can be quantified', () => {
-    expect(oneOrMore.ref`bar`).toHaveProperty('regex', '(?:\\k<bar>)+');
-    expect(oneOrMore(ref`bar`)).toHaveProperty('regex', '(?:\\k<bar>)+');
-    expect(oneOrMore.ref(1)).toHaveProperty('regex', '\\1+');
-    expect(oneOrMore(ref(12))).toHaveProperty('regex', '(?:\\12)+');
+    expect(oneOrMore.ref`bar`).toHaveProperty('regExp', '(?:\\k<bar>)+');
+    expect(oneOrMore(ref`bar`)).toHaveProperty('regExp', '(?:\\k<bar>)+');
+    expect(oneOrMore.ref(1)).toHaveProperty('regExp', '\\1+');
+    expect(oneOrMore(ref(12))).toHaveProperty('regExp', '(?:\\12)+');
   });
   it('cannot be negated', () => {
     // @ts-expect-error - ref is not negatable

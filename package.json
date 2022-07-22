@@ -1,12 +1,12 @@
 {
-  "name": "readable-regex",
+  "name": "readable-regexp",
   "version": "1.0.0",
   "author": "Henry Lin",
   "license": "MIT",
   "description": "Create readable Regular Expressions with concise syntax",
-  "main": "dist/readable-regex.js",
-  "module": "dist/readable-regex.mjs",
-  "typings": "dist/readable-regex.d.ts",
+  "main": "dist/readable-regexp.js",
+  "module": "dist/readable-regexp.mjs",
+  "typings": "dist/readable-regexp.d.ts",
   "files": [
     "dist",
     "src"

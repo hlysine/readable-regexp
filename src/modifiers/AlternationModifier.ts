@@ -1,15 +1,15 @@
-import { RegexModifier } from '../types';
+import { RegExpModifier } from '../types';
 
-export default class AlternationModifier implements RegexModifier {
+export default class AlternationModifier implements RegExpModifier {
   private readonly options: string[] = [];
 
   public add(option: string): void {
     this.options.push(option);
   }
 
-  public modify(regex: string): [string, string] {
-    if (this.options.length === 0) return ['(?:)', regex];
-    return [`(?:${this.options.join('|')})`, regex];
+  public modify(regExp: string): [string, string] {
+    if (this.options.length === 0) return ['(?:)', regExp];
+    return [`(?:${this.options.join('|')})`, regExp];
   }
 
   public clone(): AlternationModifier {

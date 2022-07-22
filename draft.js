@@ -1,5 +1,5 @@
 /*
-const regex = oneOf`http``smtp``ftp`.maybe`s`.exactly`://`
+const regExp = oneOf`http``smtp``ftp`.maybe`s`.exactly`://`
   .captureAs('domain')
   .oneOf(
     oneOrMore(word).oneOrMore(exactly`.`.oneOrMore(word)),

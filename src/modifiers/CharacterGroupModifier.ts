@@ -1,4 +1,4 @@
-import { RegexModifier } from '../types';
+import { RegExpModifier } from '../types';
 
 function escapeForCharGroup(option: string): string {
   if (option.startsWith('-')) {
@@ -23,7 +23,7 @@ function escapeForCharGroup(option: string): string {
   return option;
 }
 
-export default class CharacterGroupModifier implements RegexModifier {
+export default class CharacterGroupModifier implements RegExpModifier {
   private readonly options: string[] = [];
   private readonly negative: boolean;
 
@@ -35,9 +35,9 @@ export default class CharacterGroupModifier implements RegexModifier {
     this.options.push(option);
   }
 
-  public modify(regex: string): [string, string?] {
+  public modify(regExp: string): [string, string?] {
     if (this.options.length === 0) {
-      return [this.negative ? '[^]' : '[]', regex];
+      return [this.negative ? '[^]' : '[]', regExp];
     }
     let combined = this.options.map(escapeForCharGroup).join('');
     if (combined.startsWith('\\-')) {
@@ -46,7 +46,7 @@ export default class CharacterGroupModifier implements RegexModifier {
     if (combined.endsWith('\\-')) {
       combined = combined.substring(0, combined.length - 2) + '-';
     }
-    return [`[${this.negative ? '^' : ''}${combined}]`, regex];
+    return [`[${this.negative ? '^' : ''}${combined}]`, regExp];
   }
 
   public clone(): CharacterGroupModifier {

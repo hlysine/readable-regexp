@@ -1,4 +1,4 @@
-import { RegexModifier } from '../types';
+import { RegExpModifier } from '../types';
 
 export enum GroupType {
   NonCapture = 'nonCapture',
@@ -8,25 +8,25 @@ export enum GroupType {
   NegativeLookbehind = 'negativeLookbehind',
 }
 
-export default class GroupModifier implements RegexModifier {
+export default class GroupModifier implements RegExpModifier {
   private readonly groupType: GroupType;
 
   public constructor(groupType: GroupType) {
     this.groupType = groupType;
   }
 
-  public modify(regex: string): [string, string?] {
+  public modify(regExp: string): [string, string?] {
     switch (this.groupType) {
       case GroupType.NonCapture:
-        return [`(?:${regex})`];
+        return [`(?:${regExp})`];
       case GroupType.PositiveLookahead:
-        return [`(?=${regex})`];
+        return [`(?=${regExp})`];
       case GroupType.NegativeLookahead:
-        return [`(?!${regex})`];
+        return [`(?!${regExp})`];
       case GroupType.PositiveLookbehind:
-        return [`(?<=${regex})`];
+        return [`(?<=${regExp})`];
       case GroupType.NegativeLookbehind:
-        return [`(?<!${regex})`];
+        return [`(?<!${regExp})`];
       default:
         throw new Error('Unknown group type: ' + this.groupType);
     }
