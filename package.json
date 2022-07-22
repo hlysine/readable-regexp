@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "author": "Henry Lin",
   "license": "MIT",
-  "description": "Create readable Regular Expressions with concise syntax",
+  "description": "Create readable Regular Expressions with concise and flexible syntax.",
   "main": "dist/readable-regexp.js",
   "module": "dist/readable-regexp.mjs",
   "typings": "dist/readable-regexp.d.ts",
