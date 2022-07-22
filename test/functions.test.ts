@@ -1,4 +1,4 @@
-import {
+import r, {
   ahead,
   atLeast,
   atLeastLazily,
@@ -951,5 +951,14 @@ describe('quantifiers', () => {
     expect(oneOrMore.capture.charIn`)[]`.toString()).toBe('([)[\\]])+');
     expect(oneOrMore(capture.charIn`)[]`.capture.exactly`([])`).toString()).toBe('(?:([)[\\]])(\\(\\[\\]\\)))+');
     expect(oneOrMore.capture.group.ahead.exactly`[])`.toString()).toBe('((?=\\[\\]\\)))+');
+  });
+});
+
+describe('r', () => {
+  it('exists', () => {
+    expect(r).toBeDefined();
+    expect(r.char).toEqual(char);
+    expect(r.toRegExp).toBeDefined();
+    expect(r.toString).toBeDefined();
   });
 });

@@ -45,18 +45,18 @@ class RegExpBuilder implements RegExpToken {
   }
 
   public toString(): string {
-    const indexedGroups = this.namedGroups.filter(r => typeof r === 'number').length;
-    const invalidRefs = this.backreferences.filter(r => {
-      if (typeof r === 'number') return r > indexedGroups;
-      else return !this.namedGroups.includes(r);
+    const indexedGroups = this.namedGroups.filter(re => typeof re === 'number').length;
+    const invalidRefs = this.backreferences.filter(re => {
+      if (typeof re === 'number') return re > indexedGroups;
+      else return !this.namedGroups.includes(re);
     });
     if (invalidRefs.length > 0) {
       throw new Error('The following backreferences are not defined: ' + invalidRefs.join(', '));
     }
     const duplicateNames = this.namedGroups
-      .filter(r => typeof r === 'string')
-      .filter((r, i) => this.namedGroups.indexOf(r) !== i)
-      .filter((r, i) => this.namedGroups.indexOf(r) === i);
+      .filter(re => typeof re === 'string')
+      .filter((re, i) => this.namedGroups.indexOf(re) !== i)
+      .filter((re, i) => this.namedGroups.indexOf(re) === i);
     if (duplicateNames.length > 0) {
       throw new Error('The following named groups are defined more than once: ' + duplicateNames.join(', '));
     }
@@ -85,9 +85,9 @@ class RegExpBuilder implements RegExpToken {
       this.regExp +
       this.modifiers
         .reduce(
-          (r, modifier) => {
-            const [processed, trailing] = modifier.modify(r[0]);
-            return [processed, (trailing ?? '') + r[1]];
+          (re, modifier) => {
+            const [processed, trailing] = modifier.modify(re[0]);
+            return [processed, (trailing ?? '') + re[1]];
           },
           [regExp ?? '', '']
         )
@@ -624,47 +624,49 @@ class RegExpBuilder implements RegExpToken {
   }
 }
 
-const root = new RegExpBuilder();
+const r: RegExpToken = new RegExpBuilder();
 
-export const char = root.char;
-export const whitespace = root.whitespace;
-export const digit = root.digit;
-export const word = root.word;
-export const verticalWhitespace = root.verticalWhitespace;
-export const lineFeed = root.lineFeed;
-export const carriageReturn = root.carriageReturn;
-export const tab = root.tab;
-export const nullChar = root.nullChar;
-export const lineStart = root.lineStart;
-export const lineEnd = root.lineEnd;
-export const wordBoundary = root.wordBoundary;
-export const exactly = root.exactly;
-export const unicode = root.unicode;
-export const charIn = root.charIn;
-export const notCharIn = root.notCharIn;
-export const not = root.not;
+export default r;
 
-export const repeat = root.repeat;
-export const repeatLazily = root.repeatLazily;
-export const atLeast = root.atLeast;
-export const atLeastLazily = root.atLeastLazily;
-export const atMost = root.atMost;
-export const atMostLazily = root.atMostLazily;
-export const maybe = root.maybe;
-export const maybeLazily = root.maybeLazily;
-export const zeroOrMore = root.zeroOrMore;
-export const zeroOrMoreLazily = root.zeroOrMoreLazily;
-export const oneOrMore = root.oneOrMore;
-export const oneOrMoreLazily = root.oneOrMoreLazily;
+export const char = r.char;
+export const whitespace = r.whitespace;
+export const digit = r.digit;
+export const word = r.word;
+export const verticalWhitespace = r.verticalWhitespace;
+export const lineFeed = r.lineFeed;
+export const carriageReturn = r.carriageReturn;
+export const tab = r.tab;
+export const nullChar = r.nullChar;
+export const lineStart = r.lineStart;
+export const lineEnd = r.lineEnd;
+export const wordBoundary = r.wordBoundary;
+export const exactly = r.exactly;
+export const unicode = r.unicode;
+export const charIn = r.charIn;
+export const notCharIn = r.notCharIn;
+export const not = r.not;
 
-export const capture = root.capture;
-export const captureAs = root.captureAs;
-export const ref = root.ref;
-export const group = root.group;
-export const ahead = root.ahead;
-export const behind = root.behind;
-export const notAhead = root.notAhead;
-export const notBehind = root.notBehind;
-export const oneOf = root.oneOf;
+export const repeat = r.repeat;
+export const repeatLazily = r.repeatLazily;
+export const atLeast = r.atLeast;
+export const atLeastLazily = r.atLeastLazily;
+export const atMost = r.atMost;
+export const atMostLazily = r.atMostLazily;
+export const maybe = r.maybe;
+export const maybeLazily = r.maybeLazily;
+export const zeroOrMore = r.zeroOrMore;
+export const zeroOrMoreLazily = r.zeroOrMoreLazily;
+export const oneOrMore = r.oneOrMore;
+export const oneOrMoreLazily = r.oneOrMoreLazily;
 
-export const match = root.match;
+export const capture = r.capture;
+export const captureAs = r.captureAs;
+export const ref = r.ref;
+export const group = r.group;
+export const ahead = r.ahead;
+export const behind = r.behind;
+export const notAhead = r.notAhead;
+export const notBehind = r.notBehind;
+export const oneOf = r.oneOf;
+
+export const match = r.match;
