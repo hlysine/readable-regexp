@@ -18,6 +18,6 @@ export default class CaptureModifier implements RegexModifier {
   }
 
   public clone(): CaptureModifier {
-    return new CaptureModifier();
+    return new CaptureModifier(this.name);
   }
 }

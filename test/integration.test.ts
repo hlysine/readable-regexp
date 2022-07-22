@@ -12,7 +12,7 @@ describe('integration test', () => {
     const regex = lineStart.match(protocol).exactly`://`.match(domain).maybe(port).maybe(path).maybe(query).lineEnd;
 
     expect(regex.toString()).toBe(
-      '^(https?|smtp|ftp):\\/\\/(?<domain>[\\w\\-]+(?:\\.[\\w\\-]+)+)(?::(?<port>\\d+))?(?:\\/(?<path>[\\w\\-.]+(?:\\/[\\w\\-.]+)*))?(?:\\?(?<query>.*))?$'
+      '^(?<protocol>https?|smtp|ftp):\\/\\/(?<domain>[\\w\\-]+(?:\\.[\\w\\-]+)+)(?::(?<port>\\d+))?(?:\\/(?<path>[\\w\\-.]+(?:\\/[\\w\\-.]+)*))?(?:\\?(?<query>.*))?$'
     );
 
     const regexObj = regex.toRegExp();
