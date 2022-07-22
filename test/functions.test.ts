@@ -502,6 +502,8 @@ describe('captureAs', () => {
     expect(captureAs`_bAR123``foo`.toString()).toBe('(?<_bAR123>foo)');
     expect(() => captureAs`123bar``foo`.toString()).toThrow();
     expect(() => captureAs```foo`.toString()).toThrow();
+    expect(() => captureAs`bar``foo`.captureAs`bar``foo`.toString()).toThrow();
+    expect(() => captureAs`bar`(captureAs`bar``foo`).toString()).toThrow();
   });
   it('can be quantified', () => {
     expect(oneOrMore.captureAs`bar``foo`.toString()).toBe('(?<bar>foo)+');

@@ -53,6 +53,14 @@ class RegexBuilder implements RegexToken {
     if (invalidRefs.length > 0) {
       throw new Error('The following backreferences are not defined: ' + invalidRefs.join(', '));
     }
+    const duplicateNames = this.namedGroups
+      .filter(r => typeof r === 'string')
+      .filter((r, i) => this.namedGroups.indexOf(r) !== i)
+      .filter((r, i) => this.namedGroups.indexOf(r) === i);
+    if (duplicateNames.length > 0) {
+      throw new Error('The following named groups are defined more than once: ' + duplicateNames.join(', '));
+    }
+
     return this.executeModifiers();
   }
 
