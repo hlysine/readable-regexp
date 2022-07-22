@@ -1,30 +1,32 @@
-import commonjs from '@rollup/plugin-commonjs';
-import nodeResolve from '@rollup/plugin-node-resolve';
 import { OutputOptions } from 'rollup';
+import commonjs from '@rollup/plugin-commonjs';
+import del from 'rollup-plugin-delete';
 import dts from 'rollup-plugin-dts';
 import esbuild from 'rollup-plugin-esbuild';
+import nodeResolve from '@rollup/plugin-node-resolve';
 import packageJson from './package.json';
 
-const name = packageJson.main.replace(/\.js$/, '');
+const name = packageJson.main.replace(/\.umd\.js$/, '');
 
-const bundle = config => ({
-  ...config,
+const bundle = cfg => ({
+  ...cfg,
   input: './src/index.ts',
   external: /node_modules/,
 });
 
 const config: OutputOptions[] = [
   bundle({
-    plugins: [nodeResolve(), commonjs(), esbuild()],
+    plugins: [del({ targets: 'dist/*' }), nodeResolve(), commonjs(), esbuild({ minify: true })],
     output: [
-      {
-        file: `${name}.js`,
-        format: 'cjs',
-        sourcemap: true,
-      },
       {
         file: `${name}.mjs`,
         format: 'es',
+        sourcemap: true,
+      },
+      {
+        file: `${name}.umd.js`,
+        format: 'umd',
+        name: 'readableRegExp',
         sourcemap: true,
       },
     ],

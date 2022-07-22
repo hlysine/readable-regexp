@@ -624,9 +624,7 @@ class RegExpBuilder implements RegExpToken {
   }
 }
 
-const r: RegExpToken = new RegExpBuilder();
-
-export default r;
+export const r: RegExpToken = new RegExpBuilder();
 
 export const char = r.char;
 export const whitespace = r.whitespace;

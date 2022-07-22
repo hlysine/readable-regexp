@@ -1,4 +1,4 @@
-import r, {
+import {
   ahead,
   atLeast,
   atLeastLazily,
@@ -23,6 +23,7 @@ import r, {
   oneOf,
   oneOrMore,
   oneOrMoreLazily,
+  r,
   ref,
   repeat,
   repeatLazily,

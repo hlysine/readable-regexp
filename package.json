@@ -4,12 +4,11 @@
   "author": "Henry Lin",
   "license": "MIT",
   "description": "Create readable Regular Expressions with concise and flexible syntax.",
-  "main": "dist/readable-regexp.js",
+  "main": "dist/readable-regexp.umd.js",
   "module": "dist/readable-regexp.mjs",
   "typings": "dist/readable-regexp.d.ts",
   "files": [
-    "dist",
-    "src"
+    "dist"
   ],
   "scripts": {
     "build": "rollup --config rollup.config.ts --configPlugin rollup-plugin-esbuild",
@@ -33,6 +32,7 @@
     "jest": "^28.1.3",
     "prettier": "^2.7.1",
     "rollup": "^2.77.0",
+    "rollup-plugin-delete": "^2.0.0",
     "rollup-plugin-dts": "^4.2.2",
     "rollup-plugin-esbuild": "^4.9.1",
     "ts-jest": "^28.0.7",
