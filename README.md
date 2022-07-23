@@ -3,8 +3,28 @@
 [![CI](https://github.com/hlysine/readable-regexp/actions/workflows/main.yml/badge.svg)](https://github.com/hlysine/readable-regexp/actions/workflows/main.yml)
 [![Coverage Status](https://coveralls.io/repos/github/hlysine/readable-regex/badge.svg?branch=main)](https://coveralls.io/github/hlysine/readable-regex?branch=main)
 [![TypeScript](https://img.shields.io/badge/built%20with-TypeScript-blue)](https://www.typescriptlang.org/)
+[![npm](https://img.shields.io/npm/v/readable-regexp)](https://www.npmjs.com/package/readable-regexp)
+[![npm bundle size](https://img.shields.io/bundlephobia/minzip/readable-regexp)](https://www.npmjs.com/package/readable-regexp)
 
 Create readable Regular Expressions with concise and flexible syntax.
+
+## Table of Contents
+
+- [Installation](#installation)
+    - [Using a package manager](#using-a-package-manager)
+    - [Using a CDN](#using-a-cdn)
+- [Features](#features)
+    - [Readability](#readability)
+    - [Flexibility & Conciseness](#flexibility---conciseness)
+    - [Safety](#safety)
+- [Documentation](#documentation)
+    - [Syntax Rules](#syntax-rules)
+    - [Special Tokens](#special-tokens)
+    - [Character Classes](#character-classes)
+    - [Anchors](#anchors)
+    - [Quantifiers](#quantifiers)
+    - [Groups](#groups)
+    - [Misc](#misc)
 
 ## Installation
 
