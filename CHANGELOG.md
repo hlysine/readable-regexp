@@ -22,3 +22,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Basic readme
 - Rollup build config for ES Modules and UMD formats
 - Rollup build config for a .d.ts file
+
+[1.0.0]: https://github.com/hlysine/readable-regexp/releases/tag/v1.0.0
+[1.1.0]: https://github.com/hlysine/readable-regexp/releases/tag/v1.1.0
