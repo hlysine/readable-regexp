@@ -56,9 +56,56 @@ export interface CanBeQuantified {
   readonly [quantifiableSymbol]: undefined;
 }
 
+export enum Flag {
+  /**
+   * Allows more than 1 match.
+   */
+  Global = 'g',
+  /**
+   * ^ and $ match start/end of line.
+   */
+  MultiLine = 'm',
+  /**
+   * Case insensitive.
+   */
+  IgnoreCase = 'i',
+  /**
+   * The next match must follow the previous one.
+   */
+  Sticky = 'y',
+  /**
+   * Use full unicode.
+   */
+  Unicode = 'u',
+  /**
+   * Dot matches newlines.
+   */
+  SingleLine = 's',
+  /**
+   * Output match indices.
+   */
+  Indices = 'd',
+}
+
+export type FlagUnion = `${Flag}`;
+
+export type FlagsString<TFlags extends string> = TFlags extends ''
+  ? ''
+  : TFlags extends `${FlagUnion}${infer rest}`
+  ? TFlags extends `${infer first}${rest}`
+    ? `${first}${FlagsString<rest>}`
+    : never
+  : never;
+
+export interface FlagFunction {
+  (template: TemplateStringsArray, ...args: unknown[]): RegExp;
+  (...flags: FlagUnion[]): RegExp;
+  <TFlag extends string>(flags?: FlagsString<TFlag> & TFlag): RegExp;
+}
+
 export interface RegExpToken {
   toString(): string;
-  toRegExp(): RegExp;
+  toRegExp: FlagFunction;
 
   get char(): RegExpToken & CanBeQuantified;
   get whitespace(): RegExpToken & CanBeNegated & CanBeQuantified;

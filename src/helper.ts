@@ -138,3 +138,5 @@ export const charLiteral = /^(?:\\u[0-9a-fA-F]{4}$|\\x[0-9a-fA-F]{2}|\\\d{1,3})/
 export const captureName = /^[a-zA-Z_][a-zA-Z0-9_]*$/;
 
 export const negatableTokens = /^\\[sdwb]$/;
+
+export const flagString = /^[gmiyusd]*$/;

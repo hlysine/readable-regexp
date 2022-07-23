@@ -1,4 +1,5 @@
 import {
+  Flag,
   ahead,
   atLeast,
   atLeastLazily,
@@ -35,6 +36,30 @@ import {
   zeroOrMore,
   zeroOrMoreLazily,
 } from '../src/index';
+
+describe('toRegExp', () => {
+  it('should return a RegExp', () => {
+    expect(exactly`foo`.toRegExp()).toBeInstanceOf(RegExp);
+    expect(exactly`foo`.toRegExp().source).toBe('foo');
+  });
+  it('includes flags', () => {
+    expect(exactly`foo`.toRegExp().flags).toBe('');
+    expect(exactly`foo`.toRegExp``.flags).toBe('');
+    expect(exactly`foo`.toRegExp`i`.flags).toBe('i');
+    expect(exactly`foo`.toRegExp('i').flags).toBe('i');
+    expect(exactly`foo`.toRegExp(Flag.Global, Flag.Indices).flags).toBe('dg');
+    expect(exactly`foo`.toRegExp`igm`.flags).toBe('gim');
+    expect(exactly`foo`.toRegExp('igm').flags).toBe('gim');
+    expect(exactly`foo`.toRegExp('i', 'g', 'm').flags).toBe('gim');
+    expect(exactly`foo`.toRegExp('i', 'g', 'm', Flag.Sticky).flags).toBe('gimy');
+  });
+  it('validates flags', () => {
+    // @ts-expect-error - invalid flag
+    expect(() => exactly`foo`.toRegExp('k')).toThrow();
+    // @ts-expect-error - invalid flag
+    expect(() => exactly`foo`.toRegExp('ikg')).toThrow();
+  });
+});
 
 describe('exactly', () => {
   it('accepts plain strings', () => {

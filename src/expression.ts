@@ -4,6 +4,8 @@ import {
   CanBeQuantified,
   CharClassFunction,
   ExtraQuantifiedToken,
+  FlagUnion,
+  FlagsString,
   GroupFunction,
   LiteralFunction,
   QuantifiedToken,
@@ -15,7 +17,16 @@ import {
   quantifiableSymbol,
 } from './types';
 import GroupModifier, { GroupType } from './modifiers/GroupModifier';
-import { assign, bind, captureName, getLiteralString, hexNumber, isLiteralArgument, octalNumber } from './helper';
+import {
+  assign,
+  bind,
+  captureName,
+  flagString,
+  getLiteralString,
+  hexNumber,
+  isLiteralArgument,
+  octalNumber,
+} from './helper';
 import AlternationModifier from './modifiers/AlternationModifier';
 import CaptureModifier from './modifiers/CaptureModifier';
 import CharacterClassModifier from './modifiers/CharacterClassModifier';
@@ -64,8 +75,17 @@ class RegExpBuilder implements RegExpToken {
     return this.executeModifiers();
   }
 
-  public toRegExp(): RegExp {
-    return new RegExp(this.toString());
+  public toRegExp<TFlag extends string>(
+    ...flags: [(FlagsString<TFlag> & TFlag)?] | FlagUnion[] | [TemplateStringsArray, ...unknown[]]
+  ): RegExp {
+    let fl: string | undefined;
+    if (isLiteralArgument(flags)) {
+      fl = getLiteralString(flags);
+    } else if (flags.length > 0) {
+      fl = flags.join('');
+    }
+    if (fl && !flagString.test(fl)) throw new Error('Invalid flags: ' + flags);
+    return new RegExp(this.toString(), fl);
   }
 
   /*
