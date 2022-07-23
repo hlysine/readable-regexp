@@ -10,6 +10,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - uses: actions/github-script@v6
+        id: get-tag-name
+        with:
+          script: return context.payload.ref.replace(/\/refs\/tags\//, '');
+          result-encoding: string
+
       - name: Checkout Code
         uses: actions/checkout@v2.4.0
 
@@ -37,7 +43,7 @@ jobs:
         uses: 'marvinpinto/action-automatic-releases@latest'
         with:
           repo_token: '${{ secrets.GITHUB_TOKEN }}'
-          title: 'readable-regexp ${{ github.ref }}'
+          title: 'readable-regexp ${{steps.get-tag-name.outputs.result}}'
           prerelease: false
           files: |
             *.tgz
