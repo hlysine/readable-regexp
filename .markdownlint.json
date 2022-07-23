@@ -1,4 +1,7 @@
 {
-  "line-length": { "line_length": 120 },
-  "no-duplicate-heading": { "siblings_only": true }
+  "line-length": false,
+  "no-duplicate-heading": { "siblings_only": true },
+  "no-inline-html": false,
+  "no-space-in-code": false,
+  "no-multiple-blanks": { "maximum": 2 }
 }
