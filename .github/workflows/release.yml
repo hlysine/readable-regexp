@@ -34,12 +34,13 @@ jobs:
         run: npm pack
 
       - name: Release
-        uses: "marvinpinto/action-automatic-releases@latest"
+        uses: 'marvinpinto/action-automatic-releases@latest'
         with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          title: "readable-regexp ${{ github.ref }}"
+          repo_token: '${{ secrets.GITHUB_TOKEN }}'
+          title: 'readable-regexp ${{ github.ref }}'
           prerelease: false
-          files: *.tgz
+          files: |
+            *.tgz
 
       - name: Publish
         uses: JS-DevTools/npm-publish@v1
