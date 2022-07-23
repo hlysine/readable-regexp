@@ -15,7 +15,7 @@ Create readable Regular Expressions with concise and flexible syntax.
     - [Using a CDN](#using-a-cdn)
 - [Features](#features)
     - [Readability](#readability)
-    - [Flexibility & Conciseness](#flexibility---conciseness)
+    - [Flexibility & Conciseness](#flexibility--conciseness)
     - [Safety](#safety)
 - [Documentation](#documentation)
     - [Syntax Rules](#syntax-rules)
