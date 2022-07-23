@@ -15,7 +15,7 @@ Create readable Regular Expressions with concise and flexible syntax.
     - [Using a CDN](#using-a-cdn)
 - [Features](#features)
     - [Readability](#readability)
-    - [Flexibility & Conciseness](#flexibility--conciseness)
+    - [Flexibility and Conciseness](#flexibility-and-conciseness)
     - [Safety](#safety)
 - [Documentation](#documentation)
     - [Syntax Rules](#syntax-rules)
@@ -115,7 +115,7 @@ const regExp = /^(?<protocol>https?|smtp|ftp):\/\/(?<domain>[\w\-]+(?:\.[\w\-]+)
 ```
 </details>
 
-### Flexibility & Conciseness
+### Flexibility and Conciseness
 
 Readability is important, but conciseness is also equally important. This is why readable-regexp offers multiple 
 shorthands and alternative syntax which you can adopt if you prefer.
