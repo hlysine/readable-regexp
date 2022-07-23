@@ -4,6 +4,21 @@
   "author": "Henry Lin",
   "license": "MIT",
   "description": "Create readable Regular Expressions with concise and flexible syntax.",
+  "keywords": [
+    "regex",
+    "regexp",
+    "readable",
+    "verbal",
+    "regular",
+    "expression",
+    "typescript",
+    "typed"
+  ],
+  "homepage": "https://github.com/hlysine/readable-regexp#readme",
+  "repository": "github:hlysine/readable-regexp",
+  "bugs": {
+    "url": "https://github.com/hlysine/readable-regexp/issues"
+  },
   "main": "dist/readable-regexp.umd.js",
   "module": "dist/readable-regexp.mjs",
   "typings": "dist/readable-regexp.d.ts",
