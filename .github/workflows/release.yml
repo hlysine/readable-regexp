@@ -13,7 +13,7 @@ jobs:
       - uses: actions/github-script@v6
         id: get-tag-name
         with:
-          script: return context.payload.ref.replace(/\/refs\/tags\//, '');
+          script: return context.payload.ref.replace(/refs\/tags\//, '');
           result-encoding: string
 
       - name: Checkout Code
