@@ -1,6 +1,6 @@
 import { RegExpModifier } from '../types';
 
-function escapeForCharGroup(option: string): string {
+function escapeForCharClass(option: string): string {
   if (option.startsWith('-')) {
     option = '\\-' + option.substring(1);
   }
@@ -23,7 +23,7 @@ function escapeForCharGroup(option: string): string {
   return option;
 }
 
-export default class CharacterGroupModifier implements RegExpModifier {
+export default class CharacterClassModifier implements RegExpModifier {
   private readonly options: string[] = [];
   private readonly negative: boolean;
 
@@ -39,7 +39,7 @@ export default class CharacterGroupModifier implements RegExpModifier {
     if (this.options.length === 0) {
       return [this.negative ? '[^]' : '[]', regExp];
     }
-    let combined = this.options.map(escapeForCharGroup).join('');
+    let combined = this.options.map(escapeForCharClass).join('');
     if (combined.startsWith('\\-')) {
       combined = '-' + combined.substring(2);
     }
@@ -49,8 +49,8 @@ export default class CharacterGroupModifier implements RegExpModifier {
     return [`[${this.negative ? '^' : ''}${combined}]`, regExp];
   }
 
-  public clone(): CharacterGroupModifier {
-    const modifier = new CharacterGroupModifier(this.negative);
+  public clone(): CharacterClassModifier {
+    const modifier = new CharacterClassModifier(this.negative);
     this.options.forEach(option => modifier.add(option));
     return modifier;
   }

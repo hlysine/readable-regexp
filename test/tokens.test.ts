@@ -1,8 +1,10 @@
 import {
+  backspace,
   carriageReturn,
   char,
   digit,
   exactly,
+  formFeed,
   lineEnd,
   lineFeed,
   lineStart,
@@ -22,7 +24,9 @@ const testCases = [
   ['digit', digit, '\\d'],
   ['word', word, '\\w'],
   ['verticalWhitespace', verticalWhitespace, '\\v'],
+  ['backspace', backspace, '[\\b]'],
   ['lineFeed', lineFeed, '\\n'],
+  ['formFeed', formFeed, '\\f'],
   ['carriageReturn', carriageReturn, '\\r'],
   ['tab', tab, '\\t'],
   ['nullChar', nullChar, '\\0'],
@@ -58,8 +62,14 @@ describe('negation', () => {
     expect(not.verticalWhitespace.toString()).toBe('[^\\v]');
     expect(not(verticalWhitespace).toString()).toBe('[^\\v]');
 
+    expect(not.backspace.toString()).toBe('[^\\b]');
+    expect(not(backspace).toString()).toBe('[^\\b]');
+
     expect(not.lineFeed.toString()).toBe('[^\\n]');
     expect(not(lineFeed).toString()).toBe('[^\\n]');
+
+    expect(not.formFeed.toString()).toBe('[^\\f]');
+    expect(not(formFeed).toString()).toBe('[^\\f]');
 
     expect(not.carriageReturn.toString()).toBe('[^\\r]');
     expect(not(carriageReturn).toString()).toBe('[^\\r]');
@@ -104,8 +114,14 @@ describe('quantification', () => {
     expect(oneOrMore.verticalWhitespace.toString()).toBe('\\v+');
     expect(oneOrMore(verticalWhitespace).toString()).toBe('\\v+');
 
+    expect(oneOrMore.backspace.toString()).toBe('[\\b]+');
+    expect(oneOrMore(backspace).toString()).toBe('[\\b]+');
+
     expect(oneOrMore.lineFeed.toString()).toBe('\\n+');
     expect(oneOrMore(lineFeed).toString()).toBe('\\n+');
+
+    expect(oneOrMore.formFeed.toString()).toBe('\\f+');
+    expect(oneOrMore(formFeed).toString()).toBe('\\f+');
 
     expect(oneOrMore.carriageReturn.toString()).toBe('\\r+');
     expect(oneOrMore(carriageReturn).toString()).toBe('\\r+');

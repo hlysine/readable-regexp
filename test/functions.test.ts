@@ -12,6 +12,7 @@ import {
   digit,
   exactly,
   group,
+  hex,
   lineStart,
   match,
   maybe,
@@ -20,6 +21,7 @@ import {
   notAhead,
   notBehind,
   notCharIn,
+  octal,
   oneOf,
   oneOrMore,
   oneOrMoreLazily,
@@ -62,6 +64,78 @@ describe('exactly', () => {
   });
 });
 
+describe('octal', () => {
+  it('accepts literals', () => {
+    expect(octal`123`.toString()).toBe('[\\123]');
+    expect(octal('123').toString()).toBe('[\\123]');
+  });
+  it('accepts template literals', () => {
+    expect(octal`${1}2${3}`.toString()).toBe('[\\123]');
+  });
+  it('validates correctly', () => {
+    expect(octal`377`.toString()).toBe('[\\377]');
+    expect(octal`100`.toString()).toBe('[\\100]');
+    expect(octal`1`.toString()).toBe('[\\1]');
+    expect(octal`64`.toString()).toBe('[\\64]');
+    expect(() => octal``).toThrow();
+    expect(() => octal`abc`).toThrow();
+    expect(() => octal`386`).toThrow();
+    expect(() => octal`400`).toThrow();
+  });
+  it('can be negated and quantified', () => {
+    expect(not.octal`123`.toString()).toBe('[^\\123]');
+    expect(oneOrMore.octal`123`.toString()).toBe('[\\123]+');
+    expect(oneOrMore.not.octal`123`.toString()).toBe('[^\\123]+');
+  });
+  it('throws for invalid argument', () => {
+    // @ts-expect-error - testing invalid arguments
+    expect(octal(1).toString()).toBe('[\\1]');
+    // @ts-expect-error - testing invalid arguments
+    expect(() => octal()).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => octal('a', 'b')).toThrow();
+  });
+});
+
+describe('hex', () => {
+  it('accepts literals', () => {
+    expect(hex`2e`.toString()).toBe('\\x2e');
+    expect(hex('2e').toString()).toBe('\\x2e');
+    expect(hex`12ef`.toString()).toBe('\\u12ef');
+    expect(hex('12ef').toString()).toBe('\\u12ef');
+  });
+  it('accepts template literals', () => {
+    expect(hex`f${2}`.toString()).toBe('\\xf2');
+    expect(hex`e${1}f${2}`.toString()).toBe('\\ue1f2');
+  });
+  it('validates correctly', () => {
+    expect(hex`1`.toString()).toBe('\\x01');
+    expect(hex`12ef`.toString()).toBe('\\u12ef');
+    expect(hex`FFFF`.toString()).toBe('\\uffff');
+    expect(hex`aBcD`.toString()).toBe('\\uabcd');
+    expect(hex`123`.toString()).toBe('\\u0123');
+    expect(() => hex``).toThrow();
+    expect(() => hex`g1h2`).toThrow();
+    expect(() => hex`123ef`).toThrow();
+  });
+  it('can be negated and quantified', () => {
+    expect(not.hex`2e`.toString()).toBe('[^\\x2e]');
+    expect(oneOrMore.hex`2e`.toString()).toBe('\\x2e+');
+    expect(oneOrMore.not.hex`2e`.toString()).toBe('[^\\x2e]+');
+    expect(not.hex`12ef`.toString()).toBe('[^\\u12ef]');
+    expect(oneOrMore.hex`12ef`.toString()).toBe('\\u12ef+');
+    expect(oneOrMore.not.hex`12ef`.toString()).toBe('[^\\u12ef]+');
+  });
+  it('throws for invalid argument', () => {
+    // @ts-expect-error - testing invalid arguments
+    expect(hex(1).toString()).toBe('\\x01');
+    // @ts-expect-error - testing invalid arguments
+    expect(() => hex()).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => hex('a', 'b')).toThrow();
+  });
+});
+
 describe('unicode', () => {
   it('accepts literals', () => {
     expect(unicode`12ef`.toString()).toBe('\\u12ef');
@@ -72,11 +146,11 @@ describe('unicode', () => {
   });
   it('validates correctly', () => {
     expect(unicode`12ef`.toString()).toBe('\\u12ef');
-    expect(unicode`FFFF`.toString()).toBe('\\uFFFF');
-    expect(unicode`aBcD`.toString()).toBe('\\uaBcD');
+    expect(unicode`FFFF`.toString()).toBe('\\uffff');
+    expect(unicode`aBcD`.toString()).toBe('\\uabcd');
+    expect(unicode`123`.toString()).toBe('\\u0123');
     expect(() => unicode``).toThrow();
     expect(() => unicode`g1h2`).toThrow();
-    expect(() => unicode`123`).toThrow();
     expect(() => unicode`123ef`).toThrow();
   });
   it('can be negated and quantified', () => {
@@ -86,7 +160,7 @@ describe('unicode', () => {
   });
   it('throws for invalid argument', () => {
     // @ts-expect-error - testing invalid arguments
-    expect(() => unicode(1)).toThrow();
+    expect(unicode(1).toString()).toBe('\\u0001');
     // @ts-expect-error - testing invalid arguments
     expect(() => unicode()).toThrow();
     // @ts-expect-error - testing invalid arguments
@@ -600,7 +674,7 @@ describe('ref', () => {
     expect(oneOrMore.ref`bar`).toHaveProperty('regExp', '(?:\\k<bar>)+');
     expect(oneOrMore(ref`bar`)).toHaveProperty('regExp', '(?:\\k<bar>)+');
     expect(oneOrMore.ref(1)).toHaveProperty('regExp', '\\1+');
-    expect(oneOrMore(ref(12))).toHaveProperty('regExp', '(?:\\12)+');
+    expect(oneOrMore(ref(12))).toHaveProperty('regExp', '\\12+');
   });
   it('cannot be negated', () => {
     // @ts-expect-error - ref is not negatable

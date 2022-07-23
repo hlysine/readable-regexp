@@ -1,4 +1,4 @@
-import { isBracketGroup, isCharacterGroup, unicodeLiteral } from '../helper';
+import { charLiteral, isBracketGroup, isCharacterClass } from '../helper';
 import { RegExpModifier } from '../types';
 
 const NOT_QUANTIFIABLE = new Set(['^', '$', '\\b', '\\B']);
@@ -6,8 +6,8 @@ const NOT_QUANTIFIABLE = new Set(['^', '$', '\\b', '\\B']);
 function wrapIfNeeded(regExp: string): string {
   if (regExp.length === 1) return regExp;
   if (regExp.length === 2 && regExp.startsWith('\\')) return regExp;
-  if (unicodeLiteral.test(regExp)) return regExp;
-  if (isCharacterGroup(regExp)) return regExp;
+  if (charLiteral.test(regExp)) return regExp;
+  if (isCharacterClass(regExp)) return regExp;
   if (isBracketGroup(regExp)) {
     // need to wrap lookarounds because they are not directly quantifiable
     if (!/^\((?:\?=|\?!|\?<=|\?<!)/.test(regExp)) return regExp;

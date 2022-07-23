@@ -2,7 +2,7 @@ import {
   AlternationFunction,
   CanBeNegated,
   CanBeQuantified,
-  CharGroupFunction,
+  CharClassFunction,
   ExtraQuantifiedToken,
   GroupFunction,
   LiteralFunction,
@@ -15,10 +15,10 @@ import {
   quantifiableSymbol,
 } from './types';
 import GroupModifier, { GroupType } from './modifiers/GroupModifier';
-import { assign, bind, captureName, getLiteralString, isLiteralArgument, unicodeHex } from './helper';
+import { assign, bind, captureName, getLiteralString, hexNumber, isLiteralArgument, octalNumber } from './helper';
 import AlternationModifier from './modifiers/AlternationModifier';
 import CaptureModifier from './modifiers/CaptureModifier';
-import CharacterGroupModifier from './modifiers/CharacterGroupModifier';
+import CharacterClassModifier from './modifiers/CharacterClassModifier';
 import NegationModifier from './modifiers/NegationModifier';
 import QuantityModifier from './modifiers/QuantityModifier';
 import RepeatQuantifier from './modifiers/RepeatQuantifier';
@@ -169,8 +169,16 @@ class RegExpBuilder implements RegExpToken {
     return this.addNode('\\v');
   }
 
+  public get backspace(): RegExpToken['backspace'] {
+    return this.addNode('[\\b]');
+  }
+
   public get lineFeed(): RegExpToken['lineFeed'] {
     return this.addNode('\\n');
+  }
+
+  public get formFeed(): RegExpToken['formFeed'] {
+    return this.addNode('\\f');
   }
 
   public get carriageReturn(): RegExpToken['carriageReturn'] {
@@ -206,11 +214,43 @@ class RegExpBuilder implements RegExpToken {
     return bind(func, this);
   }
 
+  public get octal(): RegExpToken['octal'] {
+    function func(this: RegExpBuilder, ...args: RegExpLiteral): RegExpToken & CanBeQuantified & CanBeNegated {
+      const literal = getLiteralString(args, false);
+      if (!octalNumber.test(literal)) throw new Error('Invalid octal character');
+      const num = Number.parseInt(literal, 8);
+      if (Number.isNaN(num) || num > 0o777 || num < 0) throw new Error('Invalid octal character');
+      if (num > 0o377) {
+        // octal literals larger than 1 byte can be parsed by the regexp engine when they exist alone,
+        // but they don't work in character classes, and hence cannot be negated.
+        throw new Error(
+          'Octal literals above 0o377 have inconsistent behavior. Please use hex/unicode literals instead.'
+        );
+      }
+      return this.addNode(`[\\${num.toString(8)}]`);
+    }
+    return bind(func, this);
+  }
+
+  public get hex(): RegExpToken['hex'] {
+    function func(this: RegExpBuilder, ...args: RegExpLiteral): RegExpToken & CanBeQuantified & CanBeNegated {
+      const literal = getLiteralString(args, false);
+      if (!hexNumber.test(literal)) throw new Error('Invalid hex character');
+      const num = Number.parseInt(literal, 16);
+      if (Number.isNaN(num) || num > 0xffff || num < 0) throw new Error('Invalid hex character');
+      if (num <= 0xff) return this.addNode(`\\x${num.toString(16).padStart(2, '0')}`);
+      else return this.addNode(`\\u${num.toString(16).padStart(4, '0')}`);
+    }
+    return bind(func, this);
+  }
+
   public get unicode(): RegExpToken['unicode'] {
     function func(this: RegExpBuilder, ...args: RegExpLiteral): RegExpToken & CanBeQuantified & CanBeNegated {
       const literal = getLiteralString(args, false);
-      if (!unicodeHex.test(literal)) throw new Error('Invalid unicode literal');
-      return this.addNode(`\\u${literal}`);
+      if (!hexNumber.test(literal)) throw new Error('Invalid unicode character');
+      const num = Number.parseInt(literal, 16);
+      if (Number.isNaN(num) || num > 0xffff || num < 0) throw new Error('Invalid unicode character');
+      return this.addNode(`\\u${num.toString(16).padStart(4, '0')}`);
     }
     return bind(func, this);
   }
@@ -219,20 +259,20 @@ class RegExpBuilder implements RegExpToken {
     function func(
       this: RegExpBuilder,
       ...args: RegExpLiteral | (string | RegExpToken)[]
-    ): RegExpToken & CanBeQuantified & CanBeNegated & CharGroupFunction<CanBeNegated> {
-      if (!(this.modifiers[0] instanceof CharacterGroupModifier))
-        throw new Error(`Unexpected modifier, expected CharacterGroupModifier, but got ${this.modifiers[0]}`);
+    ): RegExpToken & CanBeQuantified & CanBeNegated & CharClassFunction<CanBeNegated> {
+      if (!(this.modifiers[0] instanceof CharacterClassModifier))
+        throw new Error(`Unexpected modifier, expected CharacterClassModifier, but got ${this.modifiers[0]}`);
       if (isLiteralArgument(args)) {
         const literal = getLiteralString(args, false);
         return assign(
           func,
-          this.mutateModifier(modifier => (modifier as CharacterGroupModifier).add(literal))
+          this.mutateModifier(modifier => (modifier as CharacterClassModifier).add(literal))
         );
       } else {
         return assign(
           func,
           this.mutateModifier(modifier => {
-            const mod = modifier as CharacterGroupModifier;
+            const mod = modifier as CharacterClassModifier;
             args.forEach(arg => {
               if (RegExpBuilder.isRegExpBuilder(arg)) {
                 mod.add(arg.executeModifiers());
@@ -246,7 +286,7 @@ class RegExpBuilder implements RegExpToken {
         );
       }
     }
-    return bind(func, this.addModifier(new CharacterGroupModifier(false)));
+    return bind(func, this.addModifier(new CharacterClassModifier(false)));
   }
 
   public get notCharIn(): RegExpToken['notCharIn'] {
@@ -631,7 +671,9 @@ export const whitespace = r.whitespace;
 export const digit = r.digit;
 export const word = r.word;
 export const verticalWhitespace = r.verticalWhitespace;
+export const backspace = r.backspace;
 export const lineFeed = r.lineFeed;
+export const formFeed = r.formFeed;
 export const carriageReturn = r.carriageReturn;
 export const tab = r.tab;
 export const nullChar = r.nullChar;
@@ -639,6 +681,8 @@ export const lineStart = r.lineStart;
 export const lineEnd = r.lineEnd;
 export const wordBoundary = r.wordBoundary;
 export const exactly = r.exactly;
+export const octal = r.octal;
+export const hex = r.hex;
 export const unicode = r.unicode;
 export const charIn = r.charIn;
 export const notCharIn = r.notCharIn;

@@ -73,7 +73,7 @@ export function assign<T extends Function, U>(target: T, source: U): T & U {
   return target as T & U;
 }
 
-export function isCharacterGroup(regExp: string): boolean {
+export function isCharacterClass(regExp: string): boolean {
   if (!regExp.startsWith('[')) {
     return false;
   }
@@ -99,7 +99,7 @@ export function isBracketGroup(regExp: string): boolean {
   }
 
   let layer = 1;
-  let inCharGroup = false;
+  let inCharClass = false;
   let charEscaped = false;
   for (let i = 1; i < regExp.length; i++) {
     const char = regExp[i];
@@ -107,14 +107,14 @@ export function isBracketGroup(regExp: string): boolean {
       charEscaped = false;
     } else if (char === '\\') {
       charEscaped = true;
-    } else if (char === '(' && !inCharGroup) {
+    } else if (char === '(' && !inCharClass) {
       layer++;
-    } else if (char === ')' && !inCharGroup) {
+    } else if (char === ')' && !inCharClass) {
       layer--;
-    } else if (char === '[' && !inCharGroup) {
-      inCharGroup = true;
-    } else if (char === ']' && inCharGroup) {
-      inCharGroup = false;
+    } else if (char === '[' && !inCharClass) {
+      inCharClass = true;
+    } else if (char === ']' && inCharClass) {
+      inCharClass = false;
     }
 
     if (layer === 0) {
@@ -129,9 +129,11 @@ export function escapeRegExp(text: string): string {
   return text.replace(/[-[/\]{}()*+?.,\\^$|#\s]/g, '\\$&');
 }
 
-export const unicodeHex = /^[0-9a-fA-F]{4}$/;
+export const hexNumber = /^[0-9a-fA-F]+$/;
 
-export const unicodeLiteral = /^\\u[0-9a-fA-F]{4}$/;
+export const octalNumber = /^[0-7]+$/;
+
+export const charLiteral = /^(?:\\u[0-9a-fA-F]{4}$|\\x[0-9a-fA-F]{2}|\\\d{1,3})/; // last option refers to octal character or capture group backreference
 
 export const captureName = /^[a-zA-Z_][a-zA-Z0-9_]*$/;
 

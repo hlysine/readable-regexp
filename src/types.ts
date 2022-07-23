@@ -40,9 +40,9 @@ export interface LimitFunction<TExclude extends string = never> {
   (limit: number): LiteralFunction<CanBeQuantified> & QuantifierFunction & QuantifiedToken<TExclude>;
 }
 
-export interface CharGroupFunction<TOut = unknown> {
-  (template: TemplateStringsArray, ...args: unknown[]): RegExpToken & CanBeQuantified & TOut & CharGroupFunction<TOut>;
-  (...args: (string | RegExpToken)[]): RegExpToken & CanBeQuantified & TOut & CharGroupFunction<TOut>;
+export interface CharClassFunction<TOut = unknown> {
+  (template: TemplateStringsArray, ...args: unknown[]): RegExpToken & CanBeQuantified & TOut & CharClassFunction<TOut>;
+  (...args: (string | RegExpToken)[]): RegExpToken & CanBeQuantified & TOut & CharClassFunction<TOut>;
 }
 
 export const negatableSymbol = Symbol('negatableToken');
@@ -65,7 +65,9 @@ export interface RegExpToken {
   get digit(): RegExpToken & CanBeNegated & CanBeQuantified;
   get word(): RegExpToken & CanBeNegated & CanBeQuantified;
   get verticalWhitespace(): RegExpToken & CanBeNegated & CanBeQuantified;
+  get backspace(): RegExpToken & CanBeNegated & CanBeQuantified;
   get lineFeed(): RegExpToken & CanBeNegated & CanBeQuantified;
+  get formFeed(): RegExpToken & CanBeNegated & CanBeQuantified;
   get carriageReturn(): RegExpToken & CanBeNegated & CanBeQuantified;
   get tab(): RegExpToken & CanBeNegated & CanBeQuantified;
   get nullChar(): RegExpToken & CanBeNegated & CanBeQuantified;
@@ -73,9 +75,11 @@ export interface RegExpToken {
   get lineEnd(): RegExpToken & CanBeNegated;
   get wordBoundary(): RegExpToken & CanBeNegated;
   get exactly(): LiteralFunction<CanBeQuantified> & CanBeQuantified;
+  get octal(): LiteralFunction<CanBeQuantified & CanBeNegated> & CanBeQuantified & CanBeNegated;
+  get hex(): LiteralFunction<CanBeQuantified & CanBeNegated> & CanBeQuantified & CanBeNegated;
   get unicode(): LiteralFunction<CanBeQuantified & CanBeNegated> & CanBeQuantified & CanBeNegated;
-  get charIn(): CharGroupFunction<CanBeNegated> & CanBeQuantified & CanBeNegated;
-  get notCharIn(): CharGroupFunction & CanBeQuantified;
+  get charIn(): CharClassFunction<CanBeNegated> & CanBeQuantified & CanBeNegated;
+  get notCharIn(): CharClassFunction & CanBeQuantified;
   get not(): TokenFunction<CanBeNegated> & NegatedToken & CanBeQuantified;
 
   get repeat(): RepeatFunction;
