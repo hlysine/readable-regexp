@@ -1,4 +1,6 @@
-# readable-regexp
+<h1 align="center">readable-regexp</h1>
+
+<div align="center">
 
 [![CI](https://github.com/hlysine/readable-regexp/actions/workflows/main.yml/badge.svg)](https://github.com/hlysine/readable-regexp/actions/workflows/main.yml)
 [![Coverage Status](https://coveralls.io/repos/github/hlysine/readable-regex/badge.svg?branch=main)](https://coveralls.io/github/hlysine/readable-regex?branch=main)
@@ -6,7 +8,11 @@
 [![npm](https://img.shields.io/npm/v/readable-regexp)](https://www.npmjs.com/package/readable-regexp)
 [![npm bundle size](https://img.shields.io/bundlephobia/minzip/readable-regexp)](https://www.npmjs.com/package/readable-regexp)
 
+</div>
+
+<p align="center">
 Create readable Regular Expressions with concise and flexible syntax.
+</p>
 
 ## Table of Contents
 
