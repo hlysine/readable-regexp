@@ -30,9 +30,7 @@ Import readable-regexp via a script tag in your HTML file, then access the `read
 
 ```html
 <script
-  src="https://cdn.jsdelivr.net/npm/readable-regexp@1.0.0/dist/readable-regexp.umd.js"
-  integrity="sha256-UV18vP6S2jM3VSSwhk5SsfiA+ugCZ1kWQrU/5GXj75E="
-  crossorigin="anonymous"
+  src="https://cdn.jsdelivr.net/npm/readable-regexp/dist/readable-regexp.umd.js"
 ></script>
 ```
 
@@ -40,7 +38,197 @@ Import readable-regexp via a script tag in your HTML file, then access the `read
 const { r } = readableRegExp;
 ```
 
+## Features
+
+### Readability
+
+readable-regexp offers much better readability, so you don't need to confuse your future self or write tons of comment 
+just to explain 1 line of regexp. It also allows you to extract and re-use repeating parts of an expression, and to add
+inline comments to a part of the expression.
+
+<details>
+    <summary>Click to see examples</summary>
+
+Compare a readable-regexp expression:
+
+```js
+const num = capture.oneOf(
+    oneOrMore.digit,  // integer
+    zeroOrMore.digit.exactly`.`.oneOrMore.digit // decimal
+);
+const regExp = match(num).exactly`,`.maybe` `.match(num).toRegExp(Flag.Global); // num is used twice here
+```
+
+With normal JS RegExp:
+
+```js
+const regExp = /(\d+|\d*\.\d+), ?(\d+|\d*\.\d+)/g; // we have to copy-paste the capture group
+```
+
+In a more complex use case, we can destructure the expression into manageable small parts:
+
+```js
+const protocol = captureAs`protocol`.oneOf(exactly`http`.maybe`s`)`smtp``ftp`; // this is short for oneOf(exactly`http`.maybe`s`, 'smtp', 'ftp')
+const domain = captureAs`domain`(oneOrMore.charIn(word, '-').oneOrMore(exactly`.`.oneOrMore.charIn(word, '-')));
+const port = exactly`:`.captureAs`port`.oneOrMore.digit;
+const path = exactly`/`.maybe.captureAs`path`(
+  oneOrMore.charIn(word, '-.').zeroOrMore(exactly`/`.oneOrMore.charIn(word, '-.'))
+);
+const query = exactly`?`.captureAs`query`.zeroOrMore.char;
+
+// combining all the parts above
+const regExp = lineStart
+    .match(protocol)
+    .exactly`://`
+    .match(domain)
+    .maybe(port)
+    .maybe(path)
+    .maybe(query)
+    .lineEnd
+    .toRegExp();
+```
+
+This is far more readable and debuggable than the equivalent RegExp:
+
+```js
+const regExp = /^(?<protocol>https?|smtp|ftp):\/\/(?<domain>[\w\-]+(?:\.[\w\-]+)+)(?::(?<port>\d+))?(?:\/(?<path>[\w\-.]+(?:\/[\w\-.]+)*)?)?(?:\?(?<query>.*))?$/;
+```
+</details>
+
+### Flexibility & Conciseness
+
+Readability is important, but conciseness is also equally important. This is why readable-regexp offers multiple 
+shorthands and alternative syntax which you can adopt if you prefer.
+
+<details>
+  <summary>Click to see examples</summary>
+
+Without all the shorthands, an expression looks like this:
+
+```js
+const regExp = exactly('[')
+    .captureAs('timestamp')(oneOrMore(not(charIn(']'))))
+    .exactly('] ')
+    .captureAs('category')(oneOrMore(word).exactly('-').oneOrMore(word))
+    .exactly(': ')
+    .captureAs('message')(oneOrMore(char))
+    .toRegExp('gm');
+```
+
+Whenever a function takes a single string literal, you can use a tagged template literal to remove the brackets:
+
+```js
+const regExp = exactly`[`
+    .captureAs`timestamp`(oneOrMore(not(charIn`]`)))
+    .exactly`] `
+    .captureAs`category`(oneOrMore(word).exactly`-`.oneOrMore(word))
+    .exactly`: `
+    .captureAs`message`(oneOrMore(char))
+    .toRegExp`gm`;
+```
+
+When there is only one token in a quantifier or group, you can chain it with `.` instead of using a bracket:
+
+```js
+const regExp = exactly`[`
+    .captureAs`timestamp`.oneOrMore.not.charIn`]`
+    .exactly`] `
+    .captureAs`category`(oneOrMore.word.exactly`-`.oneOrMore.word)
+    .exactly`: `
+    .captureAs`message`.oneOrMore.char
+    .toRegExp`gm`;
+```
+
+There are shorthands for negating a character class or a lookaround:
+
+```js
+const regExp = exactly`[`
+    .captureAs`timestamp`.oneOrMore.notCharIn`]`
+    .exactly`] `
+    .captureAs`category`(oneOrMore.word.exactly`-`.oneOrMore.word)
+    .exactly`: `
+    .captureAs`message`.oneOrMore.char
+    .toRegExp`gm`;
+```
+
+As you can see, most of the distracting brackets are gone, and you are left with a clean and concise expression.
+</details>
+
+### Safety
+
+readable-regexp is written in TypeScript with strong typing, so auto-complete is available and a lot of common mistakes 
+can be caught at compile time.
+There is also additional type and reference checking at run time, allowing you to catch errors before even creating a
+RegExp object.
+
+<details>
+    <summary>Click to see examples</summary>
+
+Some errors can be avoided just by writing in readable-regexp:
+
+```js
+const o = "Ȯ"; // 0x022e
+const result1 = /\u22e/.test(n);
+// false
+
+const result2 = unicode`22e`.toRegExp().test(n);
+// true
+// '22e' is automatically fixed to be '\u022e'
+```
+
+Some errors can be caught by TypeScript at compile time:
+
+```js
+// @ts-expect-error - You cannot use two quantifiers on one token
+const regExp = oneOrMore.zeroOrMore`foo`;
+```
+
+```js
+// @ts-expect-error - char is not negatable, because it matches nothing
+const regExp = oneOrMore.not.char;
+```
+
+```js
+// @ts-expect-error - k is not a valid flag
+const regExp = char.toRegExp('gki');
+```
+
+Some can be caught at run time:
+
+```js
+const result1 = /(foo)\2/.test("foofoo");
+// false
+
+const result2 = capture`foo`.ref(2).toRegExp().test("foofoo");
+// Error: The following backreferences are not defined: 2
+```
+</details>
+
 ## Documentation
+
+### Syntax Rules
+
+- Chain function calls with `.` to represent consecutive tokens.
+  - `` exactly`fo`.maybe`o` `` = `foo?`
+
+
+- Using a tagged template literal is equal to calling the function with one string argument. Interpolation also works in the tagged template literals.
+  - `` exactly`foo` `` = `exactly('foo')`
+  - `` exactly`foo${someVar}` `` = `exactly('foo' + someVar)`
+
+
+- Chaining function calls is equal to calling the function with multiple arguments.
+  - `` oneOf`foo` `bar` `baz` `` = `oneOf('foo')('bar')('baz')` = `oneOf('foo', 'bar', 'baz')`
+  - `` oneOf`foo` `bar` (maybe.digit) `` = `oneOf('foo', 'bar', maybe.digit)`
+
+
+- All expressions can be coerced to string. This is especially useful in character classes.
+  - `` charIn`${word}-.` `` = `` charIn`\w-.` ``
+
+
+- If a function expects an expression and your expression consists of 1 token only, you can chain the call to omit the bracket.
+  - `oneOrMore(word)` = `oneOrMore.word`
+  - `maybe(not(digit))` = `maybe.not.digit`
 
 ### Special Tokens
 
