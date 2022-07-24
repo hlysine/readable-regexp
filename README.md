@@ -102,7 +102,9 @@ const path = exactly`/`.maybe.captureAs`path`(
 const query = exactly`?`.captureAs`query`.zeroOrMore.char;
 
 // combining all the parts above
-const regExp = lineStart.match(protocol).exactly`://`
+const regExp = lineStart
+  .match(protocol)
+  .exactly`://`
   .match(domain)
   .maybe(port)
   .maybe(path)
