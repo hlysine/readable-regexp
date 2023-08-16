@@ -1,20 +1,14 @@
 import {
   AlternationFunction,
-  CanBeNegated,
-  CanBeQuantified,
   CharClassFunction,
-  ExtraQuantifiedToken,
   FlagUnion,
   FlagsString,
   GroupFunction,
   LiteralFunction,
-  QuantifiedToken,
-  QuantifierFunction,
   RegExpLiteral,
   RegExpModifier,
   RegExpToken,
-  negatableSymbol,
-  quantifiableSymbol,
+  TokenFunction,
 } from './types';
 import {
   assign,
@@ -40,8 +34,6 @@ class RegExpBuilder implements RegExpToken {
   public readonly modifiers: RegExpModifier[];
   public readonly backreferences: (string | number)[];
   public readonly namedGroups: (string | number)[];
-  public readonly [negatableSymbol]: undefined;
-  public readonly [quantifiableSymbol]: undefined;
 
   public constructor(
     regExp?: string,
@@ -226,7 +218,7 @@ class RegExpBuilder implements RegExpToken {
   }
 
   public get exactly(): RegExpToken['exactly'] {
-    function func(this: RegExpBuilder, ...args: RegExpLiteral): RegExpToken & CanBeQuantified {
+    function func(this: RegExpBuilder, ...args: RegExpLiteral): RegExpToken {
       if (!isLiteralArgument(args)) throw new Error('Invalid arguments for exactly');
       const literal = getLiteralString(args);
       return this.addNode(literal);
@@ -235,7 +227,7 @@ class RegExpBuilder implements RegExpToken {
   }
 
   public get octal(): RegExpToken['octal'] {
-    function func(this: RegExpBuilder, ...args: RegExpLiteral): RegExpToken & CanBeQuantified & CanBeNegated {
+    function func(this: RegExpBuilder, ...args: RegExpLiteral): RegExpToken {
       const literal = getLiteralString(args, false);
       if (!octalNumber.test(literal)) throw new Error('Invalid octal character');
       const num = Number.parseInt(literal, 8);
@@ -253,7 +245,7 @@ class RegExpBuilder implements RegExpToken {
   }
 
   public get hex(): RegExpToken['hex'] {
-    function func(this: RegExpBuilder, ...args: RegExpLiteral): RegExpToken & CanBeQuantified & CanBeNegated {
+    function func(this: RegExpBuilder, ...args: RegExpLiteral): RegExpToken {
       const literal = getLiteralString(args, false);
       if (!hexNumber.test(literal)) throw new Error('Invalid hex character');
       const num = Number.parseInt(literal, 16);
@@ -265,7 +257,7 @@ class RegExpBuilder implements RegExpToken {
   }
 
   public get unicode(): RegExpToken['unicode'] {
-    function func(this: RegExpBuilder, ...args: RegExpLiteral): RegExpToken & CanBeQuantified & CanBeNegated {
+    function func(this: RegExpBuilder, ...args: RegExpLiteral): RegExpToken {
       const literal = getLiteralString(args, false);
       if (!hexNumber.test(literal)) throw new Error('Invalid unicode character');
       const num = Number.parseInt(literal, 16);
@@ -279,7 +271,7 @@ class RegExpBuilder implements RegExpToken {
     function func(
       this: RegExpBuilder,
       ...args: RegExpLiteral | (string | RegExpToken)[]
-    ): RegExpToken & CanBeQuantified & CanBeNegated & CharClassFunction<CanBeNegated> {
+    ): RegExpToken & CharClassFunction {
       if (!(this.modifiers[0] instanceof CharacterClassModifier))
         throw new Error(`Unexpected modifier, expected CharacterClassModifier, but got ${this.modifiers[0]}`);
       if (isLiteralArgument(args)) {
@@ -314,7 +306,7 @@ class RegExpBuilder implements RegExpToken {
   }
 
   public get not(): RegExpToken['not'] {
-    function func(this: RegExpBuilder, token: RegExpToken & CanBeNegated): RegExpToken & CanBeQuantified {
+    function func(this: RegExpBuilder, token: RegExpToken): RegExpToken {
       if (RegExpBuilder.isRegExpBuilder(token)) {
         return this.addNode(token);
       } else {
@@ -329,12 +321,8 @@ class RegExpBuilder implements RegExpToken {
    */
 
   public get repeat(): RegExpToken['repeat'] {
-    function configure(
-      this: RegExpBuilder,
-      min: number,
-      max?: number
-    ): LiteralFunction<CanBeQuantified> & QuantifierFunction & QuantifiedToken {
-      function func(this: RegExpBuilder, ...args: RegExpLiteral | [RegExpToken]): RegExpToken & CanBeQuantified {
+    function configure(this: RegExpBuilder, min: number, max?: number): LiteralFunction & TokenFunction & RegExpToken {
+      function func(this: RegExpBuilder, ...args: RegExpLiteral | [RegExpToken]): RegExpToken {
         if (isLiteralArgument(args)) {
           const literal = getLiteralString(args);
           return this.addNode(literal);
@@ -350,22 +338,15 @@ class RegExpBuilder implements RegExpToken {
   }
 
   public get repeatLazily(): RegExpToken['repeatLazily'] {
-    function configure(
-      this: RegExpBuilder,
-      min: number,
-      max?: number
-    ): LiteralFunction<CanBeQuantified> & QuantifierFunction & QuantifiedToken<'lazily'> {
+    function configure(this: RegExpBuilder, min: number, max?: number): LiteralFunction & TokenFunction & RegExpToken {
       return this.repeat(min, max).lazily;
     }
     return bind(configure, this);
   }
 
   public get atLeast(): RegExpToken['atLeast'] {
-    function configure(
-      this: RegExpBuilder,
-      limit: number
-    ): LiteralFunction<CanBeQuantified> & QuantifierFunction & QuantifiedToken {
-      function func(this: RegExpBuilder, ...args: RegExpLiteral | [RegExpToken]): RegExpToken & CanBeQuantified {
+    function configure(this: RegExpBuilder, limit: number): LiteralFunction & TokenFunction & RegExpToken {
+      function func(this: RegExpBuilder, ...args: RegExpLiteral | [RegExpToken]): RegExpToken {
         if (isLiteralArgument(args)) {
           const literal = getLiteralString(args);
           return this.addNode(literal);
@@ -381,21 +362,15 @@ class RegExpBuilder implements RegExpToken {
   }
 
   public get atLeastLazily(): RegExpToken['atLeastLazily'] {
-    function configure(
-      this: RegExpBuilder,
-      limit: number
-    ): LiteralFunction<CanBeQuantified> & QuantifierFunction & QuantifiedToken<'lazily'> {
+    function configure(this: RegExpBuilder, limit: number): LiteralFunction & TokenFunction & RegExpToken {
       return this.atLeast(limit).lazily;
     }
     return bind(configure, this);
   }
 
   public get atMost(): RegExpToken['atMost'] {
-    function configure(
-      this: RegExpBuilder,
-      limit: number
-    ): LiteralFunction<CanBeQuantified> & QuantifierFunction & QuantifiedToken {
-      function func(this: RegExpBuilder, ...args: RegExpLiteral | [RegExpToken]): RegExpToken & CanBeQuantified {
+    function configure(this: RegExpBuilder, limit: number): LiteralFunction & TokenFunction & RegExpToken {
+      function func(this: RegExpBuilder, ...args: RegExpLiteral | [RegExpToken]): RegExpToken {
         if (isLiteralArgument(args)) {
           const literal = getLiteralString(args);
           return this.addNode(literal);
@@ -411,17 +386,14 @@ class RegExpBuilder implements RegExpToken {
   }
 
   public get atMostLazily(): RegExpToken['atMostLazily'] {
-    function configure(
-      this: RegExpBuilder,
-      limit: number
-    ): LiteralFunction<CanBeQuantified> & QuantifierFunction & QuantifiedToken<'lazily'> {
+    function configure(this: RegExpBuilder, limit: number): LiteralFunction & TokenFunction & RegExpToken {
       return this.atMost(limit).lazily;
     }
     return bind(configure, this);
   }
 
   public get maybe(): RegExpToken['maybe'] {
-    function func(this: RegExpBuilder, ...args: RegExpLiteral | [RegExpToken]): RegExpToken & CanBeQuantified {
+    function func(this: RegExpBuilder, ...args: RegExpLiteral | [RegExpToken]): RegExpToken {
       if (isLiteralArgument(args)) {
         const literal = getLiteralString(args);
         return this.addNode(literal);
@@ -439,7 +411,7 @@ class RegExpBuilder implements RegExpToken {
   }
 
   public get zeroOrMore(): RegExpToken['zeroOrMore'] {
-    function func(this: RegExpBuilder, ...args: RegExpLiteral | [RegExpToken]): RegExpToken & CanBeQuantified {
+    function func(this: RegExpBuilder, ...args: RegExpLiteral | [RegExpToken]): RegExpToken {
       if (isLiteralArgument(args)) {
         const literal = getLiteralString(args);
         return this.addNode(literal);
@@ -457,7 +429,7 @@ class RegExpBuilder implements RegExpToken {
   }
 
   public get oneOrMore(): RegExpToken['oneOrMore'] {
-    function func(this: RegExpBuilder, ...args: RegExpLiteral | [RegExpToken]): RegExpToken & CanBeQuantified {
+    function func(this: RegExpBuilder, ...args: RegExpLiteral | [RegExpToken]): RegExpToken {
       if (isLiteralArgument(args)) {
         const literal = getLiteralString(args);
         return this.addNode(literal);
@@ -474,8 +446,8 @@ class RegExpBuilder implements RegExpToken {
     return this.oneOrMore.lazily;
   }
 
-  public get lazily(): ExtraQuantifiedToken['lazily'] {
-    function func(this: RegExpBuilder, ...args: RegExpLiteral | [RegExpToken]): RegExpToken & CanBeQuantified {
+  public get lazily(): RegExpToken['lazily'] {
+    function func(this: RegExpBuilder, ...args: RegExpLiteral | [RegExpToken]): RegExpToken {
       if (isLiteralArgument(args)) {
         const literal = getLiteralString(args);
         return this.addNode(literal);
@@ -499,7 +471,7 @@ class RegExpBuilder implements RegExpToken {
    */
 
   public get capture(): RegExpToken['capture'] {
-    function func(this: RegExpBuilder, ...args: RegExpLiteral | [RegExpToken?]): RegExpToken & CanBeQuantified {
+    function func(this: RegExpBuilder, ...args: RegExpLiteral | [RegExpToken?]): RegExpToken {
       if (args.length === 0) {
         return this.addNode('');
       } else if (isLiteralArgument(args)) {
@@ -521,14 +493,14 @@ class RegExpBuilder implements RegExpToken {
     function configure(
       this: RegExpBuilder,
       ...configArgs: RegExpLiteral
-    ): LiteralFunction<CanBeQuantified> & GroupFunction & RegExpToken {
+    ): LiteralFunction & GroupFunction & RegExpToken {
       if (!isLiteralArgument(configArgs)) {
         throw new Error('Invalid arguments for captureAs');
       }
       const name = getLiteralString(configArgs);
       if (!captureName.test(name))
         throw new Error('Invalid capture name. It must be alpha numeric and must not begin with a digit');
-      function func(this: RegExpBuilder, ...args: RegExpLiteral | [RegExpToken?]): RegExpToken & CanBeQuantified {
+      function func(this: RegExpBuilder, ...args: RegExpLiteral | [RegExpToken?]): RegExpToken {
         if (args.length === 0) {
           return this.addNode('');
         } else if (isLiteralArgument(args)) {
@@ -549,7 +521,7 @@ class RegExpBuilder implements RegExpToken {
   }
 
   public get ref(): RegExpToken['ref'] {
-    function func(this: RegExpBuilder, ...args: RegExpLiteral | [number]): RegExpToken & CanBeQuantified {
+    function func(this: RegExpBuilder, ...args: RegExpLiteral | [number]): RegExpToken {
       if (args.length === 1 && typeof args[0] === 'number') {
         const index = args[0];
         if (index <= 0) throw new Error('Invalid group index in ref');
@@ -567,7 +539,7 @@ class RegExpBuilder implements RegExpToken {
   }
 
   public get group(): RegExpToken['group'] {
-    function func(this: RegExpBuilder, ...args: RegExpLiteral | [RegExpToken?]): RegExpToken & CanBeQuantified {
+    function func(this: RegExpBuilder, ...args: RegExpLiteral | [RegExpToken?]): RegExpToken {
       if (args.length === 0) {
         return this.addNode('');
       } else if (isLiteralArgument(args)) {
@@ -583,10 +555,7 @@ class RegExpBuilder implements RegExpToken {
   }
 
   public get ahead(): RegExpToken['ahead'] {
-    function func(
-      this: RegExpBuilder,
-      ...args: RegExpLiteral | [RegExpToken?]
-    ): RegExpToken & CanBeQuantified & CanBeNegated {
+    function func(this: RegExpBuilder, ...args: RegExpLiteral | [RegExpToken?]): RegExpToken {
       if (args.length === 0) {
         return this.addNode('');
       } else if (isLiteralArgument(args)) {
@@ -602,10 +571,7 @@ class RegExpBuilder implements RegExpToken {
   }
 
   public get behind(): RegExpToken['behind'] {
-    function func(
-      this: RegExpBuilder,
-      ...args: RegExpLiteral | [RegExpToken?]
-    ): RegExpToken & CanBeQuantified & CanBeNegated {
+    function func(this: RegExpBuilder, ...args: RegExpLiteral | [RegExpToken?]): RegExpToken {
       if (args.length === 0) {
         return this.addNode('');
       } else if (isLiteralArgument(args)) {
@@ -632,7 +598,7 @@ class RegExpBuilder implements RegExpToken {
     function func(
       this: RegExpBuilder,
       ...args: RegExpLiteral | (string | RegExpToken)[]
-    ): RegExpToken & CanBeQuantified & AlternationFunction {
+    ): RegExpToken & AlternationFunction {
       if (!(this.modifiers[0] instanceof AlternationModifier))
         throw new Error(`Unexpected modifier, expected OneOfModifier, but got ${this.modifiers[0]}`);
       if (isLiteralArgument(args)) {
@@ -676,7 +642,7 @@ class RegExpBuilder implements RegExpToken {
    */
 
   public get match(): RegExpToken['match'] {
-    function func(this: RegExpBuilder, token: RegExpToken): RegExpToken & CanBeQuantified {
+    function func(this: RegExpBuilder, token: RegExpToken): RegExpToken {
       if (!RegExpBuilder.isRegExpBuilder(token)) throw new Error('Invalid arguments for match');
       return this.addNode(token);
     }
