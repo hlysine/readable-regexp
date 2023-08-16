@@ -3,8 +3,10 @@ import commonjs from '@rollup/plugin-commonjs';
 import del from 'rollup-plugin-delete';
 import dts from 'rollup-plugin-dts';
 import esbuild from 'rollup-plugin-esbuild';
+import fs from 'fs';
 import nodeResolve from '@rollup/plugin-node-resolve';
-import packageJson from './package.json';
+
+const packageJson = JSON.parse(fs.readFileSync('./package.json', { encoding: 'utf-8' }));
 
 const name = packageJson.main.replace(/\.umd\.js$/, '');
 
