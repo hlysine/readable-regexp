@@ -16,7 +16,6 @@ import {
   negatableSymbol,
   quantifiableSymbol,
 } from './types';
-import GroupModifier, { GroupType } from './modifiers/GroupModifier';
 import {
   assign,
   bind,
@@ -30,6 +29,7 @@ import {
 import AlternationModifier from './modifiers/AlternationModifier';
 import CaptureModifier from './modifiers/CaptureModifier';
 import CharacterClassModifier from './modifiers/CharacterClassModifier';
+import GroupModifier, { GroupType } from './modifiers/GroupModifier';
 import NegationModifier from './modifiers/NegationModifier';
 import QuantityModifier from './modifiers/QuantityModifier';
 import RepeatQuantifier from './modifiers/RepeatQuantifier';

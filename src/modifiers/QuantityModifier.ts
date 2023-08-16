@@ -1,5 +1,5 @@
-import { charLiteral, isBracketGroup, isCharacterClass } from '../helper';
 import { RegExpModifier } from '../types';
+import { charLiteral, isBracketGroup, isCharacterClass } from '../helper';
 
 const NOT_QUANTIFIABLE = new Set(['^', '$', '\\b', '\\B']);
 

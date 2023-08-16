@@ -1,5 +1,5 @@
-import { charLiteral, isBracketGroup, isCharacterClass, negatableTokens } from '../helper';
 import { RegExpModifier } from '../types';
+import { charLiteral, isBracketGroup, isCharacterClass, negatableTokens } from '../helper';
 
 export default class NegationModifier implements RegExpModifier {
   public modify(regExp: string): [string, string?] {
