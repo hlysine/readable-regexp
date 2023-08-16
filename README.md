@@ -204,7 +204,8 @@ const result2 = unicode`22e`.toRegExp().test(n);
 ```
 
 Some errors can be caught by TypeScript at compile time:
-**(Not working at the moment. These errors will either be thrown at runtime or be handled by readable-regexp to produce reasonable RegExp.**
+
+**(Not working at the moment. These errors will either be thrown at runtime or be handled by readable-regexp to produce reasonable RegExp.)**
 
 ```js
 // @ts-expect-error - You cannot use two quantifiers on one token
