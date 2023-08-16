@@ -19,9 +19,16 @@
   "bugs": {
     "url": "https://github.com/hlysine/readable-regexp/issues"
   },
-  "main": "dist/readable-regexp.umd.js",
-  "module": "dist/readable-regexp.mjs",
-  "typings": "dist/readable-regexp.d.ts",
+  "main": "./dist/readable-regexp.umd.js",
+  "module": "./dist/readable-regexp.mjs",
+  "typings": "./dist/readable-regexp.d.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/readable-regexp.umd.js",
+      "import": "./dist/readable-regexp.mjs",
+      "types": "./dist/readable-regexp.d.ts"
+    }
+  },
   "files": [
     "dist"
   ],
