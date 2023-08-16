@@ -4,6 +4,7 @@
 /node_modules/
 /dist/
 /coverage/
+/example-app/
 
 
 # Created by https://www.toptal.com/developers/gitignore/api/webstorm
