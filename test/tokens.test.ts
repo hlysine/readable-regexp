@@ -34,7 +34,7 @@ const testCases = [
   ['lineEnd', lineEnd, '$'],
   ['wordBoundary', wordBoundary, '\\b'],
 ] as const;
-function runTest([name, token, expected]: typeof testCases[number]): void {
+function runTest([name, token, expected]: (typeof testCases)[number]): void {
   describe(name, () => {
     it('works', () => {
       expect(token.toString()).toBe(expected);
@@ -90,9 +90,7 @@ describe('negation', () => {
     expect(not(wordBoundary).toString()).toBe('\\B');
   });
   it('is not negatable', () => {
-    // @ts-expect-error - char is not negatable
     expect(() => not.char).toThrow();
-    // @ts-expect-error - char is not negatable
     expect(() => not(char)).toThrow();
   });
 });
@@ -133,31 +131,19 @@ describe('quantification', () => {
     expect(oneOrMore(nullChar).toString()).toBe('\\0+');
   });
   it('is not quantifiable', () => {
-    // @ts-expect-error - lineStart is not quantifiable
     expect(() => oneOrMore.lineStart).toThrow();
-    // @ts-expect-error - lineStart is not quantifiable
     expect(() => oneOrMore(lineStart)).toThrow();
-    // @ts-expect-error - lineStart is negated with lookahead, which can technically be quantified but has no effect
     expect(oneOrMore.not.lineStart.toString()).toBe('(?:(?!^))+');
-    // @ts-expect-error - lineStart is negated with lookahead, which can technically be quantified but has no effect
     expect(oneOrMore(not(lineStart)).toString()).toBe('(?:(?!^))+');
 
-    // @ts-expect-error - lineEnd is not quantifiable
     expect(() => oneOrMore.lineEnd).toThrow();
-    // @ts-expect-error - lineEnd is not quantifiable
     expect(() => oneOrMore(lineEnd)).toThrow();
-    // @ts-expect-error - lineEnd is negated with lookahead, which can technically be quantified but has no effect
     expect(oneOrMore.not.lineEnd.toString()).toBe('(?:(?!$))+');
-    // @ts-expect-error - lineEnd is negated with lookahead, which can technically be quantified but has no effect
     expect(oneOrMore(not(lineEnd)).toString()).toBe('(?:(?!$))+');
 
-    // @ts-expect-error - wordBoundary is not quantifiable
     expect(() => oneOrMore.wordBoundary).toThrow();
-    // @ts-expect-error - wordBoundary is not quantifiable
     expect(() => oneOrMore(wordBoundary)).toThrow();
-    // @ts-expect-error - wordBoundary is not quantifiable
     expect(() => oneOrMore.not.wordBoundary).toThrow();
-    // @ts-expect-error - wordBoundary is not quantifiable
     expect(() => oneOrMore(not(wordBoundary))).toThrow();
   });
 });
