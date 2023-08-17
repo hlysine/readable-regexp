@@ -283,7 +283,7 @@ const regExp = oneOrMore(exactly`fo`.maybe`o`);
 ### Special Tokens
 
 | Function                                               | RegExp equivalent | Explanation                                                       |
-| ------------------------------------------------------ | ----------------- | ----------------------------------------------------------------- |
+|--------------------------------------------------------|-------------------|-------------------------------------------------------------------|
 | `` exactly`(yes/no)` ``                                | `\(yes\/no\)`     | Match the given string literally, escaping all special characters |
 | `lineFeed`                                             | `\n`              | Match a line feed character                                       |
 | `not.lineFeed`<br/>`not(lineFeed)`                     | `[^\n]`           | Match anything other than a line feed                             |
@@ -316,16 +316,16 @@ uses the 2-byte sequence `\uffff`.
 
 ### Character Classes
 
-| Function                                                                                                         | RegExp equivalent | Explanation                                                                                     |
-| ---------------------------------------------------------------------------------------------------------------- | ----------------- | ----------------------------------------------------------------------------------------------- |
-| `word`                                                                                                           | `\w`              | Match alphanumeric characters and underscore                                                    |
-| `not.word`<br/>`not(word)`                                                                                       | `\W`              | Match anything other than `\w`                                                                  |
-| `digit`                                                                                                          | `\d`              | Match a character between `0` to `9`                                                            |
-| `not.digit`<br/>`not(digit)`                                                                                     | `\D`              | Match anything other than a digit                                                               |
-| `whitespace`                                                                                                     | `\s`              | Match all types of whitespace characters                                                        |
-| `not.whitespace`<br/>`not(whitespace)`                                                                           | `\S`              | Match anything other than a whitespace                                                          |
-| `char`                                                                                                           | `.`               | `not.char` does not exist because it does not match anything                                    |
-| `` charIn`a-z_-` ``<br/>`charIn('a-z', '_-')`<br/>`` charIn`a-z` `_-` ``                                       | `[a-z_-]`         | Match a character listed in the group. A hyphen denotes a range of characters, such as `a-z`. † |
+| Function                                                                                                      | RegExp equivalent | Explanation                                                                                     |
+|---------------------------------------------------------------------------------------------------------------|-------------------|-------------------------------------------------------------------------------------------------|
+| `word`                                                                                                        | `\w`              | Match alphanumeric characters and underscore                                                    |
+| `not.word`<br/>`not(word)`                                                                                    | `\W`              | Match anything other than `\w`                                                                  |
+| `digit`                                                                                                       | `\d`              | Match a character between `0` to `9`                                                            |
+| `not.digit`<br/>`not(digit)`                                                                                  | `\D`              | Match anything other than a digit                                                               |
+| `whitespace`                                                                                                  | `\s`              | Match all types of whitespace characters                                                        |
+| `not.whitespace`<br/>`not(whitespace)`                                                                        | `\S`              | Match anything other than a whitespace                                                          |
+| `char`                                                                                                        | `.`               | `not.char` does not exist because it does not match anything                                    |
+| `` charIn`a-z_-` ``<br/>`charIn('a-z', '_-')`<br/>`` charIn`a-z` `_-` ``                                      | `[a-z_-]`         | Match a character listed in the group. A hyphen denotes a range of characters, such as `a-z`. † |
 | `` notCharIn`a-z_-` ``<br/>`` not.charIn`a-z_-` ``<br/>`notCharIn('a-z', '_-')`<br/>`` notCharIn`a-z` `_-` `` | `[^a-z_-]`        | Match a character not listed in the group. †                                                    |
 
 #### † Notes on character classes
@@ -348,7 +348,7 @@ All other characters are not escaped in `charIn`, so you can use escape sequence
 ### Anchors
 
 | Function                                   | RegExp equivalent | Explanation                                                                       |
-| ------------------------------------------ | ----------------- | --------------------------------------------------------------------------------- |
+|--------------------------------------------|-------------------|-----------------------------------------------------------------------------------|
 | `lineStart`                                | `^`               | Assert position at the start of string, or start of line if multiline flag is set |
 | `not.lineStart`<br/>`not(lineStart)`       | `(?!^)`           | Assert position not at the start of string/line                                   |
 | `lineEnd`                                  | `$`               | Assert position at the end of string, or end of line if multiline flag is set     |
@@ -358,25 +358,25 @@ All other characters are not escaped in `charIn`, so you can use escape sequence
 
 ### Quantifiers
 
-| Function                                                                           | RegExp equivalent | Explanation                                                                                   |
-| ---------------------------------------------------------------------------------- | ----------------- | --------------------------------------------------------------------------------------------- |
-| `` repeat(3,5)`foo` ``<br/>`` repeat(3,5).exactly`foo` ``<br/>`repeat(3,5)('foo')` | `(?:foo){3,5}`    | Match a token the specified amount of times. Supply 1 parameter for an exact number of times. |
-| `` repeatLazily(3,5)`foo` ``<br/>`` repeat.lazily(3,5)`foo` ``                     | `(?:foo){3,5}?`   | Same as `repeat`, but match as short as possible                                              |
-| `` atLeast(3)`foo` ``<br/>`` atLeast(3).exactly`foo` ``<br/>`atLeast(3)('foo')`    | `(?:foo){3,}`     | Match a token at least the specified amount of times.                                         |
-| `` atLeastLazily(3)`foo` ``<br/>`` atLeast.lazily(3)`foo` ``                       | `(?:foo){3,}?`    | Same as `atLeast`, but match as short as possible                                             |
-| `` atMost(3)`foo` ``<br/>`` atMost(3).exactly`foo` ``<br/>`atMost(3)('foo')`       | `(?:foo){,3}`     | Match a token at most the specified amount of times.                                          |
-| `` atMostLazily(3)`foo` ``<br/>`` atMost.lazily(3)`foo` ``                         | `(?:foo){,3}?`    | Same as `atMost`, but match as short as possible                                              |
-| `` maybe`foo` ``<br/>`` maybe.exactly`foo` ``<br/>`maybe('foo')`                   | `(?:foo)?`        | Match a token 0 to 1 times                                                                    |
-| `` maybeLazily`foo` ``<br/>`` maybe.lazily`foo` ``                                 | `(?:foo)??`       | Same as `maybe`, but match as short as possible                                               |
-| `` zeroOrMore`foo` ``<br/>`` zeroOrMore.exactly`foo` ``<br/>`zeroOrMore('foo')`    | `(?:foo)*`        | Match a token 0 to infinite times                                                             |
-| `` zeroOrMoreLazily`foo` ``<br/>`` zeroOrMore.lazily`foo` ``                       | `(?:foo)*?`       | Same as `zeroOrMore`, but match as short as possible                                          |
-| `` oneOrMore`foo` ``<br/>`` oneOrMore.exactly`foo` ``<br/>`oneOrMore('foo')`       | `(?:foo)+`        | Match a token 1 to infinite times                                                             |
-| `` oneOrMoreLazily`foo` ``<br/>`` oneOrMore.lazily`foo` ``                         | `(?:foo)+?`       | Same as `oneOrMore`, but match as short as possible                                           |
+| Function                                                                                                                                                                 | RegExp equivalent                    | Explanation                                                                                                                |
+|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------|----------------------------------------------------------------------------------------------------------------------------|
+| `` repeat(3,5)`foo` ``<br/>`` repeat(3,5).exactly`foo` ``<br/>`repeat(3,5)('foo')`<br/><br/>`` repeat(3)`foo` ``<br/>`` repeat(3).exactly`foo` ``<br/>`repeat(3)('foo')` | `(?:foo){3,5}`<br/><br/>`(?:foo){3}` | Match a token the specified amount of times. Supply 1 parameter for an exact number of times, or 2 parameters for min/max. |
+| `` repeatLazily(3,5)`foo` ``<br/>`` repeat.lazily(3,5)`foo` ``                                                                                                           | `(?:foo){3,5}?`                      | Same as `repeat`, but match as short as possible                                                                           |
+| `` atLeast(3)`foo` ``<br/>`` atLeast(3).exactly`foo` ``<br/>`atLeast(3)('foo')`                                                                                          | `(?:foo){3,}`                        | Match a token at least the specified amount of times.                                                                      |
+| `` atLeastLazily(3)`foo` ``<br/>`` atLeast.lazily(3)`foo` ``                                                                                                             | `(?:foo){3,}?`                       | Same as `atLeast`, but match as short as possible                                                                          |
+| `` atMost(3)`foo` ``<br/>`` atMost(3).exactly`foo` ``<br/>`atMost(3)('foo')`                                                                                             | `(?:foo){0,3}`                       | Match a token at most the specified amount of times.                                                                       |
+| `` atMostLazily(3)`foo` ``<br/>`` atMost.lazily(3)`foo` ``                                                                                                               | `(?:foo){0,3}?`                      | Same as `atMost`, but match as short as possible                                                                           |
+| `` maybe`foo` ``<br/>`` maybe.exactly`foo` ``<br/>`maybe('foo')`                                                                                                         | `(?:foo)?`                           | Match a token 0 to 1 times                                                                                                 |
+| `` maybeLazily`foo` ``<br/>`` maybe.lazily`foo` ``                                                                                                                       | `(?:foo)??`                          | Same as `maybe`, but match as short as possible                                                                            |
+| `` zeroOrMore`foo` ``<br/>`` zeroOrMore.exactly`foo` ``<br/>`zeroOrMore('foo')`                                                                                          | `(?:foo)*`                           | Match a token 0 to infinite times                                                                                          |
+| `` zeroOrMoreLazily`foo` ``<br/>`` zeroOrMore.lazily`foo` ``                                                                                                             | `(?:foo)*?`                          | Same as `zeroOrMore`, but match as short as possible                                                                       |
+| `` oneOrMore`foo` ``<br/>`` oneOrMore.exactly`foo` ``<br/>`oneOrMore('foo')`                                                                                             | `(?:foo)+`                           | Match a token 1 to infinite times                                                                                          |
+| `` oneOrMoreLazily`foo` ``<br/>`` oneOrMore.lazily`foo` ``                                                                                                               | `(?:foo)+?`                          | Same as `oneOrMore`, but match as short as possible                                                                        |
 
 ### Groups
 
 | Function                                                                                               | RegExp equivalent                    | Explanation                                                                                                         |
-| ------------------------------------------------------------------------------------------------------ | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------- |
+|--------------------------------------------------------------------------------------------------------|--------------------------------------|---------------------------------------------------------------------------------------------------------------------|
 | `` capture`foo` ``<br/>`` capture.exactly`foo` ``<br/>`capture('foo')`                                 | `(foo)`                              | Wrap the given token in a capture group                                                                             |
 | `` captureAs`name` `foo` ``<br/>`` captureAs`name`.exactly`foo` ``<br/>`captureAs('name')('foo')`      | `(?<name>foo)`                       | Wrap the given token in a named capture group                                                                       |
 | `` captureAs`name` `foo`.ref`name` ``<br/>`` capture`foo`.ref(1) ``                                    | `(?<name>foo)\k<name>`<br/>`(foo)\1` | Supply a number to reference the capture group with that index. Supply a string to reference a named capture group. |
