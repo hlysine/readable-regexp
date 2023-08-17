@@ -328,33 +328,33 @@ describe('atLeast', () => {
 
 describe('atMost', () => {
   it('accepts plain strings', () => {
-    expect(atMost(3)`foo`.toString()).toBe('(?:foo){,3}');
-    expect(atMost(3)('foo').toString()).toBe('(?:foo){,3}');
+    expect(atMost(3)`foo`.toString()).toBe('(?:foo){0,3}');
+    expect(atMost(3)('foo').toString()).toBe('(?:foo){0,3}');
   });
   it('accepts special tokens', () => {
-    expect(atMost(3)(char).toString()).toBe('.{,3}');
-    expect(atMost(3).char.toString()).toBe('.{,3}');
+    expect(atMost(3)(char).toString()).toBe('.{0,3}');
+    expect(atMost(3).char.toString()).toBe('.{0,3}');
   });
   it('accepts expressions', () => {
-    expect(atMost(3)(exactly`foo`).toString()).toBe('(?:foo){,3}');
-    expect(atMost(3).exactly`foo`.toString()).toBe('(?:foo){,3}');
+    expect(atMost(3)(exactly`foo`).toString()).toBe('(?:foo){0,3}');
+    expect(atMost(3).exactly`foo`.toString()).toBe('(?:foo){0,3}');
   });
   it('cannot be quantified in dot syntax', () => {
-    expect(oneOrMore.atMost(3)`foo`.toString()).toBe('(?:(?:foo){,3})+');
-    expect(oneOrMore(atMost(3)`foo`).toString()).toBe('(?:(?:foo){,3})+');
+    expect(oneOrMore.atMost(3)`foo`.toString()).toBe('(?:(?:foo){0,3})+');
+    expect(oneOrMore(atMost(3)`foo`).toString()).toBe('(?:(?:foo){0,3})+');
   });
   it('cannot be negated', () => {
     expect(() => not.atMost(3)`foo`.toString()).toThrow();
     expect(() => not(atMost(3)`foo`).toString()).toThrow();
   });
   it('supports lazily', () => {
-    expect(atMost(3).lazily`foo`.toString()).toBe('(?:foo){,3}?');
+    expect(atMost(3).lazily`foo`.toString()).toBe('(?:foo){0,3}?');
     expect(
       atMost(3)
         .lazily(exactly`foo`)
         .toString()
-    ).toBe('(?:foo){,3}?');
-    expect(atMostLazily(3)`foo`.toString()).toBe('(?:foo){,3}?');
+    ).toBe('(?:foo){0,3}?');
+    expect(atMostLazily(3)`foo`.toString()).toBe('(?:foo){0,3}?');
   });
   it('throws for invalid argument', () => {
     // @ts-expect-error - testing invalid arguments
@@ -876,7 +876,7 @@ describe('oneOf', () => {
     expect(() => not(oneOf`foo``bar``baz`).toString()).toThrow();
   });
   it('throws for invalid argument', () => {
-    expect(oneOf().toString()).toBe('(?:)');
+    expect(() => oneOf().toString()).toThrow();
     expect(oneOf``.toString()).toBe('(?:)');
     // @ts-expect-error - testing invalid arguments
     expect(() => oneOf(1)).toThrow();
@@ -888,6 +888,8 @@ describe('oneOf', () => {
 describe('match', () => {
   it('accepts expressions', () => {
     expect(match(exactly`foo`).toString()).toBe('foo');
+    expect(match(exactly`foo`, exactly`bar`).toString()).toBe('foobar');
+    expect(match(not.behind`foo`, maybe.exactly`bar`, oneOrMore`baz`).toString()).toBe('(?<!foo)(?:bar)?(?:baz)+');
   });
   it('is chainable', () => {
     expect(match(exactly`foo`).char.toString()).toBe('foo.');
@@ -902,7 +904,6 @@ describe('match', () => {
     expect(() => not(match(exactly`foo`)).toString()).toThrow();
   });
   it('throws for invalid argument', () => {
-    // @ts-expect-error - testing invalid arguments
     expect(() => match().toString()).toThrow();
     // @ts-expect-error - testing invalid arguments
     expect(() => match``.toString()).toThrow();
@@ -999,6 +1000,9 @@ describe('quantifiers', () => {
     expect(oneOrMore.capture.charIn`)[]`.toString()).toBe('([)[\\]])+');
     expect(oneOrMore(capture.charIn`)[]`.capture.exactly`([])`).toString()).toBe('(?:([)[\\]])(\\(\\[\\]\\)))+');
     expect(oneOrMore.capture.group.ahead.exactly`[])`.toString()).toBe('((?=\\[\\]\\)))+');
+  });
+  it('throws when quantifying nothing', () => {
+    expect(() => oneOrMore.toString()).toThrow();
   });
 });
 
