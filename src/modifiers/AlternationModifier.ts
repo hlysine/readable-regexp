@@ -8,7 +8,9 @@ export default class AlternationModifier implements RegExpModifier {
   }
 
   public modify(regExp: string): [string, string] {
-    if (this.options.length === 0) return ['(?:)', regExp];
+    if (this.options.length === 0) {
+      throw new Error('Alternation is empty');
+    }
     return [`(?:${this.options.join('|')})`, regExp];
   }
 

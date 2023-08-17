@@ -28,7 +28,7 @@ export default class NegationModifier implements RegExpModifier {
             return [`(?<!${regExp.substring(4, regExp.length - 1)})`];
           }
         } else {
-          throw new Error('The provided token is not negatable: ' + regExp);
+          throw new Error('The provided token is not negatable or is already negated: ' + regExp);
         }
     }
   }

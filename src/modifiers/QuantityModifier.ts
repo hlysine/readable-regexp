@@ -24,7 +24,10 @@ export default abstract class QuantityModifier implements RegExpModifier {
 
   public modify(regExp: string): [string, string?] {
     if (NOT_QUANTIFIABLE.has(regExp)) {
-      throw new Error('The provided token is not quantifiable');
+      throw new Error('The provided token is not quantifiable: ' + regExp);
+    }
+    if (regExp.length === 0) {
+      throw new Error('There is nothing to quantify');
     }
     return [this.quantify(wrapIfNeeded(regExp)) + (this.lazy ? '?' : '')];
   }

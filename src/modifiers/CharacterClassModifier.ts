@@ -37,7 +37,11 @@ export default class CharacterClassModifier implements RegExpModifier {
 
   public modify(regExp: string): [string, string?] {
     if (this.options.length === 0) {
-      return [this.negative ? '[^]' : '[]', regExp];
+      if (this.negative) {
+        return ['[^]', regExp];
+      } else {
+        throw new Error('Character class is empty and is not negated');
+      }
     }
     let combined = this.options.map(escapeForCharClass).join('');
     if (combined.startsWith('\\-')) {

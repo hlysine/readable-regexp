@@ -236,7 +236,7 @@ class RegExpBuilder implements RegExpToken {
         // octal literals larger than 1 byte can be parsed by the regexp engine when they exist alone,
         // but they don't work in character classes, and hence cannot be negated.
         throw new Error(
-          'Octal literals above 0o377 have inconsistent behavior. Please use hex/unicode literals instead.'
+          'Octal literals above 0o377 have inconsistent behavior. Please use hex/unicode literals instead'
         );
       }
       return this.addNode(`[\\${num.toString(8)}]`);
