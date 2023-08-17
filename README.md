@@ -406,6 +406,25 @@ This is equivalent to:
 const coordinates = oneOrMore.digit.exactly`,`.oneOrMore.digit;
 ```
 
+`match` can also accept multiple tokens and chain them together, which can be useful for code formatting.
+
+Example:
+
+```js
+const filename = match(
+    oneOrMore.word,
+    exactly`_`,
+    oneOrMore.digit,
+    exactly`.txt`
+);
+```
+
+This is equivalent to:
+
+```js
+const filename = oneOrMore.word.exactly`_`.oneOrMore.digit.exactly`.txt`;
+```
+
 #### `toString()`
 
 Get the current expression as a RegExp string. This is a terminal operation, which means no more functions can
