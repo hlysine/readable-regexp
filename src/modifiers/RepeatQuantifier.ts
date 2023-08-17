@@ -31,7 +31,7 @@ export default class RepeatQuantifier extends QuantityModifier {
     } else if (this.min !== undefined) {
       return `${regExp}{${this.min},}`;
     } else if (this.max !== undefined) {
-      return `${regExp}{,${this.max}}`;
+      return `${regExp}{0,${this.max}}`;
     } else {
       throw new Error('No min or max provided for RepeatQuantifier');
     }
