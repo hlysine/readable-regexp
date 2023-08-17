@@ -273,7 +273,9 @@ class RegExpBuilder implements RegExpToken {
       ...args: RegExpLiteral | (string | RegExpToken)[]
     ): RegExpToken & CharClassFunction {
       if (!(this.modifiers[0] instanceof CharacterClassModifier))
-        throw new Error(`Unexpected modifier, expected CharacterClassModifier, but got ${this.modifiers[0]}`);
+        throw new Error(
+          `Unexpected modifier, expected CharacterClassModifier, but got ${this.modifiers[0]}. This is probably a bug.`
+        );
       if (isLiteralArgument(args)) {
         const literal = getLiteralString(args, false);
         return assign(
@@ -600,7 +602,9 @@ class RegExpBuilder implements RegExpToken {
       ...args: RegExpLiteral | (string | RegExpToken)[]
     ): RegExpToken & AlternationFunction {
       if (!(this.modifiers[0] instanceof AlternationModifier))
-        throw new Error(`Unexpected modifier, expected OneOfModifier, but got ${this.modifiers[0]}`);
+        throw new Error(
+          `Unexpected modifier, expected OneOfModifier, but got ${this.modifiers[0]}. This is probably a bug.`
+        );
       if (isLiteralArgument(args)) {
         const literal = getLiteralString(args);
         return assign(
@@ -643,6 +647,7 @@ class RegExpBuilder implements RegExpToken {
 
   public get match(): RegExpToken['match'] {
     function func(this: RegExpBuilder, ...tokens: RegExpToken[]): RegExpToken {
+      if (tokens.length === 0) throw new Error('No arguments provided for match');
       if (tokens.some(token => !RegExpBuilder.isRegExpBuilder(token)))
         throw new Error('Invalid arguments for match: ' + tokens);
       // eslint-disable-next-line @typescript-eslint/no-this-alias
