@@ -642,9 +642,15 @@ class RegExpBuilder implements RegExpToken {
    */
 
   public get match(): RegExpToken['match'] {
-    function func(this: RegExpBuilder, token: RegExpToken): RegExpToken {
-      if (!RegExpBuilder.isRegExpBuilder(token)) throw new Error('Invalid arguments for match');
-      return this.addNode(token);
+    function func(this: RegExpBuilder, ...tokens: RegExpToken[]): RegExpToken {
+      if (tokens.some(token => !RegExpBuilder.isRegExpBuilder(token)))
+        throw new Error('Invalid arguments for match: ' + tokens);
+      // eslint-disable-next-line @typescript-eslint/no-this-alias
+      let builder = this;
+      tokens.forEach(token => {
+        builder = builder.addNode(token as RegExpBuilder);
+      });
+      return builder;
     }
     return bind(func, this);
   }

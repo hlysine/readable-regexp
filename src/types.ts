@@ -13,6 +13,10 @@ export interface TokenFunction {
   (node: RegExpToken): RegExpToken;
 }
 
+export interface MultiTokenFunction {
+  (...nodes: RegExpToken[]): RegExpToken;
+}
+
 export interface GroupFunction {
   (node?: RegExpToken): RegExpToken;
 }
@@ -136,7 +140,7 @@ export interface RegExpToken {
   get notBehind(): LiteralFunction & GroupFunction & RegExpToken;
   get oneOf(): AlternationFunction;
 
-  get match(): TokenFunction;
+  get match(): MultiTokenFunction;
 
   get lazily(): LiteralFunction & TokenFunction & RegExpToken;
 }
