@@ -1,0 +1,651 @@
+<!DOCTYPE html><html class="default" lang="en"><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>readable-regexp</title><meta name="description" content="Documentation for readable-regexp"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="assets/style.css"/><link rel="stylesheet" href="assets/highlight.css"/><script defer src="assets/main.js"></script><script async src="assets/search.js" id="tsd-search-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os"</script><header class="tsd-page-toolbar">
+<div class="tsd-toolbar-contents container">
+<div class="table-cell" id="tsd-search" data-base=".">
+<div class="field"><label for="tsd-search-field" class="tsd-widget tsd-toolbar-icon search no-caption"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M15.7824 13.833L12.6666 10.7177C12.5259 10.5771 12.3353 10.499 12.1353 10.499H11.6259C12.4884 9.39596 13.001 8.00859 13.001 6.49937C13.001 2.90909 10.0914 0 6.50048 0C2.90959 0 0 2.90909 0 6.49937C0 10.0896 2.90959 12.9987 6.50048 12.9987C8.00996 12.9987 9.39756 12.4863 10.5008 11.6239V12.1332C10.5008 12.3332 10.5789 12.5238 10.7195 12.6644L13.8354 15.7797C14.1292 16.0734 14.6042 16.0734 14.8948 15.7797L15.7793 14.8954C16.0731 14.6017 16.0731 14.1267 15.7824 13.833ZM6.50048 10.499C4.29094 10.499 2.50018 8.71165 2.50018 6.49937C2.50018 4.29021 4.28781 2.49976 6.50048 2.49976C8.71001 2.49976 10.5008 4.28708 10.5008 6.49937C10.5008 8.70852 8.71314 10.499 6.50048 10.499Z" fill="var(--color-text)"></path></svg></label><input type="text" id="tsd-search-field" aria-label="Search"/></div>
+<div class="field">
+<div id="tsd-toolbar-links"></div></div>
+<ul class="results">
+<li class="state loading">Preparing search index...</li>
+<li class="state failure">The search index is not available</li></ul><a href="index.html" class="title">readable-regexp</a></div>
+<div class="table-cell" id="tsd-widgets"><a href="#" class="tsd-widget tsd-toolbar-icon menu no-caption" data-toggle="menu" aria-label="Menu"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="3" width="14" height="2" fill="var(--color-text)"></rect><rect x="1" y="7" width="14" height="2" fill="var(--color-text)"></rect><rect x="1" y="11" width="14" height="2" fill="var(--color-text)"></rect></svg></a></div></div></header>
+<div class="container container-main">
+<div class="col-content">
+<div class="tsd-page-title">
+<h2>readable-regexp</h2></div>
+<div class="tsd-panel tsd-typography"><h1 align="center">readable-regexp</h1>
+
+<div align="center">
+
+<p><a href="https://github.com/hlysine/readable-regexp/actions/workflows/main.yml"><img src="https://github.com/hlysine/readable-regexp/actions/workflows/main.yml/badge.svg" alt="CI"></a>
+<a href="https://coveralls.io/github/hlysine/readable-regexp?branch=main"><img src="https://coveralls.io/repos/github/hlysine/readable-regexp/badge.svg?branch=main" alt="Coverage Status"></a>
+<a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/built%20with-TypeScript-blue" alt="TypeScript"></a>
+<a href="https://www.npmjs.com/package/readable-regexp"><img src="https://img.shields.io/npm/v/readable-regexp" alt="npm"></a>
+<a href="https://www.npmjs.com/package/readable-regexp"><img src="https://img.shields.io/bundlephobia/minzip/readable-regexp" alt="npm bundle size"></a>
+<a href="https://www.npmjs.com/package/readable-regexp"><img src="https://img.shields.io/badge/dynamic/json?url=https://api.npmutil.com/package/readable-regexp&label=dependencies&query=$.dependencies.count" alt="Dependency Count"></a></p>
+</div>
+
+<p align="center">
+Create readable Regular Expressions with concise and flexible syntax.
+</p>
+
+<a id="md:table-of-contents" class="tsd-anchor"></a><h2><a href="#md:table-of-contents">Table of Contents</a></h2><ul>
+<li><a href="#installation">Installation</a><ul>
+<li><a href="#using-a-package-manager">Using a package manager</a></li>
+<li><a href="#using-a-cdn">Using a CDN</a></li>
+</ul>
+</li>
+<li><a href="#features">Features</a><ul>
+<li><a href="#readability">Readability</a></li>
+<li><a href="#flexibility-and-conciseness">Flexibility and Conciseness</a></li>
+<li><a href="#safety">Safety</a></li>
+</ul>
+</li>
+<li><a href="#documentation">Documentation</a><ul>
+<li><a href="#syntax-rules">Syntax Rules</a></li>
+<li><a href="#special-tokens">Special Tokens</a></li>
+<li><a href="#character-classes">Character Classes</a></li>
+<li><a href="#anchors">Anchors</a></li>
+<li><a href="#quantifiers">Quantifiers</a></li>
+<li><a href="#groups">Groups</a></li>
+<li><a href="#misc">Misc</a></li>
+</ul>
+</li>
+</ul>
+<a id="md:installation" class="tsd-anchor"></a><h2><a href="#md:installation">Installation</a></h2><a id="md:using-a-package-manager" class="tsd-anchor"></a><h3><a href="#md:using-a-package-manager">Using a package manager</a></h3><p>Install readable-regexp with your preferred package manager, and then import it with CommonJS or ES Modules syntax:</p>
+<pre><code class="language-bash"><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-2">install</span><span class="hl-1"> </span><span class="hl-2">readable-regexp</span><br/><br/><span class="hl-0">yarn</span><span class="hl-1"> </span><span class="hl-2">add</span><span class="hl-1"> </span><span class="hl-2">readable-regexp</span>
+</code><button>Copy</button></pre>
+<pre><code class="language-js"><span class="hl-3">import</span><span class="hl-1"> { </span><span class="hl-4">oneOrMore</span><span class="hl-1">, </span><span class="hl-4">exactly</span><span class="hl-1"> } </span><span class="hl-3">from</span><span class="hl-1"> </span><span class="hl-2">&#39;readable-regexp&#39;</span><span class="hl-1">;</span><br/><br/><span class="hl-5">const</span><span class="hl-1"> { </span><span class="hl-6">oneOrMore</span><span class="hl-1">, </span><span class="hl-6">exactly</span><span class="hl-1"> } = </span><span class="hl-0">require</span><span class="hl-1">(</span><span class="hl-2">&#39;readable-regexp&#39;</span><span class="hl-1">);</span>
+</code><button>Copy</button></pre>
+<a id="md:using-a-cdn" class="tsd-anchor"></a><h3><a href="#md:using-a-cdn">Using a CDN</a></h3><p>Import readable-regexp via a script tag in your HTML file, then access the <code>readableRegExp</code> global object in your JS code:</p>
+<pre><code class="language-html"><span class="hl-7">&lt;</span><span class="hl-8">script</span><span class="hl-9"> </span><span class="hl-10">src</span><span class="hl-9">=</span><span class="hl-11">&quot;https://cdn.jsdelivr.net/npm/readable-regexp/dist/readable-regexp.umd.js&quot;</span><span class="hl-7">&gt;&lt;/</span><span class="hl-8">script</span><span class="hl-7">&gt;</span>
+</code><button>Copy</button></pre>
+<pre><code class="language-js"><span class="hl-5">const</span><span class="hl-1"> { </span><span class="hl-6">oneOrMore</span><span class="hl-1">, </span><span class="hl-6">exactly</span><span class="hl-1"> } = </span><span class="hl-4">readableRegExp</span><span class="hl-1">;</span>
+</code><button>Copy</button></pre>
+<a id="md:features" class="tsd-anchor"></a><h2><a href="#md:features">Features</a></h2><a id="md:readability" class="tsd-anchor"></a><h3><a href="#md:readability">Readability</a></h3><p>readable-regexp offers much better readability, so you don&#39;t need to confuse your future self or write tons of comment
+just to explain 1 line of regexp. It also allows you to extract and re-use repeating parts of an expression, and to add
+inline comments to a part of the expression.</p>
+<details>
+    <summary>Click to see examples</summary>
+
+<p>Compare a readable-regexp expression:</p>
+<pre><code class="language-js"><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-6">num</span><span class="hl-1"> = </span><span class="hl-4">capture</span><span class="hl-1">.</span><span class="hl-0">oneOf</span><span class="hl-1">(</span><br/><span class="hl-1">  </span><span class="hl-4">oneOrMore</span><span class="hl-1">.</span><span class="hl-4">digit</span><span class="hl-1">, </span><span class="hl-12">// integer</span><br/><span class="hl-1">  </span><span class="hl-4">zeroOrMore</span><span class="hl-1">.</span><span class="hl-4">digit</span><span class="hl-1">.</span><span class="hl-0">exactly</span><span class="hl-2">`.`</span><span class="hl-1">.</span><span class="hl-4">oneOrMore</span><span class="hl-1">.</span><span class="hl-4">digit</span><span class="hl-1"> </span><span class="hl-12">// decimal</span><br/><span class="hl-1">);</span><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-6">regExp</span><span class="hl-1"> = </span><span class="hl-0">match</span><span class="hl-1">(</span><span class="hl-4">num</span><span class="hl-1">).</span><span class="hl-0">exactly</span><span class="hl-2">`,`</span><span class="hl-1">.</span><span class="hl-0">maybe</span><span class="hl-2">` `</span><span class="hl-1">.</span><span class="hl-0">match</span><span class="hl-1">(</span><span class="hl-4">num</span><span class="hl-1">).</span><span class="hl-0">toRegExp</span><span class="hl-1">(</span><span class="hl-4">Flag</span><span class="hl-1">.</span><span class="hl-4">Global</span><span class="hl-1">); </span><span class="hl-12">// num is used twice here</span>
+</code><button>Copy</button></pre>
+<p>With normal JS RegExp:</p>
+<pre><code class="language-js"><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-6">regExp</span><span class="hl-1"> =</span><span class="hl-13"> /</span><span class="hl-14">(</span><span class="hl-13">\d</span><span class="hl-15">+</span><span class="hl-16">|</span><span class="hl-13">\d</span><span class="hl-15">*</span><span class="hl-17">\.</span><span class="hl-13">\d</span><span class="hl-15">+</span><span class="hl-14">)</span><span class="hl-13">, </span><span class="hl-15">?</span><span class="hl-14">(</span><span class="hl-13">\d</span><span class="hl-15">+</span><span class="hl-16">|</span><span class="hl-13">\d</span><span class="hl-15">*</span><span class="hl-17">\.</span><span class="hl-13">\d</span><span class="hl-15">+</span><span class="hl-14">)</span><span class="hl-13">/</span><span class="hl-5">g</span><span class="hl-1">; </span><span class="hl-12">// we have to copy-paste the capture group</span>
+</code><button>Copy</button></pre>
+<p>In a more complex use case, we can destructure the expression into manageable small parts:</p>
+<pre><code class="language-js"><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-6">protocol</span><span class="hl-1"> = </span><span class="hl-0">captureAs</span><span class="hl-2">`protocol`</span><span class="hl-1">.</span><span class="hl-0">oneOf</span><span class="hl-1">(</span><span class="hl-0">exactly</span><span class="hl-2">`http`</span><span class="hl-1">.</span><span class="hl-0">maybe</span><span class="hl-2">`s`</span><span class="hl-1">)</span><span class="hl-2">`smtp``ftp`</span><span class="hl-1">; </span><span class="hl-12">// this is short for oneOf(exactly`http`.maybe`s`, &#39;smtp&#39;, &#39;ftp&#39;)</span><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-6">domain</span><span class="hl-1"> = </span><span class="hl-0">captureAs</span><span class="hl-2">`domain`</span><span class="hl-1">(</span><span class="hl-4">oneOrMore</span><span class="hl-1">.</span><span class="hl-0">charIn</span><span class="hl-1">(</span><span class="hl-4">word</span><span class="hl-1">, </span><span class="hl-2">&#39;-&#39;</span><span class="hl-1">).</span><span class="hl-0">oneOrMore</span><span class="hl-1">(</span><span class="hl-0">exactly</span><span class="hl-2">`.`</span><span class="hl-1">.</span><span class="hl-4">oneOrMore</span><span class="hl-1">.</span><span class="hl-0">charIn</span><span class="hl-1">(</span><span class="hl-4">word</span><span class="hl-1">, </span><span class="hl-2">&#39;-&#39;</span><span class="hl-1">)));</span><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-6">port</span><span class="hl-1"> = </span><span class="hl-0">exactly</span><span class="hl-2">`:`</span><span class="hl-1">.</span><span class="hl-0">captureAs</span><span class="hl-2">`port`</span><span class="hl-1">.</span><span class="hl-4">oneOrMore</span><span class="hl-1">.</span><span class="hl-4">digit</span><span class="hl-1">;</span><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-6">path</span><span class="hl-1"> = </span><span class="hl-0">exactly</span><span class="hl-2">`/`</span><span class="hl-1">.</span><span class="hl-4">maybe</span><span class="hl-1">.</span><span class="hl-0">captureAs</span><span class="hl-2">`path`</span><span class="hl-1">(</span><br/><span class="hl-1">  </span><span class="hl-4">oneOrMore</span><span class="hl-1">.</span><span class="hl-0">charIn</span><span class="hl-1">(</span><span class="hl-4">word</span><span class="hl-1">, </span><span class="hl-2">&#39;-.&#39;</span><span class="hl-1">).</span><span class="hl-0">zeroOrMore</span><span class="hl-1">(</span><span class="hl-0">exactly</span><span class="hl-2">`/`</span><span class="hl-1">.</span><span class="hl-4">oneOrMore</span><span class="hl-1">.</span><span class="hl-0">charIn</span><span class="hl-1">(</span><span class="hl-4">word</span><span class="hl-1">, </span><span class="hl-2">&#39;-.&#39;</span><span class="hl-1">))</span><br/><span class="hl-1">);</span><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-6">query</span><span class="hl-1"> = </span><span class="hl-0">exactly</span><span class="hl-2">`?`</span><span class="hl-1">.</span><span class="hl-0">captureAs</span><span class="hl-2">`query`</span><span class="hl-1">.</span><span class="hl-4">zeroOrMore</span><span class="hl-1">.</span><span class="hl-4">char</span><span class="hl-1">;</span><br/><br/><span class="hl-12">// combining all the parts above</span><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-6">regExp</span><span class="hl-1"> = </span><span class="hl-4">lineStart</span><br/><span class="hl-1">  .</span><span class="hl-0">match</span><span class="hl-1">(</span><span class="hl-4">protocol</span><span class="hl-1">)</span><br/><span class="hl-1">  .</span><span class="hl-0">exactly</span><span class="hl-2">`://`</span><br/><span class="hl-1">  .</span><span class="hl-0">match</span><span class="hl-1">(</span><span class="hl-4">domain</span><span class="hl-1">)</span><br/><span class="hl-1">  .</span><span class="hl-0">maybe</span><span class="hl-1">(</span><span class="hl-4">port</span><span class="hl-1">)</span><br/><span class="hl-1">  .</span><span class="hl-0">maybe</span><span class="hl-1">(</span><span class="hl-4">path</span><span class="hl-1">)</span><br/><span class="hl-1">  .</span><span class="hl-0">maybe</span><span class="hl-1">(</span><span class="hl-4">query</span><span class="hl-1">)</span><br/><span class="hl-1">  .</span><span class="hl-4">lineEnd</span><span class="hl-1">.</span><span class="hl-0">toRegExp</span><span class="hl-1">();</span>
+</code><button>Copy</button></pre>
+<p>This is far more readable and debuggable than the equivalent RegExp:</p>
+<pre><code class="language-js"><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-6">regExp</span><span class="hl-1"> =</span><br/><span class="hl-1">  </span><span class="hl-13">/</span><span class="hl-16">^</span><span class="hl-14">(?&lt;</span><span class="hl-4">protocol</span><span class="hl-14">&gt;</span><span class="hl-13">https</span><span class="hl-15">?</span><span class="hl-16">|</span><span class="hl-13">smtp</span><span class="hl-16">|</span><span class="hl-13">ftp</span><span class="hl-14">)</span><span class="hl-13">:</span><span class="hl-17">\/\/</span><span class="hl-14">(?&lt;</span><span class="hl-4">domain</span><span class="hl-14">&gt;[</span><span class="hl-13">\w</span><span class="hl-17">\-</span><span class="hl-14">]</span><span class="hl-15">+</span><span class="hl-14">(?:</span><span class="hl-17">\.</span><span class="hl-14">[</span><span class="hl-13">\w</span><span class="hl-17">\-</span><span class="hl-14">]</span><span class="hl-15">+</span><span class="hl-14">)</span><span class="hl-15">+</span><span class="hl-14">)(?:</span><span class="hl-13">:</span><span class="hl-14">(?&lt;</span><span class="hl-4">port</span><span class="hl-14">&gt;</span><span class="hl-13">\d</span><span class="hl-15">+</span><span class="hl-14">))</span><span class="hl-15">?</span><span class="hl-14">(?:</span><span class="hl-17">\/</span><span class="hl-14">(?&lt;</span><span class="hl-4">path</span><span class="hl-14">&gt;[</span><span class="hl-13">\w\-.</span><span class="hl-14">]</span><span class="hl-15">+</span><span class="hl-14">(?:</span><span class="hl-17">\/</span><span class="hl-14">[</span><span class="hl-13">\w\-.</span><span class="hl-14">]</span><span class="hl-15">+</span><span class="hl-14">)</span><span class="hl-15">*</span><span class="hl-14">)</span><span class="hl-15">?</span><span class="hl-14">)</span><span class="hl-15">?</span><span class="hl-14">(?:</span><span class="hl-17">\?</span><span class="hl-14">(?&lt;</span><span class="hl-4">query</span><span class="hl-14">&gt;</span><span class="hl-13">.</span><span class="hl-15">*</span><span class="hl-14">))</span><span class="hl-15">?</span><span class="hl-16">$</span><span class="hl-13">/</span><span class="hl-1">;</span>
+</code><button>Copy</button></pre>
+</details>
+
+<a id="md:flexibility-and-conciseness" class="tsd-anchor"></a><h3><a href="#md:flexibility-and-conciseness">Flexibility and Conciseness</a></h3><p>Readability is important, but conciseness is also equally important. This is why readable-regexp offers multiple
+shorthands and alternative syntax which you can adopt if you prefer.</p>
+<details>
+  <summary>Click to see examples</summary>
+
+<p>Without all the shorthands, an expression looks like this:</p>
+<pre><code class="language-js"><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-6">regExp</span><span class="hl-1"> = </span><span class="hl-0">exactly</span><span class="hl-1">(</span><span class="hl-2">&#39;[&#39;</span><span class="hl-1">)</span><br/><span class="hl-1">  .</span><span class="hl-0">captureAs</span><span class="hl-1">(</span><span class="hl-2">&#39;timestamp&#39;</span><span class="hl-1">)(</span><span class="hl-0">oneOrMore</span><span class="hl-1">(</span><span class="hl-0">not</span><span class="hl-1">(</span><span class="hl-0">charIn</span><span class="hl-1">(</span><span class="hl-2">&#39;]&#39;</span><span class="hl-1">))))</span><br/><span class="hl-1">  .</span><span class="hl-0">exactly</span><span class="hl-1">(</span><span class="hl-2">&#39;] &#39;</span><span class="hl-1">)</span><br/><span class="hl-1">  .</span><span class="hl-0">captureAs</span><span class="hl-1">(</span><span class="hl-2">&#39;category&#39;</span><span class="hl-1">)(</span><span class="hl-0">oneOrMore</span><span class="hl-1">(</span><span class="hl-4">word</span><span class="hl-1">).</span><span class="hl-0">exactly</span><span class="hl-1">(</span><span class="hl-2">&#39;-&#39;</span><span class="hl-1">).</span><span class="hl-0">oneOrMore</span><span class="hl-1">(</span><span class="hl-4">word</span><span class="hl-1">))</span><br/><span class="hl-1">  .</span><span class="hl-0">exactly</span><span class="hl-1">(</span><span class="hl-2">&#39;: &#39;</span><span class="hl-1">)</span><br/><span class="hl-1">  .</span><span class="hl-0">captureAs</span><span class="hl-1">(</span><span class="hl-2">&#39;message&#39;</span><span class="hl-1">)(</span><span class="hl-0">oneOrMore</span><span class="hl-1">(</span><span class="hl-4">char</span><span class="hl-1">))</span><br/><span class="hl-1">  .</span><span class="hl-0">toRegExp</span><span class="hl-1">(</span><span class="hl-2">&#39;gm&#39;</span><span class="hl-1">);</span>
+</code><button>Copy</button></pre>
+<p>Whenever a function takes a single string literal, you can use a tagged template literal to remove the brackets:</p>
+<pre><code class="language-js"><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-6">regExp</span><span class="hl-1"> = </span><span class="hl-0">exactly</span><span class="hl-2">`[`</span><br/><span class="hl-1">  .</span><span class="hl-0">captureAs</span><span class="hl-2">`timestamp`</span><span class="hl-1">(</span><span class="hl-0">oneOrMore</span><span class="hl-1">(</span><span class="hl-0">not</span><span class="hl-1">(</span><span class="hl-0">charIn</span><span class="hl-2">`]`</span><span class="hl-1">)))</span><br/><span class="hl-1">  .</span><span class="hl-0">exactly</span><span class="hl-2">`] `</span><br/><span class="hl-1">  .</span><span class="hl-0">captureAs</span><span class="hl-2">`category`</span><span class="hl-1">(</span><span class="hl-0">oneOrMore</span><span class="hl-1">(</span><span class="hl-4">word</span><span class="hl-1">).</span><span class="hl-0">exactly</span><span class="hl-2">`-`</span><span class="hl-1">.</span><span class="hl-0">oneOrMore</span><span class="hl-1">(</span><span class="hl-4">word</span><span class="hl-1">))</span><br/><span class="hl-1">  .</span><span class="hl-0">exactly</span><span class="hl-2">`: `</span><br/><span class="hl-1">  .</span><span class="hl-0">captureAs</span><span class="hl-2">`message`</span><span class="hl-1">(</span><span class="hl-0">oneOrMore</span><span class="hl-1">(</span><span class="hl-4">char</span><span class="hl-1">))</span><br/><span class="hl-1">  .</span><span class="hl-0">toRegExp</span><span class="hl-2">`gm`</span><span class="hl-1">;</span>
+</code><button>Copy</button></pre>
+<p>When there is only one token in a quantifier or group, you can chain it with <code>.</code> instead of using a bracket:</p>
+<pre><code class="language-js"><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-6">regExp</span><span class="hl-1"> = </span><span class="hl-0">exactly</span><span class="hl-2">`[`</span><br/><span class="hl-1">  .</span><span class="hl-0">captureAs</span><span class="hl-2">`timestamp`</span><span class="hl-1">.</span><span class="hl-4">oneOrMore</span><span class="hl-1">.</span><span class="hl-4">not</span><span class="hl-1">.</span><span class="hl-0">charIn</span><span class="hl-2">`]`</span><br/><span class="hl-1">  .</span><span class="hl-0">exactly</span><span class="hl-2">`] `</span><br/><span class="hl-1">  .</span><span class="hl-0">captureAs</span><span class="hl-2">`category`</span><span class="hl-1">(</span><span class="hl-4">oneOrMore</span><span class="hl-1">.</span><span class="hl-4">word</span><span class="hl-1">.</span><span class="hl-0">exactly</span><span class="hl-2">`-`</span><span class="hl-1">.</span><span class="hl-4">oneOrMore</span><span class="hl-1">.</span><span class="hl-4">word</span><span class="hl-1">)</span><br/><span class="hl-1">  .</span><span class="hl-0">exactly</span><span class="hl-2">`: `</span><br/><span class="hl-1">  .</span><span class="hl-0">captureAs</span><span class="hl-2">`message`</span><span class="hl-1">.</span><span class="hl-4">oneOrMore</span><span class="hl-1">.</span><span class="hl-4">char</span><br/><span class="hl-1">  .</span><span class="hl-0">toRegExp</span><span class="hl-2">`gm`</span><span class="hl-1">;</span>
+</code><button>Copy</button></pre>
+<p>There are shorthands for negating a character class or a lookaround:</p>
+<pre><code class="language-js"><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-6">regExp</span><span class="hl-1"> = </span><span class="hl-0">exactly</span><span class="hl-2">`[`</span><br/><span class="hl-1">  .</span><span class="hl-0">captureAs</span><span class="hl-2">`timestamp`</span><span class="hl-1">.</span><span class="hl-4">oneOrMore</span><span class="hl-1">.</span><span class="hl-0">notCharIn</span><span class="hl-2">`]`</span><br/><span class="hl-1">  .</span><span class="hl-0">exactly</span><span class="hl-2">`] `</span><br/><span class="hl-1">  .</span><span class="hl-0">captureAs</span><span class="hl-2">`category`</span><span class="hl-1">(</span><span class="hl-4">oneOrMore</span><span class="hl-1">.</span><span class="hl-4">word</span><span class="hl-1">.</span><span class="hl-0">exactly</span><span class="hl-2">`-`</span><span class="hl-1">.</span><span class="hl-4">oneOrMore</span><span class="hl-1">.</span><span class="hl-4">word</span><span class="hl-1">)</span><br/><span class="hl-1">  .</span><span class="hl-0">exactly</span><span class="hl-2">`: `</span><br/><span class="hl-1">  .</span><span class="hl-0">captureAs</span><span class="hl-2">`message`</span><span class="hl-1">.</span><span class="hl-4">oneOrMore</span><span class="hl-1">.</span><span class="hl-4">char</span><br/><span class="hl-1">  .</span><span class="hl-0">toRegExp</span><span class="hl-2">`gm`</span><span class="hl-1">;</span>
+</code><button>Copy</button></pre>
+<p>As you can see, most of the distracting brackets are gone, and you are left with a clean and concise expression.</p>
+</details>
+
+<a id="md:safety" class="tsd-anchor"></a><h3><a href="#md:safety">Safety</a></h3><p>readable-regexp is written in TypeScript with strong typing, so auto-complete is available and a lot of common mistakes
+can be caught at compile time.
+There is also additional type and reference checking at run time, allowing you to catch errors before even creating a
+RegExp object.</p>
+<details>
+    <summary>Click to see examples</summary>
+
+<p>Some errors can be avoided just by writing in readable-regexp:</p>
+<pre><code class="language-js"><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-6">o</span><span class="hl-1"> = </span><span class="hl-2">&#39;Ȯ&#39;</span><span class="hl-1">; </span><span class="hl-12">// 0x022e</span><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-6">result1</span><span class="hl-1"> =</span><span class="hl-13"> /</span><span class="hl-17">\u</span><span class="hl-13">22e/</span><span class="hl-1">.</span><span class="hl-0">test</span><span class="hl-1">(</span><span class="hl-4">n</span><span class="hl-1">);</span><br/><span class="hl-12">// false</span><br/><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-6">result2</span><span class="hl-1"> = </span><span class="hl-0">unicode</span><span class="hl-2">`22e`</span><span class="hl-1">.</span><span class="hl-0">toRegExp</span><span class="hl-1">().</span><span class="hl-0">test</span><span class="hl-1">(</span><span class="hl-4">n</span><span class="hl-1">);</span><br/><span class="hl-12">// true</span><br/><span class="hl-12">// &#39;22e&#39; is automatically fixed to be &#39;\u022e&#39;</span>
+</code><button>Copy</button></pre>
+<p>Some errors can be caught by TypeScript at compile time:</p>
+<p><strong>(Not working at the moment. These errors will either be thrown at runtime or be handled by readable-regexp to produce reasonable RegExp.)</strong></p>
+<pre><code class="language-js"><span class="hl-12">// @ts-expect-error - You cannot use two quantifiers on one token</span><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-6">regExp</span><span class="hl-1"> = </span><span class="hl-4">oneOrMore</span><span class="hl-1">.</span><span class="hl-0">zeroOrMore</span><span class="hl-2">`foo`</span><span class="hl-1">;</span>
+</code><button>Copy</button></pre>
+<pre><code class="language-js"><span class="hl-12">// @ts-expect-error - char is not negatable, because it matches nothing</span><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-6">regExp</span><span class="hl-1"> = </span><span class="hl-4">oneOrMore</span><span class="hl-1">.</span><span class="hl-4">not</span><span class="hl-1">.</span><span class="hl-4">char</span><span class="hl-1">;</span>
+</code><button>Copy</button></pre>
+<pre><code class="language-js"><span class="hl-12">// @ts-expect-error - k is not a valid flag</span><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-6">regExp</span><span class="hl-1"> = </span><span class="hl-4">char</span><span class="hl-1">.</span><span class="hl-0">toRegExp</span><span class="hl-1">(</span><span class="hl-2">&#39;gki&#39;</span><span class="hl-1">);</span>
+</code><button>Copy</button></pre>
+<p>Some can be caught at run time:</p>
+<pre><code class="language-js"><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-6">result1</span><span class="hl-1"> =</span><span class="hl-13"> /</span><span class="hl-14">(</span><span class="hl-13">foo</span><span class="hl-14">)</span><span class="hl-5">\2</span><span class="hl-13">/</span><span class="hl-1">.</span><span class="hl-0">test</span><span class="hl-1">(</span><span class="hl-2">&#39;foofoo&#39;</span><span class="hl-1">);</span><br/><span class="hl-12">// false</span><br/><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-6">result2</span><span class="hl-1"> = </span><span class="hl-0">capture</span><span class="hl-2">`foo`</span><span class="hl-1">.</span><span class="hl-0">ref</span><span class="hl-1">(</span><span class="hl-18">2</span><span class="hl-1">).</span><span class="hl-0">toRegExp</span><span class="hl-1">().</span><span class="hl-0">test</span><span class="hl-1">(</span><span class="hl-2">&#39;foofoo&#39;</span><span class="hl-1">);</span><br/><span class="hl-12">// Error: The following backreferences are not defined: 2</span>
+</code><button>Copy</button></pre>
+</details>
+
+<a id="md:documentation" class="tsd-anchor"></a><h2><a href="#md:documentation">Documentation</a></h2><a id="md:syntax-rules" class="tsd-anchor"></a><h3><a href="#md:syntax-rules">Syntax Rules</a></h3><ul>
+<li><p>Chain function calls with <code>.</code> to represent consecutive tokens.</p>
+<ul>
+<li><code>exactly`fo`.maybe`o`</code> = <code>foo?</code></li>
+</ul>
+</li>
+<li><p>Using a tagged template literal is equal to calling the function with one string argument. Interpolation also works in the tagged template literals.</p>
+<ul>
+<li><code>exactly`foo`</code> = <code>exactly(&#39;foo&#39;)</code></li>
+<li><code>exactly`foo${someVar}`</code> = <code>exactly(&#39;foo&#39; + someVar)</code></li>
+</ul>
+</li>
+<li><p>Chaining function calls is equal to calling the function with multiple arguments.</p>
+<ul>
+<li><code>oneOf`foo` `bar` `baz`</code> = <code>oneOf(&#39;foo&#39;)(&#39;bar&#39;)(&#39;baz&#39;)</code> = <code>oneOf(&#39;foo&#39;, &#39;bar&#39;, &#39;baz&#39;)</code></li>
+<li><code>oneOf`foo` `bar` (maybe.digit)</code> = <code>oneOf(&#39;foo&#39;, &#39;bar&#39;, maybe.digit)</code></li>
+</ul>
+</li>
+<li><p>All expressions can be coerced to string. This is especially useful in character classes.</p>
+<ul>
+<li><code>charIn`${word}-.`</code> = <code>charIn`\w-.`</code></li>
+</ul>
+</li>
+<li><p>If a function expects an expression and your expression consists of 1 token only, you can chain the call to omit the bracket.</p>
+<ul>
+<li><code>oneOrMore(word)</code> = <code>oneOrMore.word</code></li>
+<li><code>maybe(not(digit))</code> = <code>maybe.not.digit</code></li>
+</ul>
+</li>
+<li><p>If you prefer, you may prefix all expressions with <code>r.</code> to avoid having to import all functions separately.</p>
+</li>
+</ul>
+<pre><code class="language-js"><span class="hl-3">import</span><span class="hl-1"> { </span><span class="hl-4">r</span><span class="hl-1"> } </span><span class="hl-3">from</span><span class="hl-1"> </span><span class="hl-2">&#39;readable-regexp&#39;</span><span class="hl-1">;</span><br/><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-6">regExp</span><span class="hl-1"> = </span><span class="hl-4">r</span><span class="hl-1">.</span><span class="hl-0">oneOrMore</span><span class="hl-1">(</span><span class="hl-4">r</span><span class="hl-1">.</span><span class="hl-0">exactly</span><span class="hl-2">`fo`</span><span class="hl-1">.</span><span class="hl-0">maybe</span><span class="hl-2">`o`</span><span class="hl-1">);</span>
+</code><button>Copy</button></pre>
+<pre><code class="language-js"><span class="hl-3">import</span><span class="hl-1"> { </span><span class="hl-4">oneOrMore</span><span class="hl-1">, </span><span class="hl-4">exactly</span><span class="hl-1"> } </span><span class="hl-3">from</span><span class="hl-1"> </span><span class="hl-2">&#39;readable-regexp&#39;</span><span class="hl-1">;</span><br/><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-6">regExp</span><span class="hl-1"> = </span><span class="hl-0">oneOrMore</span><span class="hl-1">(</span><span class="hl-0">exactly</span><span class="hl-2">`fo`</span><span class="hl-1">.</span><span class="hl-0">maybe</span><span class="hl-2">`o`</span><span class="hl-1">);</span>
+</code><button>Copy</button></pre>
+<a id="md:special-tokens" class="tsd-anchor"></a><h3><a href="#md:special-tokens">Special Tokens</a></h3><table>
+<thead>
+<tr>
+<th>Function</th>
+<th>RegExp equivalent</th>
+<th>Explanation</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>exactly`(yes/no)`</code></td>
+<td><code>\(yes\/no\)</code></td>
+<td>Match the given string literally, escaping all special characters</td>
+</tr>
+<tr>
+<td><code>lineFeed</code></td>
+<td><code>\n</code></td>
+<td>Match a line feed character</td>
+</tr>
+<tr>
+<td><code>not.lineFeed</code><br/><code>not(lineFeed)</code></td>
+<td><code>[^\n]</code></td>
+<td>Match anything other than a line feed</td>
+</tr>
+<tr>
+<td><code>carriageReturn</code></td>
+<td><code>\r</code></td>
+<td>Match a carriage return character</td>
+</tr>
+<tr>
+<td><code>not.carriageReturn</code><br/><code>not(carriageReturn)</code></td>
+<td><code>[^\r]</code></td>
+<td>Match anything other than a carriage return</td>
+</tr>
+<tr>
+<td><code>backspace</code></td>
+<td><code>[\b]</code></td>
+<td>Match a backspace character</td>
+</tr>
+<tr>
+<td><code>not.backspace</code><br/><code>not(backspace)</code></td>
+<td><code>[^\b]</code></td>
+<td>Match anything other than a backspace</td>
+</tr>
+<tr>
+<td><code>tab</code></td>
+<td><code>\t</code></td>
+<td>Match a tab character</td>
+</tr>
+<tr>
+<td><code>not.tab</code><br/><code>not(tab)</code></td>
+<td><code>[^\t]</code></td>
+<td>Match anything other than a tab</td>
+</tr>
+<tr>
+<td><code>verticalWhitespace</code></td>
+<td><code>\v</code></td>
+<td>Match a vertical whitespace character</td>
+</tr>
+<tr>
+<td><code>not.verticalWhitespace</code><br/><code>not(verticalWhitespace)</code></td>
+<td><code>[^\v]</code></td>
+<td>Match anything other than a vertical whitespace</td>
+</tr>
+<tr>
+<td><code>formFeed</code></td>
+<td><code>\f</code></td>
+<td>Match a form feed character</td>
+</tr>
+<tr>
+<td><code>not.formFeed</code><br/><code>not(formFeed)</code></td>
+<td><code>[^\f]</code></td>
+<td>Match anything other than a form feed</td>
+</tr>
+<tr>
+<td><code>nullChar</code></td>
+<td><code>\0</code></td>
+<td>Match a null character</td>
+</tr>
+<tr>
+<td><code>not.nullChar</code><br/><code>not(nullChar)</code></td>
+<td><code>[^\0]</code></td>
+<td>Match anything not null</td>
+</tr>
+<tr>
+<td><code>octal`123`</code><br/><code>octal(&#39;123&#39;)</code></td>
+<td><code>[\123]</code></td>
+<td>Match a character with the given code point in base-8 †</td>
+</tr>
+<tr>
+<td><code>not.octal`123`</code><br/><code>not(octal(&#39;123&#39;))</code></td>
+<td><code>[^\123]</code></td>
+<td>Match anything other than the specified character</td>
+</tr>
+<tr>
+<td><code>hex`3f`</code><br/><code>hex(&#39;3f&#39;)</code></td>
+<td><code>\x3f</code></td>
+<td>Match a character with the given code point in base-16 ‡</td>
+</tr>
+<tr>
+<td><code>not.hex`3f`</code><br/><code>not(hex(&#39;3f&#39;))</code></td>
+<td><code>[^\x3f]</code></td>
+<td>Match anything other than the specified character</td>
+</tr>
+<tr>
+<td><code>unicode`3ef1`</code><br/><code>unicode(&#39;3ef1&#39;)</code></td>
+<td><code>\u3ef1</code></td>
+<td>Match a character with the given code point in base-16 ‡</td>
+</tr>
+<tr>
+<td><code>not.unicode`3ef1`</code><br/><code>not(unicode(&#39;3ef1&#39;))</code></td>
+<td><code>[^\u3ef1]</code></td>
+<td>Match anything other than the specified character</td>
+</tr>
+</tbody></table>
+<a id="md:-notes-on-octal" class="tsd-anchor"></a><h4><a href="#md:-notes-on-octal">† Notes on <code>octal</code></a></h4><p>The RegExp output of <code>octal</code> is always wrapped in a character class to disambiguate it from capture group back-references.</p>
+<p>The maximum allowed value is <code>0o377</code>, which is equivalent to <code>0xff</code>.</p>
+<a id="md:-notes-on-hex-and-unicode" class="tsd-anchor"></a><h4><a href="#md:-notes-on-hex-and-unicode">‡ Notes on <code>hex</code> and <code>unicode</code></a></h4><p>Both have the same effect, but <code>hex</code> uses the single-byte escape sequence <code>\xff</code> if possible, while <code>unicode</code> always
+uses the 2-byte sequence <code>\uffff</code>.</p>
+<a id="md:character-classes" class="tsd-anchor"></a><h3><a href="#md:character-classes">Character Classes</a></h3><table>
+<thead>
+<tr>
+<th>Function</th>
+<th>RegExp equivalent</th>
+<th>Explanation</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>word</code></td>
+<td><code>\w</code></td>
+<td>Match alphanumeric characters and underscore</td>
+</tr>
+<tr>
+<td><code>not.word</code><br/><code>not(word)</code></td>
+<td><code>\W</code></td>
+<td>Match anything other than <code>\w</code></td>
+</tr>
+<tr>
+<td><code>digit</code></td>
+<td><code>\d</code></td>
+<td>Match a character between <code>0</code> to <code>9</code></td>
+</tr>
+<tr>
+<td><code>not.digit</code><br/><code>not(digit)</code></td>
+<td><code>\D</code></td>
+<td>Match anything other than a digit</td>
+</tr>
+<tr>
+<td><code>whitespace</code></td>
+<td><code>\s</code></td>
+<td>Match all types of whitespace characters</td>
+</tr>
+<tr>
+<td><code>not.whitespace</code><br/><code>not(whitespace)</code></td>
+<td><code>\S</code></td>
+<td>Match anything other than a whitespace</td>
+</tr>
+<tr>
+<td><code>char</code></td>
+<td><code>.</code></td>
+<td>Match any character other than newline (or including line terminators when single line flag is set)<br/>Note: <code>not.char</code> does not exist because it does not match anything</td>
+</tr>
+<tr>
+<td><code>charIn`a-z_-`</code><br/><code>charIn(&#39;a-z&#39;, &#39;_-&#39;)</code><br/><code>charIn`a-z` `_-`</code></td>
+<td><code>[a-z_-]</code></td>
+<td>Match a character listed in the group. A hyphen denotes a range of characters, such as <code>a-z</code>. †</td>
+</tr>
+<tr>
+<td><code>notCharIn`a-z_-`</code><br/><code>not.charIn`a-z_-`</code><br/><code>notCharIn(&#39;a-z&#39;, &#39;_-&#39;)</code><br/><code>notCharIn`a-z` `_-`</code></td>
+<td><code>[^a-z_-]</code></td>
+<td>Match a character not listed in the group. †</td>
+</tr>
+</tbody></table>
+<a id="md:-notes-on-character-classes" class="tsd-anchor"></a><h4><a href="#md:-notes-on-character-classes">† Notes on character classes</a></h4><p><code>charIn</code> accepts a list of strings and special sequences, but you can also combine the list into one string if you prefer:</p>
+<ul>
+<li><code>charIn(&#39;a-z0-9&#39; + whitespace)</code></li>
+<li><code>charIn`a-z0-9${whitespace}`</code></li>
+<li><code>charIn`a-z0-9\s`</code></li>
+</ul>
+<p>However, combining a list of options into one string is not equivalent to a simple string concatenation. <code>-</code> is escaped
+at the beginning and end of each string in the list, so <code>charIn`a-` `z`</code> matches <code>a</code>, <code>-</code> and <code>z</code> literally, while
+<code>charIn`a-z`</code> matches alphabets from <code>a</code> to <code>z</code>.</p>
+<p>Apart from <code>-</code>, <code>^</code> and <code>]</code> are also escaped in the character class, so you cannot negate a <code>charIn</code> via a <code>^</code> character
+(you should use <code>notCharIn</code>), and you cannot close a character class prematurely.</p>
+<p>All other characters are not escaped in <code>charIn</code>, so you can use escape sequences such as <code>\uffff</code> and <code>\xff</code> freely.</p>
+<a id="md:anchors" class="tsd-anchor"></a><h3><a href="#md:anchors">Anchors</a></h3><table>
+<thead>
+<tr>
+<th>Function</th>
+<th>RegExp equivalent</th>
+<th>Explanation</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>lineStart</code></td>
+<td><code>^</code></td>
+<td>Assert position at the start of string, or start of line if multiline flag is set</td>
+</tr>
+<tr>
+<td><code>not.lineStart</code><br/><code>not(lineStart)</code></td>
+<td><code>(?!^)</code></td>
+<td>Assert position not at the start of string/line</td>
+</tr>
+<tr>
+<td><code>lineEnd</code></td>
+<td><code>$</code></td>
+<td>Assert position at the end of string, or end of line if multiline flag is set</td>
+</tr>
+<tr>
+<td><code>not.lineEnd</code><br/><code>not(lineEnd)</code></td>
+<td><code>(?!$)</code></td>
+<td>Assert position not at the end of string/line</td>
+</tr>
+<tr>
+<td><code>wordBoundary</code></td>
+<td><code>\b</code></td>
+<td>Assert position at a word boundary, between <code>word</code> and non-<code>word</code> characters</td>
+</tr>
+<tr>
+<td><code>not.wordBoundary</code><br/><code>not(wordBoundary)</code></td>
+<td><code>\B</code></td>
+<td>Assert position not at a word boundary</td>
+</tr>
+</tbody></table>
+<a id="md:quantifiers" class="tsd-anchor"></a><h3><a href="#md:quantifiers">Quantifiers</a></h3><table>
+<thead>
+<tr>
+<th>Function</th>
+<th>RegExp equivalent</th>
+<th>Explanation</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>repeat(3,5)`foo`</code><br/><code>repeat(3,5).exactly`foo`</code><br/><code>repeat(3,5)(&#39;foo&#39;)</code><br/><br/><code>repeat(3)`foo`</code><br/><code>repeat(3).exactly`foo`</code><br/><code>repeat(3)(&#39;foo&#39;)</code></td>
+<td><code>(?:foo){3,5}</code><br/><br/><code>(?:foo){3}</code></td>
+<td>Match a token the specified amount of times. Supply 1 parameter for an exact number of times, or 2 parameters for min/max.</td>
+</tr>
+<tr>
+<td><code>repeatLazily(3,5)`foo`</code><br/><code>repeat.lazily(3,5)`foo`</code></td>
+<td><code>(?:foo){3,5}?</code></td>
+<td>Same as <code>repeat</code>, but match as short as possible</td>
+</tr>
+<tr>
+<td><code>atLeast(3)`foo`</code><br/><code>atLeast(3).exactly`foo`</code><br/><code>atLeast(3)(&#39;foo&#39;)</code></td>
+<td><code>(?:foo){3,}</code></td>
+<td>Match a token at least the specified amount of times.</td>
+</tr>
+<tr>
+<td><code>atLeastLazily(3)`foo`</code><br/><code>atLeast.lazily(3)`foo`</code></td>
+<td><code>(?:foo){3,}?</code></td>
+<td>Same as <code>atLeast</code>, but match as short as possible</td>
+</tr>
+<tr>
+<td><code>atMost(3)`foo`</code><br/><code>atMost(3).exactly`foo`</code><br/><code>atMost(3)(&#39;foo&#39;)</code></td>
+<td><code>(?:foo){0,3}</code></td>
+<td>Match a token at most the specified amount of times.</td>
+</tr>
+<tr>
+<td><code>atMostLazily(3)`foo`</code><br/><code>atMost.lazily(3)`foo`</code></td>
+<td><code>(?:foo){0,3}?</code></td>
+<td>Same as <code>atMost</code>, but match as short as possible</td>
+</tr>
+<tr>
+<td><code>maybe`foo`</code><br/><code>maybe.exactly`foo`</code><br/><code>maybe(&#39;foo&#39;)</code></td>
+<td><code>(?:foo)?</code></td>
+<td>Match a token 0 or 1 times</td>
+</tr>
+<tr>
+<td><code>maybeLazily`foo`</code><br/><code>maybe.lazily`foo`</code></td>
+<td><code>(?:foo)??</code></td>
+<td>Same as <code>maybe</code>, but match as short as possible</td>
+</tr>
+<tr>
+<td><code>zeroOrMore`foo`</code><br/><code>zeroOrMore.exactly`foo`</code><br/><code>zeroOrMore(&#39;foo&#39;)</code></td>
+<td><code>(?:foo)*</code></td>
+<td>Match a token 0 to infinite times</td>
+</tr>
+<tr>
+<td><code>zeroOrMoreLazily`foo`</code><br/><code>zeroOrMore.lazily`foo`</code></td>
+<td><code>(?:foo)*?</code></td>
+<td>Same as <code>zeroOrMore</code>, but match as short as possible</td>
+</tr>
+<tr>
+<td><code>oneOrMore`foo`</code><br/><code>oneOrMore.exactly`foo`</code><br/><code>oneOrMore(&#39;foo&#39;)</code></td>
+<td><code>(?:foo)+</code></td>
+<td>Match a token 1 to infinite times</td>
+</tr>
+<tr>
+<td><code>oneOrMoreLazily`foo`</code><br/><code>oneOrMore.lazily`foo`</code></td>
+<td><code>(?:foo)+?</code></td>
+<td>Same as <code>oneOrMore</code>, but match as short as possible</td>
+</tr>
+</tbody></table>
+<a id="md:groups" class="tsd-anchor"></a><h3><a href="#md:groups">Groups</a></h3><table>
+<thead>
+<tr>
+<th>Function</th>
+<th>RegExp equivalent</th>
+<th>Explanation</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>capture`foo`</code><br/><code>capture.exactly`foo`</code><br/><code>capture(&#39;foo&#39;)</code></td>
+<td><code>(foo)</code></td>
+<td>Wrap the given token in a capture group</td>
+</tr>
+<tr>
+<td><code>captureAs`name` `foo`</code><br/><code>captureAs`name`.exactly`foo`</code><br/><code>captureAs(&#39;name&#39;)(&#39;foo&#39;)</code></td>
+<td><code>(?&lt;name&gt;foo)</code></td>
+<td>Wrap the given token in a named capture group</td>
+</tr>
+<tr>
+<td><code>captureAs`name` `foo`.ref`name`</code><br/><code>capture`foo`.ref(1)</code></td>
+<td><code>(?&lt;name&gt;foo)\k&lt;name&gt;</code><br/><code>(foo)\1</code></td>
+<td>Supply a number to reference the capture group with that index. Supply a string to reference a named capture group.</td>
+</tr>
+<tr>
+<td><code>group`foo`</code><br/><code>group.exactly`foo`</code><br/><code>group(&#39;foo&#39;)</code></td>
+<td><code>(?:foo)</code></td>
+<td>Wrap the given token in a non-capture group</td>
+</tr>
+<tr>
+<td><code>ahead`foo`</code><br/><code>ahead.exactly`foo`</code><br/><code>ahead(&#39;foo&#39;)</code></td>
+<td><code>(?=foo)</code></td>
+<td>Wrap the given token in a positive lookahead</td>
+</tr>
+<tr>
+<td><code>behind`foo`</code><br/><code>behind.exactly`foo`</code><br/><code>behind(&#39;foo&#39;)</code></td>
+<td><code>(?&lt;=foo)</code></td>
+<td>Wrap the given token in a positive lookbehind</td>
+</tr>
+<tr>
+<td><code>notAhead`foo`</code><br/><code>not.ahead`foo`</code><br/><code>notAhead.exactly`foo`</code><br/><code>notAhead(&#39;foo&#39;)</code></td>
+<td><code>(?!foo)</code></td>
+<td>Wrap the given token in a negative lookahead</td>
+</tr>
+<tr>
+<td><code>notBehind`foo`</code><br/><code>not.behind`foo`</code><br/><code>notBehind.exactly`foo`</code><br/><code>notBehind(&#39;foo&#39;)</code></td>
+<td><code>(?&lt;!foo)</code></td>
+<td>Wrap the given token in a negative lookbehind</td>
+</tr>
+<tr>
+<td><code>oneOf`foo` `bar`</code><br/><code>oneOf(exactly`foo`, exactly`bar`)</code><br/><code>oneOf(&#39;foo&#39;, &#39;bar&#39;)</code></td>
+<td><code>(?:foo&#124;bar)</code></td>
+<td>Match one in the provided list of options</td>
+</tr>
+</tbody></table>
+<a id="md:misc" class="tsd-anchor"></a><h3><a href="#md:misc">Misc</a></h3><a id="md:match" class="tsd-anchor"></a><h4><a href="#md:match"><code>match</code></a></h4><p>Include another readable RegExp token in the current expression. This is useful for extracting and re-using common expressions.</p>
+<p>Example:</p>
+<pre><code class="language-js"><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-6">number</span><span class="hl-1"> = </span><span class="hl-4">oneOrMore</span><span class="hl-1">.</span><span class="hl-4">digit</span><span class="hl-1">;</span><br/><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-6">coordinates</span><span class="hl-1"> = </span><span class="hl-0">match</span><span class="hl-1">(</span><span class="hl-4">number</span><span class="hl-1">).</span><span class="hl-0">exactly</span><span class="hl-2">`,`</span><span class="hl-1">.</span><span class="hl-0">match</span><span class="hl-1">(</span><span class="hl-4">number</span><span class="hl-1">);</span>
+</code><button>Copy</button></pre>
+<p>This is equivalent to:</p>
+<pre><code class="language-js"><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-6">coordinates</span><span class="hl-1"> = </span><span class="hl-4">oneOrMore</span><span class="hl-1">.</span><span class="hl-4">digit</span><span class="hl-1">.</span><span class="hl-0">exactly</span><span class="hl-2">`,`</span><span class="hl-1">.</span><span class="hl-4">oneOrMore</span><span class="hl-1">.</span><span class="hl-4">digit</span><span class="hl-1">;</span>
+</code><button>Copy</button></pre>
+<p><code>match</code> can also accept multiple tokens and chain them together, which can be useful for code formatting.</p>
+<p>Example:</p>
+<pre><code class="language-js"><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-6">filename</span><span class="hl-1"> = </span><span class="hl-0">match</span><span class="hl-1">(</span><br/><span class="hl-1">    </span><span class="hl-4">oneOrMore</span><span class="hl-1">.</span><span class="hl-4">word</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-0">exactly</span><span class="hl-2">`_`</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-4">oneOrMore</span><span class="hl-1">.</span><span class="hl-4">digit</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-0">exactly</span><span class="hl-2">`.txt`</span><br/><span class="hl-1">);</span>
+</code><button>Copy</button></pre>
+<p>This is equivalent to:</p>
+<pre><code class="language-js"><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-6">filename</span><span class="hl-1"> = </span><span class="hl-4">oneOrMore</span><span class="hl-1">.</span><span class="hl-4">word</span><span class="hl-1">.</span><span class="hl-0">exactly</span><span class="hl-2">`_`</span><span class="hl-1">.</span><span class="hl-4">oneOrMore</span><span class="hl-1">.</span><span class="hl-4">digit</span><span class="hl-1">.</span><span class="hl-0">exactly</span><span class="hl-2">`.txt`</span><span class="hl-1">;</span>
+</code><button>Copy</button></pre>
+<a id="md:tostring" class="tsd-anchor"></a><h4><a href="#md:tostring"><code>toString()</code></a></h4><p>Get the current expression as a RegExp string. This is a terminal operation, which means no more functions can
+be chained after <code>toString</code>, and the string output cannot be converted back to a readable RegExp token.</p>
+<p>Back-references are validated when <code>toString</code> is called, and an error will be thrown if any of the back-references are
+invalid.</p>
+<p>Example:</p>
+<pre><code class="language-js"><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-6">coordinates</span><span class="hl-1"> = </span><span class="hl-4">oneOrMore</span><span class="hl-1">.</span><span class="hl-4">digit</span><span class="hl-1">.</span><span class="hl-0">exactly</span><span class="hl-2">`,`</span><span class="hl-1">.</span><span class="hl-4">oneOrMore</span><span class="hl-1">.</span><span class="hl-4">digit</span><span class="hl-1">.</span><span class="hl-0">toString</span><span class="hl-1">();</span><br/><span class="hl-0">expect</span><span class="hl-1">(</span><span class="hl-4">coordinates</span><span class="hl-1">).</span><span class="hl-0">toBe</span><span class="hl-1">(</span><span class="hl-2">&quot;</span><span class="hl-17">\\</span><span class="hl-2">d+,</span><span class="hl-17">\\</span><span class="hl-2">d+&quot;</span><span class="hl-1">);</span>
+</code><button>Copy</button></pre>
+<a id="md:toregexpflags" class="tsd-anchor"></a><h4><a href="#md:toregexpflags"><code>toRegExp(flags?)</code></a></h4><p>Get a RegExp object of the current expression. This is a terminal operation, which means no more functions can
+be chained after <code>toRegExp</code>, and the output cannot be converted back to a readable RegExp token.</p>
+<p>Back-references are validated when <code>toRegExp</code> is called, and an error will be thrown if any of the back-references are
+invalid.</p>
+<p>You can supply a list of flags to set in the RegExp object:</p>
+<ul>
+<li><code>toRegExp(&#39;gmi&#39;)</code></li>
+<li><code>toRegExp`gmi`</code></li>
+<li><code>toRegExp(Flag.Global, Flag.MultiLine, Flag.IgnoreCase)</code></li>
+<li><code>toRegExp(&#39;g&#39;, &#39;m&#39;, &#39;i&#39;)</code></li>
+</ul>
+<pre><code class="language-js"><span class="hl-5">const</span><span class="hl-1"> </span><span class="hl-6">coordinates</span><span class="hl-1"> = </span><span class="hl-4">oneOrMore</span><span class="hl-1">.</span><span class="hl-4">digit</span><br/><span class="hl-1">  .</span><span class="hl-0">exactly</span><span class="hl-2">`,`</span><br/><span class="hl-1">  .</span><span class="hl-4">oneOrMore</span><span class="hl-1">.</span><span class="hl-4">digit</span><br/><span class="hl-1">  .</span><span class="hl-0">toRegExp</span><span class="hl-1">(</span><span class="hl-4">Flag</span><span class="hl-1">.</span><span class="hl-4">Global</span><span class="hl-1">);</span><br/><span class="hl-4">console</span><span class="hl-1">.</span><span class="hl-0">log</span><span class="hl-1">(</span><span class="hl-4">coordinates</span><span class="hl-1">.</span><span class="hl-0">exec</span><span class="hl-1">(</span><span class="hl-2">&#39;[1,2] [3,4]&#39;</span><span class="hl-1">));  </span><span class="hl-12">// expect 2 matches</span>
+</code><button>Copy</button></pre>
+</div></div>
+<div class="col-sidebar">
+<div class="page-menu">
+<div class="tsd-navigation settings">
+<details class="tsd-index-accordion"><summary class="tsd-accordion-summary">
+<h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4.93896 8.531L12 15.591L19.061 8.531L16.939 6.409L12 11.349L7.06098 6.409L4.93896 8.531Z" fill="var(--color-text)" id="icon-chevronDown"></path></svg>Settings</h3></summary>
+<div class="tsd-accordion-details">
+<div class="tsd-filter-visibility">
+<h4 class="uppercase">Member Visibility</h4><form>
+<ul id="tsd-filter-options">
+<li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-protected" name="protected"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Protected</span></label></li>
+<li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-private" name="private"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Private</span></label></li>
+<li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-inherited" name="inherited" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Inherited</span></label></li>
+<li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-external" name="external"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>External</span></label></li></ul></form></div>
+<div class="tsd-theme-toggle">
+<h4 class="uppercase">Theme</h4><select id="tsd-theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></div></div></details></div>
+<details open class="tsd-index-accordion tsd-page-navigation"><summary class="tsd-accordion-summary">
+<h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><use href="#icon-chevronDown"></use></svg>On This Page</h3></summary>
+<div class="tsd-accordion-details">
+<ul>
+<li>
+<ul>
+<li><a href="#md:table-of-contents"><span>Table of <wbr/>Contents</span></a></li>
+<li>
+<ul>
+<li><a href="#md:installation"><span>Installation</span></a></li>
+<li>
+<ul>
+<li><a href="#md:using-a-package-manager"><span>Using a package manager</span></a></li>
+<li><a href="#md:using-a-cdn"><span>Using a CDN</span></a></li></ul></li>
+<li><a href="#md:features"><span>Features</span></a></li>
+<li>
+<ul>
+<li><a href="#md:readability"><span>Readability</span></a></li>
+<li><a href="#md:flexibility-and-conciseness"><span>Flexibility and <wbr/>Conciseness</span></a></li>
+<li><a href="#md:safety"><span>Safety</span></a></li></ul></li>
+<li><a href="#md:documentation"><span>Documentation</span></a></li>
+<li>
+<ul>
+<li><a href="#md:syntax-rules"><span>Syntax <wbr/>Rules</span></a></li>
+<li><a href="#md:special-tokens"><span>Special <wbr/>Tokens</span></a></li>
+<li>
+<ul>
+<li><a href="#md:-notes-on-octal"><span>† <wbr/>Notes on octal</span></a></li>
+<li><a href="#md:-notes-on-hex-and-unicode"><span>‡ <wbr/>Notes on hex and unicode</span></a></li></ul></li>
+<li><a href="#md:character-classes"><span>Character <wbr/>Classes</span></a></li>
+<li>
+<ul>
+<li><a href="#md:-notes-on-character-classes"><span>† <wbr/>Notes on character classes</span></a></li></ul></li>
+<li><a href="#md:anchors"><span>Anchors</span></a></li>
+<li><a href="#md:quantifiers"><span>Quantifiers</span></a></li>
+<li><a href="#md:groups"><span>Groups</span></a></li>
+<li><a href="#md:misc"><span>Misc</span></a></li>
+<li>
+<ul>
+<li><a href="#md:match"><span>match</span></a></li>
+<li><a href="#md:tostring"><span>to<wbr/>String()</span></a></li>
+<li><a href="#md:toregexpflags"><span>to<wbr/>Reg<wbr/>Exp(flags?)</span></a></li></ul></li></ul></li></ul></li></ul></li></ul></div></details></div>
+<div class="site-menu">
+<nav class="tsd-navigation"><a href="modules.html" class="current"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-4"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-namespace)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6"></rect><path d="M9.33 16V7.24H10.77L13.446 14.74C13.43 14.54 13.41 14.296 13.386 14.008C13.37 13.712 13.354 13.404 13.338 13.084C13.33 12.756 13.326 12.448 13.326 12.16V7.24H14.37V16H12.93L10.266 8.5C10.282 8.692 10.298 8.936 10.314 9.232C10.33 9.52 10.342 9.828 10.35 10.156C10.366 10.476 10.374 10.784 10.374 11.08V16H9.33Z" fill="var(--color-text)"></path></g></svg><span>readable-<wbr/>regexp</span></a>
+<ul class="tsd-small-nested-navigation">
+<li><a href="enums/Flag.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-8"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-enum)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6"></rect><path d="M9.45 16V7.24H14.49V8.224H10.518V10.936H14.07V11.908H10.518V15.016H14.49V16H9.45Z" fill="var(--color-text)"></path></g></svg><span>Flag</span></a></li>
+<li><a href="variables/backspace.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-32"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-variable)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6"></rect><path d="M11.106 16L8.85 7.24H9.966L11.454 13.192C11.558 13.608 11.646 13.996 11.718 14.356C11.79 14.708 11.842 14.976 11.874 15.16C11.906 14.976 11.954 14.708 12.018 14.356C12.09 13.996 12.178 13.608 12.282 13.192L13.758 7.24H14.85L12.582 16H11.106Z" fill="var(--color-text)"></path></g></svg><span>backspace</span></a></li>
+<li><a href="variables/carriageReturn.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-32"></use></svg><span>carriage<wbr/>Return</span></a></li>
+<li><a href="variables/char.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-32"></use></svg><span>char</span></a></li>
+<li><a href="variables/digit.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-32"></use></svg><span>digit</span></a></li>
+<li><a href="variables/formFeed.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-32"></use></svg><span>form<wbr/>Feed</span></a></li>
+<li><a href="variables/lineEnd.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-32"></use></svg><span>line<wbr/>End</span></a></li>
+<li><a href="variables/lineFeed.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-32"></use></svg><span>line<wbr/>Feed</span></a></li>
+<li><a href="variables/lineStart.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-32"></use></svg><span>line<wbr/>Start</span></a></li>
+<li><a href="variables/nullChar.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-32"></use></svg><span>null<wbr/>Char</span></a></li>
+<li><a href="variables/r.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-32"></use></svg><span>r</span></a></li>
+<li><a href="variables/tab.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-32"></use></svg><span>tab</span></a></li>
+<li><a href="variables/verticalWhitespace.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-32"></use></svg><span>vertical<wbr/>Whitespace</span></a></li>
+<li><a href="variables/whitespace.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-32"></use></svg><span>whitespace</span></a></li>
+<li><a href="variables/word.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-32"></use></svg><span>word</span></a></li>
+<li><a href="variables/wordBoundary.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-32"></use></svg><span>word<wbr/>Boundary</span></a></li>
+<li><a href="functions/ahead.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><g id="icon-64"><rect fill="var(--color-icon-background)" stroke="var(--color-ts-function)" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="6"></rect><path d="M9.39 16V7.24H14.55V8.224H10.446V11.128H14.238V12.112H10.47V16H9.39Z" fill="var(--color-text)"></path></g></svg><span>ahead</span></a></li>
+<li><a href="functions/atLeast.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>at<wbr/>Least</span></a></li>
+<li><a href="functions/atLeastLazily.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>at<wbr/>Least<wbr/>Lazily</span></a></li>
+<li><a href="functions/atMost.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>at<wbr/>Most</span></a></li>
+<li><a href="functions/atMostLazily.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>at<wbr/>Most<wbr/>Lazily</span></a></li>
+<li><a href="functions/behind.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>behind</span></a></li>
+<li><a href="functions/capture.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>capture</span></a></li>
+<li><a href="functions/captureAs.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>capture<wbr/>As</span></a></li>
+<li><a href="functions/charIn.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>char<wbr/>In</span></a></li>
+<li><a href="functions/exactly.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>exactly</span></a></li>
+<li><a href="functions/group.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>group</span></a></li>
+<li><a href="functions/hex.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>hex</span></a></li>
+<li><a href="functions/match.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>match</span></a></li>
+<li><a href="functions/maybe.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>maybe</span></a></li>
+<li><a href="functions/maybeLazily.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>maybe<wbr/>Lazily</span></a></li>
+<li><a href="functions/not.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>not</span></a></li>
+<li><a href="functions/notAhead.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>not<wbr/>Ahead</span></a></li>
+<li><a href="functions/notBehind.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>not<wbr/>Behind</span></a></li>
+<li><a href="functions/notCharIn.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>not<wbr/>Char<wbr/>In</span></a></li>
+<li><a href="functions/octal.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>octal</span></a></li>
+<li><a href="functions/oneOf.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>one<wbr/>Of</span></a></li>
+<li><a href="functions/oneOrMore.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>one<wbr/>Or<wbr/>More</span></a></li>
+<li><a href="functions/oneOrMoreLazily.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>one<wbr/>Or<wbr/>More<wbr/>Lazily</span></a></li>
+<li><a href="functions/ref.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>ref</span></a></li>
+<li><a href="functions/repeat.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>repeat</span></a></li>
+<li><a href="functions/repeatLazily.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>repeat<wbr/>Lazily</span></a></li>
+<li><a href="functions/unicode.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>unicode</span></a></li>
+<li><a href="functions/zeroOrMore.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>zero<wbr/>Or<wbr/>More</span></a></li>
+<li><a href="functions/zeroOrMoreLazily.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>zero<wbr/>Or<wbr/>More<wbr/>Lazily</span></a></li></ul></nav></div></div></div>
+<div class="tsd-generator">
+<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p></div>
+<div class="overlay"></div></body></html>
