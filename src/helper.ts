@@ -133,7 +133,11 @@ export const hexNumber = /^[0-9a-fA-F]+$/;
 
 export const octalNumber = /^[0-7]+$/;
 
-export const charLiteral = /^(?:\\u[0-9a-fA-F]{4}$|\\x[0-9a-fA-F]{2}|\\\d{1,3})/; // last option refers to octal character or capture group backreference
+// octal escape sequences are not matched here because they should be wrapped in a character class
+export const negatableCharLiteral = /^(?:\\u[0-9a-fA-F]{4}|\\x[0-9a-fA-F]{2})$/;
+
+// last option refers to octal character or capture group backreference
+export const charLiteral = /^(?:\\u[0-9a-fA-F]{4}|\\x[0-9a-fA-F]{2}|\\\d{1,3})$/;
 
 export const captureName = /^[a-zA-Z_][a-zA-Z0-9_]*$/;
 
