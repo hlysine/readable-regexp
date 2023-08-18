@@ -94,6 +94,9 @@ export interface FlagFunction {
   <TFlag extends string>(flags?: FlagsString<TFlag> & TFlag): RegExp;
 }
 
+/**
+ * A RegExp token that can be chained with other tokens to form a RegExp expression.
+ */
 export interface RegExpToken {
   /**
    * Get the current expression as a RegExp string. This is a terminal operation, which means no more functions can be
