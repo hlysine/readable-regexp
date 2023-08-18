@@ -7,7 +7,7 @@
     "jest": true
   },
   "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint", "prettier", "sort-imports-es6-autofix"],
+  "plugins": ["@typescript-eslint", "eslint-plugin-tsdoc", "prettier", "sort-imports-es6-autofix"],
   "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended", "prettier"],
   "parserOptions": {
     "ecmaVersion": "latest",
@@ -83,6 +83,7 @@
     "sort-imports": "off",
     "sort-imports-es6-autofix/sort-imports-es6": "warn",
     "spaced-comment": ["error", "always", { "markers": ["/"] }],
-    "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }]
+    "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
+    "tsdoc/syntax": "warn"
   }
 }
