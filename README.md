@@ -20,6 +20,7 @@ Create readable Regular Expressions with concise and flexible syntax.
 - [Installation](#installation)
   - [Using a package manager](#using-a-package-manager)
   - [Using a CDN](#using-a-cdn)
+- [Quick Example](#quick-example)
 - [Features](#features)
   - [Readability](#readability)
   - [Flexibility and Conciseness](#flexibility-and-conciseness)
@@ -61,6 +62,58 @@ Import readable-regexp via a script tag in your HTML file, then access the `read
 
 ```js
 const { oneOrMore, exactly } = readableRegExp;
+```
+
+## Quick Example
+
+This is an email RegExp:
+
+```js
+/^([^<>()[\]\\.,;:@"\s]+(?:\.[^<>()[\]\\.,;:@"\s]+)*|".+")@(\[\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\]|(?:[a-zA-Z0-9\-]+\.)+[a-zA-Z]{2,})$/
+```
+
+And this is the same expression written in readable RegExp:
+
+```js
+const allowedChar = notCharIn`<>()[]\\\\``.,;:@"`(whitespace);
+const email = lineStart
+  .capture.oneOf
+    ( // username
+      oneOrMore.match(allowedChar)
+      .zeroOrMore(
+        exactly`.`
+        .oneOrMore.match(allowedChar)
+      )
+    )
+    ( // quoted string
+      exactly`"`
+      .oneOrMore.char
+      .exactly`"`
+    )
+  .exactly`@`
+  .capture.oneOf
+    ( // IPv4 address
+      exactly`[`
+      .repeat(1, 3).digit
+      .exactly`.`
+      .repeat(1, 3).digit
+      .exactly`.`
+      .repeat(1, 3).digit
+      .exactly`.`
+      .repeat(1, 3).digit
+      .exactly`]`
+    )
+    ( // domain name
+      oneOrMore(
+        oneOrMore.charIn`a-z``A-Z``0-9``-`
+        .exactly`.`
+      )
+      .atLeast(2).charIn`a-z``A-Z`
+    )
+  .lineEnd
+  .toRegExp();
+
+email.test("abc@example.com"); // true
 ```
 
 ## Features
