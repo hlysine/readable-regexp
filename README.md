@@ -15,7 +15,7 @@
 Create readable Regular Expressions with concise and flexible syntax.
 </p>
 
-![ray-so-export(1)](https://github.com/hlysine/readable-regexp/assets/25472513/3c0540d5-1b25-4f83-afb4-7ed16a3a5140)
+![Quick example of readable-regexp](https://github.com/hlysine/readable-regexp/assets/25472513/3c0540d5-1b25-4f83-afb4-7ed16a3a5140)
 
 ## Table of Contents
 
