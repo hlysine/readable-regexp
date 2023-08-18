@@ -13,7 +13,13 @@ function escapeForCharClass(option: string): string {
     if (charEscaped) {
       charEscaped = false;
     } else if (char === '\\') {
-      charEscaped = true;
+      if (i === option.length - 1) {
+        // escape backslash at the end of the string
+        option = option + '\\';
+        break;
+      } else {
+        charEscaped = true;
+      }
     } else if (char === ']' || char === '^') {
       // escape this character
       option = option.substring(0, i) + '\\' + option.substring(i);

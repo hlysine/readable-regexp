@@ -666,8 +666,9 @@ export interface RegExpToken {
    * Apart from `-`, `^` and `]` are also escaped in the character class, so you cannot negate a `charIn` via a `^`
    * character (you should use `notCharIn`), and you cannot close a character class prematurely.
    *
-   * All other characters are not escaped in `charIn`, so you can use escape sequences such as `\uffff` and `\xff`
-   * freely.
+   * Backslashes `\` are only escaped at the end of a string, so you can use escape sequences such as `\uffff` and
+   * `\xff` freely. If you want to include `\` in the character class, you should write it at the end of a string or
+   * escape with `\\`.
    *
    * @example
    *
