@@ -75,7 +75,7 @@ This is an email RegExp:
 And this is the same expression written in readable RegExp:
 
 ```js
-const allowedChar = notCharIn`<>()[]\\\\``.,;:@"`(whitespace);
+const allowedChar = notCharIn`<>()[]\\\\` `.,;:@"` (whitespace);
 const email = lineStart
   .capture.oneOf
     ( // username
@@ -105,10 +105,10 @@ const email = lineStart
     )
     ( // domain name
       oneOrMore(
-        oneOrMore.charIn`a-z``A-Z``0-9``-`
+        oneOrMore.charIn`a-z` `A-Z` `0-9` `-`
         .exactly`.`
       )
-      .atLeast(2).charIn`a-z``A-Z`
+      .atLeast(2).charIn`a-z` `A-Z`
     )
   .lineEnd
   .toRegExp();
