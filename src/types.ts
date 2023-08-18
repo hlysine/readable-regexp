@@ -89,8 +89,76 @@ export type FlagsString<TFlags extends string> = TFlags extends ''
   : never;
 
 export interface FlagFunction {
+  /**
+   * Get a RegExp object of the current expression. This is a terminal operation, which means no more functions can be
+   * chained after toRegExp, and the output cannot be converted back to a readable RegExp token.
+   *
+   * Back-references are validated when toRegExp is called, and an error will be thrown if any of the back-references
+   * are invalid.
+   *
+   * You can supply a list of flags to set in the RegExp object:
+   * -     toRegExp('gmi')
+   * -     toRegExp`gmi`
+   * -     toRegExp(Flag.Global, Flag.MultiLine, Flag.IgnoreCase)
+   * -     toRegExp('g', 'm', 'i')
+   *
+   * @example
+   * ```js
+   * const coordinates = oneOrMore.digit
+   *   .exactly`,`
+   *   .oneOrMore.digit
+   *   .toRegExp(Flag.Global);
+   * console.log(coordinates.exec('[1,2] [3,4]'));  // expect 2 matches
+   * ```
+   */
   (template: TemplateStringsArray, ...args: unknown[]): RegExp;
+  /**
+   * Get a RegExp object of the current expression. This is a terminal operation, which means no more functions can be
+   * chained after toRegExp, and the output cannot be converted back to a readable RegExp token.
+   *
+   * Back-references are validated when toRegExp is called, and an error will be thrown if any of the back-references
+   * are invalid.
+   *
+   * You can supply a list of flags to set in the RegExp object:
+   * -     toRegExp('gmi')
+   * -     toRegExp`gmi`
+   * -     toRegExp(Flag.Global, Flag.MultiLine, Flag.IgnoreCase)
+   * -     toRegExp('g', 'm', 'i')
+   *
+   * @example
+   * ```js
+   * const coordinates = oneOrMore.digit
+   *   .exactly`,`
+   *   .oneOrMore.digit
+   *   .toRegExp(Flag.Global);
+   * console.log(coordinates.exec('[1,2] [3,4]'));  // expect 2 matches
+   * ```
+   * @param flags - Flags to set in the RegExp object.
+   */
   (...flags: FlagUnion[]): RegExp;
+  /**
+   * Get a RegExp object of the current expression. This is a terminal operation, which means no more functions can be
+   * chained after toRegExp, and the output cannot be converted back to a readable RegExp token.
+   *
+   * Back-references are validated when toRegExp is called, and an error will be thrown if any of the back-references
+   * are invalid.
+   *
+   * You can supply a list of flags to set in the RegExp object:
+   * -     toRegExp('gmi')
+   * -     toRegExp`gmi`
+   * -     toRegExp(Flag.Global, Flag.MultiLine, Flag.IgnoreCase)
+   * -     toRegExp('g', 'm', 'i')
+   *
+   * @example
+   * ```js
+   * const coordinates = oneOrMore.digit
+   *   .exactly`,`
+   *   .oneOrMore.digit
+   *   .toRegExp(Flag.Global);
+   * console.log(coordinates.exec('[1,2] [3,4]'));  // expect 2 matches
+   * ```
+   * @param flags - Flags to set in the RegExp object.
+   */
   <TFlag extends string>(flags?: FlagsString<TFlag> & TFlag): RegExp;
 }
 
