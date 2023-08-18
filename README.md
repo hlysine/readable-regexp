@@ -15,12 +15,13 @@
 Create readable Regular Expressions with concise and flexible syntax.
 </p>
 
+![ray-so-export(1)](https://github.com/hlysine/readable-regexp/assets/25472513/3c0540d5-1b25-4f83-afb4-7ed16a3a5140)
+
 ## Table of Contents
 
 - [Installation](#installation)
   - [Using a package manager](#using-a-package-manager)
   - [Using a CDN](#using-a-cdn)
-- [Quick Example](#quick-example)
 - [Features](#features)
   - [Readability](#readability)
   - [Flexibility and Conciseness](#flexibility-and-conciseness)
@@ -64,58 +65,6 @@ Import readable-regexp via a script tag in your HTML file, then access the `read
 const { oneOrMore, exactly } = readableRegExp;
 ```
 
-## Quick Example
-
-This is an email RegExp:
-
-```js
-/^([^<>()[\]\\.,;:@"\s]+(?:\.[^<>()[\]\\.,;:@"\s]+)*|".+")@(\[\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\]|(?:[a-zA-Z0-9\-]+\.)+[a-zA-Z]{2,})$/
-```
-
-And this is the same expression written in readable RegExp:
-
-```js
-const allowedChar = notCharIn`<>()[]\\\\` `.,;:@"` (whitespace);
-const email = lineStart
-  .capture.oneOf
-    ( // username
-      oneOrMore.match(allowedChar)
-      .zeroOrMore(
-        exactly`.`
-        .oneOrMore.match(allowedChar)
-      )
-    )
-    ( // quoted string
-      exactly`"`
-      .oneOrMore.char
-      .exactly`"`
-    )
-  .exactly`@`
-  .capture.oneOf
-    ( // IPv4 address
-      exactly`[`
-      .repeat(1, 3).digit
-      .exactly`.`
-      .repeat(1, 3).digit
-      .exactly`.`
-      .repeat(1, 3).digit
-      .exactly`.`
-      .repeat(1, 3).digit
-      .exactly`]`
-    )
-    ( // domain name
-      oneOrMore(
-        oneOrMore.charIn`a-z` `A-Z` `0-9` `-`
-        .exactly`.`
-      )
-      .atLeast(2).charIn`a-z` `A-Z`
-    )
-  .lineEnd
-  .toRegExp();
-
-email.test("abc@example.com"); // true
-```
-
 ## Features
 
 ### Readability
@@ -146,37 +95,43 @@ const regExp = /(\d+|\d*\.\d+), ?(\d+|\d*\.\d+)/g; // we have to copy-paste the 
 In a more complex use case, we can destructure the expression into manageable small parts:
 
 ```js
-const protocol = captureAs`protocol`.oneOf
-  (exactly`http`.maybe`s`)
-  `smtp`
-  `ftp`;
-const domain = captureAs`domain`(
-  oneOrMore.charIn(word, '-')
-  .oneOrMore(
-    exactly`.`.oneOrMore.charIn(word, '-')
-  )
-);
-const port = exactly`:`
-  .captureAs`port`.oneOrMore.digit;
-const path = exactly`/`
-  .maybe.captureAs`path`(
-    oneOrMore.charIn(word, '-.')
-    .zeroOrMore(
-      exactly`/`
-      .oneOrMore.charIn(word, '-.')
-    )
-  );
-const query = exactly`?`
-  .captureAs`query`.zeroOrMore.char;
+const allowedChar = notCharIn`<>()[]\\\\` `.,;:@"` (whitespace);
 
-// combining all the parts above
-const regExp = lineStart
-  .match(protocol)
-  .exactly`://`
-  .match(domain)
-  .maybe(port)
-  .maybe(path)
-  .maybe(query)
+const username =
+  oneOrMore.match(allowedChar)
+  .zeroOrMore(
+    exactly`.`
+    .oneOrMore.match(allowedChar)
+  );
+
+const quotedString =
+  exactly`"`
+  .oneOrMore.char
+  .exactly`"`;
+
+const ipv4Address =
+  exactly`[`
+  .repeat(1, 3).digit
+  .exactly`.`
+  .repeat(1, 3).digit
+  .exactly`.`
+  .repeat(1, 3).digit
+  .exactly`.`
+  .repeat(1, 3).digit
+  .exactly`]`;
+
+const domainName =
+  oneOrMore(
+    oneOrMore.charIn`a-z` `A-Z` `0-9` `-`
+    .exactly`.`
+  )
+  .atLeast(2).charIn`a-z` `A-Z`;
+
+const email =
+  lineStart
+  .capture.oneOf(username, quotedString)
+  .exactly`@`
+  .capture.oneOf(ipv4Address, domainName)
   .lineEnd
   .toRegExp();
 ```
@@ -184,8 +139,8 @@ const regExp = lineStart
 This is far more readable and debuggable than the equivalent RegExp:
 
 ```js
-const regExp =
-  /^(?<protocol>https?|smtp|ftp):\/\/(?<domain>[\w\-]+(?:\.[\w\-]+)+)(?::(?<port>\d+))?(?:\/(?<path>[\w\-.]+(?:\/[\w\-.]+)*)?)?(?:\?(?<query>.*))?$/;
+const email =
+  /^([^<>()[\]\\.,;:@"\s]+(?:\.[^<>()[\]\\.,;:@"\s]+)*|".+")@(\[\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\]|(?:[a-zA-Z0-9\-]+\.)+[a-zA-Z]{2,})$/;
 ```
 
 </details>
