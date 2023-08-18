@@ -300,8 +300,11 @@ const regExp = oneOrMore(exactly`fo`.maybe`o`);
 | `nullChar`                                             | `\0`              | Match a null character                                            |
 | `not.nullChar`<br/>`not(nullChar)`                     | `[^\0]`           | Match anything not null                                           |
 | `` octal`123` ``<br/>`octal('123')`                    | `[\123]`          | Match a character with the given code point in base-8 †           |
+| `` not.octal`123` ``<br/>`not(octal('123'))`           | `[^\123]`         | Match anything other than the specified character                 |
 | `` hex`3f` ``<br/>`hex('3f')`                          | `\x3f`            | Match a character with the given code point in base-16 ‡          |
+| `` not.hex`3f` ``<br/>`not(hex('3f'))`                 | `[^\x3f]`         | Match anything other than the specified character                 |
 | `` unicode`3ef1` ``<br/>`unicode('3ef1')`              | `\u3ef1`          | Match a character with the given code point in base-16 ‡          |
+| `` not.unicode`3ef1` ``<br/>`not(unicode('3ef1'))`     | `[^\u3ef1]`       | Match anything other than the specified character                 |
 
 #### † Notes on `octal`
 
