@@ -39,8 +39,9 @@ escaped at the beginning and end of each string in the list, so <code>charIn`a-`
 literally, while <code>charIn`a-z`</code> matches alphabets from <code>a</code> to <code>z</code>.</p>
 <p>Apart from <code>-</code>, <code>^</code> and <code>]</code> are also escaped in the character class, so you cannot negate a <code>charIn</code> via a <code>^</code>
 character (you should use <code>notCharIn</code>), and you cannot close a character class prematurely.</p>
-<p>All other characters are not escaped in <code>charIn</code>, so you can use escape sequences such as <code>\uffff</code> and <code>\xff</code>
-freely.</p>
+<p>Backslashes <code>\</code> are only escaped at the end of a string, so you can use escape sequences such as <code>\uffff</code> and
+<code>\xff</code> freely. If you want to include `` in the character class, you should write it at the end of a string or
+escape with <code>\\</code>.</p>
 </div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
@@ -65,7 +66,7 @@ freely.</p>
 </code><button>Copy</button></pre>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/hlysine/readable-regexp/blob/4ec1292/src/types.ts#L43">types.ts:43</a></li></ul></aside></li>
+<li>Defined in <a href="https://github.com/hlysine/readable-regexp/blob/f0c2d34/src/types.ts#L43">types.ts:43</a></li></ul></aside></li>
 <li class="tsd-signature tsd-anchor-link" id="charIn-1"><span class="tsd-kind-call-signature">char<wbr/>In</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span><span class="tsd-kind-parameter">args</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type ">RegExpToken</span><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-type ">CharClassFunction</span><a href="#charIn-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-comment tsd-typography"><p>Match a character listed in the group. A hyphen denotes a range of characters, such as <code>a-z</code>.</p>
@@ -88,8 +89,9 @@ escaped at the beginning and end of each string in the list, so <code>charIn`a-`
 literally, while <code>charIn`a-z`</code> matches alphabets from <code>a</code> to <code>z</code>.</p>
 <p>Apart from <code>-</code>, <code>^</code> and <code>]</code> are also escaped in the character class, so you cannot negate a <code>charIn</code> via a <code>^</code>
 character (you should use <code>notCharIn</code>), and you cannot close a character class prematurely.</p>
-<p>All other characters are not escaped in <code>charIn</code>, so you can use escape sequences such as <code>\uffff</code> and <code>\xff</code>
-freely.</p>
+<p>Backslashes <code>\</code> are only escaped at the end of a string, so you can use escape sequences such as <code>\uffff</code> and
+<code>\xff</code> freely. If you want to include `` in the character class, you should write it at the end of a string or
+escape with <code>\\</code>.</p>
 </div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
@@ -112,7 +114,7 @@ freely.</p>
 </code><button>Copy</button></pre>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/hlysine/readable-regexp/blob/4ec1292/src/types.ts#L44">types.ts:44</a></li></ul></aside></li></ul></section></div>
+<li>Defined in <a href="https://github.com/hlysine/readable-regexp/blob/f0c2d34/src/types.ts#L44">types.ts:44</a></li></ul></aside></li></ul></section></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">
