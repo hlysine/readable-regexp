@@ -93,13 +93,28 @@ const regExp = /(\d+|\d*\.\d+), ?(\d+|\d*\.\d+)/g; // we have to copy-paste the 
 In a more complex use case, we can destructure the expression into manageable small parts:
 
 ```js
-const protocol = captureAs`protocol`.oneOf(exactly`http`.maybe`s`)`smtp``ftp`; // this is short for oneOf(exactly`http`.maybe`s`, 'smtp', 'ftp')
-const domain = captureAs`domain`(oneOrMore.charIn(word, '-').oneOrMore(exactly`.`.oneOrMore.charIn(word, '-')));
-const port = exactly`:`.captureAs`port`.oneOrMore.digit;
-const path = exactly`/`.maybe.captureAs`path`(
-  oneOrMore.charIn(word, '-.').zeroOrMore(exactly`/`.oneOrMore.charIn(word, '-.'))
+const protocol = captureAs`protocol`.oneOf
+  (exactly`http`.maybe`s`)
+  `smtp`
+  `ftp`;
+const domain = captureAs`domain`(
+  oneOrMore.charIn(word, '-')
+  .oneOrMore(
+    exactly`.`.oneOrMore.charIn(word, '-')
+  )
 );
-const query = exactly`?`.captureAs`query`.zeroOrMore.char;
+const port = exactly`:`
+  .captureAs`port`.oneOrMore.digit;
+const path = exactly`/`
+  .maybe.captureAs`path`(
+    oneOrMore.charIn(word, '-.')
+    .zeroOrMore(
+      exactly`/`
+      .oneOrMore.charIn(word, '-.')
+    )
+  );
+const query = exactly`?`
+  .captureAs`query`.zeroOrMore.char;
 
 // combining all the parts above
 const regExp = lineStart
@@ -109,7 +124,8 @@ const regExp = lineStart
   .maybe(port)
   .maybe(path)
   .maybe(query)
-  .lineEnd.toRegExp();
+  .lineEnd
+  .toRegExp();
 ```
 
 This is far more readable and debuggable than the equivalent RegExp:
