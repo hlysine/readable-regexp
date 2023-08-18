@@ -440,7 +440,7 @@ Example:
 
 ```js
 const coordinates = oneOrMore.digit.exactly`,`.oneOrMore.digit.toString();
-// coordinates: \d+,\d+
+expect(coordinates).toBe("\\d+,\\d+");
 ```
 
 #### `toRegExp(flags?)`
@@ -463,5 +463,5 @@ const coordinates = oneOrMore.digit
   .exactly`,`
   .oneOrMore.digit
   .toRegExp(Flag.Global);
-console.log(coordinates.exec('[1,2] [3,4]'));
+console.log(coordinates.exec('[1,2] [3,4]'));  // expect 2 matches
 ```
