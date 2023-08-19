@@ -1,4 +1,4 @@
-import { RegExpLiteral } from './types';
+import { IncompleteToken, RegExpLiteral } from './types';
 
 /**
  * Check whether a given value is a template strings array.
@@ -40,15 +40,34 @@ export function getLiteralString(args: RegExpLiteral, escape = true): string {
   return escape ? escapeRegExp(ret) : ret;
 }
 
+const incompleteTokenError = (tokenName: string, funcName: string, internal: boolean) => {
+  throw new Error(
+    `Required parameters are missing in the token ${tokenName}. ${
+      internal
+        ? `(Error thrown from internal function ${funcName}.)`
+        : `You should call ${tokenName} as a function to provide the required parameters before using ${funcName}.`
+    }`
+  );
+};
+
+const incompleteToken = (tokenName: string): IncompleteToken => ({
+  toString: (() => incompleteTokenError(tokenName, 'toString', false)) as never,
+  toRegExp: (() => incompleteTokenError(tokenName, 'toRegExp', false)) as never,
+  executeModifiers: (() => incompleteTokenError(tokenName, 'executeModifiers', true)) as never,
+  addModifier: (() => incompleteTokenError(tokenName, 'addModifier', true)) as never,
+  addNode: (() => incompleteTokenError(tokenName, 'addNode', true)) as never,
+});
+
 /**
- * This is equivalent to the built-in Function.bind, but forwards all symbols from thisArg to the bound function.
- * This allows the quantifiable and negatable tags to be passed to the bound function.
+ * A special bind function for incomplete tokens with required parameters such that errors are thrown when the token
+ * is used without the required parameters.
  */
-export function bind<T extends Function, U>(
+export function bindAsIncomplete<T extends Function, U>(
   func: T,
-  thisArg: U
-): T & { [K in keyof U as K extends symbol ? K : never]: U[K] } {
-  return func.bind(thisArg);
+  thisArg: U,
+  tokenName: string
+): T & { [K in keyof U as K extends symbol ? K : never]: U[K] } & IncompleteToken {
+  return assign(func.bind(thisArg), incompleteToken(tokenName));
 }
 
 /**

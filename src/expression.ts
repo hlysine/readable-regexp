@@ -12,7 +12,7 @@ import {
 } from './types';
 import {
   assign,
-  bind,
+  bindAsIncomplete,
   captureName,
   flagString,
   getLiteralString,
@@ -223,7 +223,7 @@ class RegExpBuilder implements RegExpToken {
       const literal = getLiteralString(args);
       return this.addNode(literal);
     }
-    return bind(func, this);
+    return bindAsIncomplete(func, this, 'exactly');
   }
 
   public get octal(): RegExpToken['octal'] {
@@ -241,7 +241,7 @@ class RegExpBuilder implements RegExpToken {
       }
       return this.addNode(`[\\${num.toString(8)}]`);
     }
-    return bind(func, this);
+    return bindAsIncomplete(func, this, 'octal');
   }
 
   public get hex(): RegExpToken['hex'] {
@@ -253,7 +253,7 @@ class RegExpBuilder implements RegExpToken {
       if (num <= 0xff) return this.addNode(`\\x${num.toString(16).padStart(2, '0')}`);
       else return this.addNode(`\\u${num.toString(16).padStart(4, '0')}`);
     }
-    return bind(func, this);
+    return bindAsIncomplete(func, this, 'hex');
   }
 
   public get unicode(): RegExpToken['unicode'] {
@@ -264,7 +264,7 @@ class RegExpBuilder implements RegExpToken {
       if (Number.isNaN(num) || num > 0xffff || num < 0) throw new Error('Invalid unicode character');
       return this.addNode(`\\u${num.toString(16).padStart(4, '0')}`);
     }
-    return bind(func, this);
+    return bindAsIncomplete(func, this, 'unicode');
   }
 
   public get charIn(): RegExpToken['charIn'] {
@@ -300,7 +300,7 @@ class RegExpBuilder implements RegExpToken {
         );
       }
     }
-    return bind(func, this.addModifier(new CharacterClassModifier(false)));
+    return bindAsIncomplete(func, this.addModifier(new CharacterClassModifier(false)), 'charIn');
   }
 
   public get notCharIn(): RegExpToken['notCharIn'] {
@@ -336,14 +336,14 @@ class RegExpBuilder implements RegExpToken {
       }
       return assign(func, this.addModifier(new RepeatQuantifier(min, max ?? min)));
     }
-    return bind(configure, this);
+    return bindAsIncomplete(configure, this, 'repeat');
   }
 
   public get repeatLazily(): RegExpToken['repeatLazily'] {
     function configure(this: RegExpBuilder, min: number, max?: number): LiteralFunction & TokenFunction & RegExpToken {
       return this.repeat(min, max).lazily;
     }
-    return bind(configure, this);
+    return bindAsIncomplete(configure, this, 'repeatLazily');
   }
 
   public get atLeast(): RegExpToken['atLeast'] {
@@ -360,14 +360,14 @@ class RegExpBuilder implements RegExpToken {
       }
       return assign(func, this.addModifier(new RepeatQuantifier(limit, undefined)));
     }
-    return bind(configure, this);
+    return bindAsIncomplete(configure, this, 'atLeast');
   }
 
   public get atLeastLazily(): RegExpToken['atLeastLazily'] {
     function configure(this: RegExpBuilder, limit: number): LiteralFunction & TokenFunction & RegExpToken {
       return this.atLeast(limit).lazily;
     }
-    return bind(configure, this);
+    return bindAsIncomplete(configure, this, 'atLeastLazily');
   }
 
   public get atMost(): RegExpToken['atMost'] {
@@ -384,14 +384,14 @@ class RegExpBuilder implements RegExpToken {
       }
       return assign(func, this.addModifier(new RepeatQuantifier(undefined, limit)));
     }
-    return bind(configure, this);
+    return bindAsIncomplete(configure, this, 'atMost');
   }
 
   public get atMostLazily(): RegExpToken['atMostLazily'] {
     function configure(this: RegExpBuilder, limit: number): LiteralFunction & TokenFunction & RegExpToken {
       return this.atMost(limit).lazily;
     }
-    return bind(configure, this);
+    return bindAsIncomplete(configure, this, 'atMostLazily');
   }
 
   public get maybe(): RegExpToken['maybe'] {
@@ -519,7 +519,7 @@ class RegExpBuilder implements RegExpToken {
         this.addModifier(new CaptureModifier(name), builder => builder.namedGroups.push(name, 0))
       );
     }
-    return bind(configure, this);
+    return bindAsIncomplete(configure, this, 'captureAs');
   }
 
   public get ref(): RegExpToken['ref'] {
@@ -537,7 +537,7 @@ class RegExpBuilder implements RegExpToken {
         throw new Error('Invalid arguments for ref');
       }
     }
-    return bind(func, this);
+    return bindAsIncomplete(func, this, 'ref');
   }
 
   public get group(): RegExpToken['group'] {
@@ -638,7 +638,7 @@ class RegExpBuilder implements RegExpToken {
         );
       }
     }
-    return bind(func, this.addModifier(new AlternationModifier()));
+    return bindAsIncomplete(func, this.addModifier(new AlternationModifier()), 'oneOf');
   }
 
   /*
@@ -657,7 +657,7 @@ class RegExpBuilder implements RegExpToken {
       });
       return builder;
     }
-    return bind(func, this);
+    return bindAsIncomplete(func, this, 'match');
   }
 }
 

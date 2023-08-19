@@ -44,6 +44,34 @@ export interface CharClassFunction {
   (...args: (string | RegExpToken)[]): RegExpToken & CharClassFunction;
 }
 
+export interface IncompleteToken {
+  /**
+   * @deprecated The token is incomplete. Please provide the required parameters.
+   * @throws Error: Required parameters are missing in the token.
+   */
+  toString: never;
+  /**
+   * @deprecated The token is incomplete. Please provide the required parameters.
+   * @throws Error: Required parameters are missing in the token.
+   */
+  toRegExp: never;
+  /**
+   * @deprecated The token is incomplete. Please provide the required parameters.
+   * @throws Error: Required parameters are missing in the token.
+   */
+  executeModifiers: never;
+  /**
+   * @deprecated The token is incomplete. Please provide the required parameters.
+   * @throws Error: Required parameters are missing in the token.
+   */
+  addModifier: never;
+  /**
+   * @deprecated The token is incomplete. Please provide the required parameters.
+   * @throws Error: Required parameters are missing in the token.
+   */
+  addNode: never;
+}
+
 /**
  * Flags that can be set in a RegExp object.
  */
@@ -642,7 +670,7 @@ export interface RegExpToken {
    * /\(yes\/no\)/
    * ```
    */
-  get exactly(): LiteralFunction;
+  get exactly(): LiteralFunction & IncompleteToken;
 
   /**
    * Match a character with the given code point in base-8.
@@ -667,7 +695,7 @@ export interface RegExpToken {
    * /[\123]/
    * ```
    */
-  get octal(): LiteralFunction;
+  get octal(): LiteralFunction & IncompleteToken;
 
   /**
    * Match a character with the given code point in base-16.
@@ -690,7 +718,7 @@ export interface RegExpToken {
    * /\x3f/
    * ```
    */
-  get hex(): LiteralFunction;
+  get hex(): LiteralFunction & IncompleteToken;
 
   /**
    * Match a character with the given code point in base-16.
@@ -713,7 +741,7 @@ export interface RegExpToken {
    * /\u3ef1/
    * ```
    */
-  get unicode(): LiteralFunction;
+  get unicode(): LiteralFunction & IncompleteToken;
 
   /**
    * Match a character listed in the group. A hyphen denotes a range of characters, such as `a-z`.
@@ -767,7 +795,7 @@ export interface RegExpToken {
    * /[^a-z_-]/
    * ```
    */
-  get charIn(): CharClassFunction;
+  get charIn(): CharClassFunction & IncompleteToken;
 
   /**
    * Match a character not listed in the group. A hyphen denotes a range of characters, such as `a-z`.
@@ -790,7 +818,7 @@ export interface RegExpToken {
    * /[^a-z_-]/
    * ```
    */
-  get notCharIn(): CharClassFunction;
+  get notCharIn(): CharClassFunction & IncompleteToken;
 
   /**
    * Negate a given token, causing it to match anything other than the token itself.
@@ -861,7 +889,7 @@ export interface RegExpToken {
    * /(?:foo){3,5}?/
    * ```
    */
-  get repeat(): RepeatFunction;
+  get repeat(): RepeatFunction & IncompleteToken;
 
   /**
    * Match a token the specified amount of times, trying to match as short as possible. Supply 1 parameter for an exact
@@ -882,7 +910,7 @@ export interface RegExpToken {
    * /(?:foo){3,5}?/
    * ```
    */
-  get repeatLazily(): RepeatFunction;
+  get repeatLazily(): RepeatFunction & IncompleteToken;
 
   /**
    * Match a token at least the specified amount of times.
@@ -914,7 +942,7 @@ export interface RegExpToken {
    * /(?:foo){3,}?/
    * ```
    */
-  get atLeast(): LimitFunction;
+  get atLeast(): LimitFunction & IncompleteToken;
 
   /**
    * Match a token at least the specified amount of times, trying to match as short as possible.
@@ -934,7 +962,7 @@ export interface RegExpToken {
    * /(?:foo){3,}?/
    * ```
    */
-  get atLeastLazily(): LimitFunction;
+  get atLeastLazily(): LimitFunction & IncompleteToken;
 
   /**
    * Match a token at most the specified amount of times.
@@ -966,7 +994,7 @@ export interface RegExpToken {
    * /(?:foo){0,3}?/
    * ```
    */
-  get atMost(): LimitFunction;
+  get atMost(): LimitFunction & IncompleteToken;
 
   /**
    * Match a token at most the specified amount of times, trying to match as short as possible.
@@ -986,7 +1014,7 @@ export interface RegExpToken {
    * /(?:foo){0,3}?/
    * ```
    */
-  get atMostLazily(): LimitFunction;
+  get atMostLazily(): LimitFunction & IncompleteToken;
 
   /**
    * Match a token 0 or 1 times.
@@ -1181,7 +1209,7 @@ export interface RegExpToken {
    * /(?<name>foo)/
    * ```
    */
-  get captureAs(): NamedCaptureFunction;
+  get captureAs(): NamedCaptureFunction & IncompleteToken;
 
   /**
    * Supply a number to reference the capture group with that index. Supply a string to reference a named capture group.
@@ -1210,7 +1238,7 @@ export interface RegExpToken {
    * /(foo)\1/
    * ```
    */
-  get ref(): LiteralFunction & NumberFunction;
+  get ref(): LiteralFunction & NumberFunction & IncompleteToken;
 
   /**
    * Wrap the given token in a non-capture group.
@@ -1360,7 +1388,7 @@ export interface RegExpToken {
    * /(?:foo|bar)/
    * ```
    */
-  get oneOf(): AlternationFunction;
+  get oneOf(): AlternationFunction & IncompleteToken;
 
   /**
    * Include another readable RegExp token in the current expression. This is useful for extracting and re-using common
@@ -1398,7 +1426,7 @@ export interface RegExpToken {
    * const filename = oneOrMore.word.exactly`_`.oneOrMore.digit.exactly`.txt`;
    * ```
    */
-  get match(): MultiTokenFunction;
+  get match(): MultiTokenFunction & IncompleteToken;
 
   /**
    * Converts a quantifier to be lazy, causing it to match as short as possible.
