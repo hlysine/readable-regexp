@@ -2,7 +2,7 @@ import { RegExpLiteral } from './types';
 
 /**
  * Check whether a given value is a template strings array.
- * @param arg The argument to check.
+ * @param arg - The argument to check.
  * @returns Whether the argument is a template strings array.
  */
 export function isTemplateStringsArray(arg: unknown): arg is TemplateStringsArray {
@@ -11,7 +11,7 @@ export function isTemplateStringsArray(arg: unknown): arg is TemplateStringsArra
 
 /**
  * Check whether the argument contains exactly one string in string or template form.
- * @param args The argument to check.
+ * @param args - The argument to check.
  * @returns Whether the argument contains exactly one string in string or template form.
  */
 export function isLiteralArgument(args: unknown[]): args is RegExpLiteral {
@@ -26,8 +26,8 @@ export function isLiteralArgument(args: unknown[]): args is RegExpLiteral {
 
 /**
  * Get the literal string from a string or template string array.
- * @param args Arguments passed to the function, either a string or a template string.
- * @param escape Whether to escape the string.
+ * @param args - Arguments passed to the function, either a string or a template string.
+ * @param escape - Whether to escape the string.
  * @returns The literal string.
  */
 export function getLiteralString(args: RegExpLiteral, escape = true): string {
@@ -53,8 +53,8 @@ export function bind<T extends Function, U>(
 
 /**
  * Copy all properties from source to target, including those in the prototype chain of source.
- * @param target The target object to which the properties will be added.
- * @param source The source object from which the properties will be copied.
+ * @param target - The target object to which the properties will be added.
+ * @param source - The source object from which the properties will be copied.
  * @returns The target object.
  */
 export function assign<T extends Function, U>(target: T, source: U): T & U {
