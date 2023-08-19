@@ -84,6 +84,10 @@ describe('exactly', () => {
     expect(() => exactly()).toThrow();
     // @ts-expect-error - testing invalid arguments
     expect(() => exactly('a', 'b')).toThrow();
+    // @ts-expect-error - testing missing arguments
+    expect(() => exactly.toString()).toThrow('required parameters');
+    // @ts-expect-error - testing missing arguments
+    expect(() => exactly.exactly`a`.toString()).toThrow();
   });
 });
 
@@ -117,6 +121,10 @@ describe('octal', () => {
     expect(() => octal()).toThrow();
     // @ts-expect-error - testing invalid arguments
     expect(() => octal('a', 'b')).toThrow();
+    // @ts-expect-error - testing missing arguments
+    expect(() => octal.toString()).toThrow('required parameters');
+    // @ts-expect-error - testing missing arguments
+    expect(() => octal.octal`123`.toString()).toThrow();
   });
 });
 
@@ -156,6 +164,10 @@ describe('hex', () => {
     expect(() => hex()).toThrow();
     // @ts-expect-error - testing invalid arguments
     expect(() => hex('a', 'b')).toThrow();
+    // @ts-expect-error - testing missing arguments
+    expect(() => hex.toString()).toThrow('required parameters');
+    // @ts-expect-error - testing missing arguments
+    expect(() => hex.hex`2e`.toString()).toThrow();
   });
 });
 
@@ -188,6 +200,10 @@ describe('unicode', () => {
     expect(() => unicode()).toThrow();
     // @ts-expect-error - testing invalid arguments
     expect(() => unicode('a', 'b')).toThrow();
+    // @ts-expect-error - testing missing arguments
+    expect(() => unicode.toString()).toThrow('required parameters');
+    // @ts-expect-error - testing missing arguments
+    expect(() => unicode.unicode`12ef`.toString()).toThrow();
   });
 });
 
@@ -277,6 +293,14 @@ describe('repeat', () => {
     expect(() => repeat(3, 5)(1)).toThrow();
     // @ts-expect-error - testing invalid arguments
     expect(() => repeat(3, 5)('a', 'b')).toThrow();
+    // @ts-expect-error - testing missing arguments
+    expect(() => repeat.toString()).toThrow('required parameters');
+    // @ts-expect-error - testing missing arguments
+    expect(() => repeatLazily.toString()).toThrow('required parameters');
+    expect(() => repeat(3, 5).lazily.toString()).toThrow('nothing to quantify');
+    expect(() => repeat(3, 5).toString()).toThrow('nothing to quantify');
+    // @ts-expect-error - testing missing arguments
+    expect(() => repeat.repeat(3, 5).toString()).toThrow();
   });
 });
 
@@ -323,6 +347,14 @@ describe('atLeast', () => {
     expect(() => atLeast(3)(1)).toThrow();
     // @ts-expect-error - testing invalid arguments
     expect(() => atLeast(3)('a', 'b')).toThrow();
+    // @ts-expect-error - testing missing arguments
+    expect(() => atLeast.toString()).toThrow('required parameters');
+    // @ts-expect-error - testing missing arguments
+    expect(() => atLeastLazily.toString()).toThrow('required parameters');
+    expect(() => atLeast(3).lazily.toString()).toThrow('nothing to quantify');
+    expect(() => atLeast(3).toString()).toThrow('nothing to quantify');
+    // @ts-expect-error - testing missing arguments
+    expect(() => atLeast.atLeast(3).toString()).toThrow();
   });
 });
 
@@ -369,6 +401,14 @@ describe('atMost', () => {
     expect(() => atMost(3)(1)).toThrow();
     // @ts-expect-error - testing invalid arguments
     expect(() => atMost(3)('a', 'b')).toThrow();
+    // @ts-expect-error - testing missing arguments
+    expect(() => atMost.toString()).toThrow('required parameters');
+    // @ts-expect-error - testing missing arguments
+    expect(() => atMostLazily.toString()).toThrow('required parameters');
+    expect(() => atMost(3).lazily.toString()).toThrow('nothing to quantify');
+    expect(() => atMost(3).toString()).toThrow('nothing to quantify');
+    // @ts-expect-error - testing missing arguments
+    expect(() => atMost.atMost(3).toString()).toThrow();
   });
 });
 
@@ -537,7 +577,7 @@ describe('capture', () => {
     expect(() => not(capture`foo`).toString()).toThrow();
   });
   it('throws for invalid argument', () => {
-    expect(capture().toString()).toBe('()');
+    expect(() => capture().toString()).toThrow('Empty capture group');
     // @ts-expect-error - testing invalid arguments
     expect(() => capture(1)).toThrow();
     // @ts-expect-error - testing invalid arguments
@@ -593,11 +633,17 @@ describe('captureAs', () => {
     // @ts-expect-error - testing invalid arguments
     expect(() => captureAs('a', 'b')).toThrow();
 
-    expect(captureAs`foo`().toString()).toBe('(?<foo>)');
+    expect(() => captureAs`foo`().toString()).toThrow('Empty capture group');
     // @ts-expect-error - testing invalid arguments
     expect(() => captureAs`foo`(1)).toThrow();
     // @ts-expect-error - testing invalid arguments
     expect(() => captureAs`foo`('a', 'b')).toThrow();
+
+    // @ts-expect-error - testing missing arguments
+    expect(() => captureAs.toString()).toThrow('required parameters');
+    expect(() => captureAs`test`.toString()).toThrow('Empty capture group');
+    // @ts-expect-error - testing missing arguments
+    expect(() => captureAs.captureAs(3).toString()).toThrow();
   });
 });
 
@@ -680,6 +726,11 @@ describe('ref', () => {
     expect(() => ref()).toThrow();
     // @ts-expect-error - testing invalid arguments
     expect(() => ref('a', 'b')).toThrow();
+
+    // @ts-expect-error - testing missing arguments
+    expect(() => ref.toString()).toThrow('required parameters');
+    // @ts-expect-error - testing missing arguments
+    expect(() => ref.ref(3).toString()).toThrow();
   });
 });
 
@@ -882,6 +933,11 @@ describe('oneOf', () => {
     expect(() => oneOf(1)).toThrow();
     // @ts-expect-error - testing invalid arguments
     expect(() => oneOf('a', 1, 12)).toThrow();
+
+    // @ts-expect-error - testing missing arguments
+    expect(() => oneOf.toString()).toThrow('required parameters');
+    // @ts-expect-error - testing missing arguments
+    expect(() => oneOf.oneOf(3).toString()).toThrow();
   });
 });
 
@@ -911,6 +967,11 @@ describe('match', () => {
     expect(() => match(1)).toThrow();
     // @ts-expect-error - testing invalid arguments
     expect(() => match('a', 1, 12)).toThrow();
+
+    // @ts-expect-error - testing missing arguments
+    expect(() => match.toString()).toThrow('required parameters');
+    // @ts-expect-error - testing missing arguments
+    expect(() => match.match(3).toString()).toThrow();
   });
 });
 
@@ -953,6 +1014,11 @@ describe('charIn', () => {
     expect(() => charIn(1)).toThrow();
     // @ts-expect-error - testing invalid arguments
     expect(() => charIn('a', 1, 12)).toThrow();
+
+    // @ts-expect-error - testing missing arguments
+    expect(() => charIn.toString()).toThrow('required parameters');
+    // @ts-expect-error - testing missing arguments
+    expect(() => charIn.charIn(3).toString()).toThrow();
   });
 });
 
@@ -990,6 +1056,11 @@ describe('notCharIn', () => {
     expect(() => notCharIn(1)).toThrow();
     // @ts-expect-error - testing invalid arguments
     expect(() => notCharIn('a', 1, 12)).toThrow();
+
+    // @ts-expect-error - testing missing arguments
+    expect(() => notCharIn.toString()).toThrow('required parameters');
+    // @ts-expect-error - testing missing arguments
+    expect(() => notCharIn.notCharIn(3).toString()).toThrow();
   });
 });
 
