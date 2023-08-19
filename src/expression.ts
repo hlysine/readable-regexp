@@ -3,7 +3,9 @@ import {
   CharClassFunction,
   FlagUnion,
   FlagsString,
+  GenericFunction,
   GroupFunction,
+  IncompleteToken,
   LiteralFunction,
   RegExpLiteral,
   RegExpModifier,
@@ -1876,3 +1878,83 @@ export const oneOf = r.oneOf;
  * ```
  */
 export const match = r.match;
+
+// a list of tokens with RegExpBuilder assigned to a function
+const funcTokens = [
+  not,
+  maybe,
+  maybeLazily,
+  zeroOrMore,
+  zeroOrMoreLazily,
+  oneOrMore,
+  oneOrMoreLazily,
+  capture,
+  group,
+  ahead,
+  behind,
+  notAhead,
+  notBehind,
+];
+
+type IncompleteTokenCheck<TokenType, ResultType> = TokenType extends RegExpToken
+  ? ResultType
+  : TokenType extends IncompleteToken
+  ? ResultType
+  : { error: 'Invalid token type: tokens with required parameters should intersect the IncompleteToken type.' };
+
+type TransformStringLiteralArgs<Args> = Args extends [infer U, ...infer Rest]
+  ? [
+      U extends TemplateStringsArray ? string : U, // replace template string with ordinary string
+      ...(Rest extends unknown[] ? (unknown[] extends Rest ? [] : Rest) : Rest), // Remove the rest parameter if the argument is a string literal
+    ]
+  : Args;
+
+type CustomTokenConfig<TokenType> = (TokenType extends RegExpToken
+  ? {
+      constant: (this: RegExpToken) => RegExpToken;
+    }
+  : {}) &
+  (TokenType extends GenericFunction<infer Args, infer ReturnType>
+    ? { dynamic: (this: RegExpToken, ...args: TransformStringLiteralArgs<Args>) => ReturnType }
+    : {});
+
+export function defineCustomToken<Name extends keyof RegExpToken>(
+  tokenName: Name,
+  config: IncompleteTokenCheck<RegExpToken[Name], CustomTokenConfig<RegExpToken[Name]>>
+): RegExpToken[Name] {
+  if (tokenName in RegExpBuilder.prototype) throw new Error(`Token ${tokenName} already exists`);
+  Object.defineProperty(RegExpBuilder.prototype, tokenName, {
+    get() {
+      function configure(
+        this: RegExpBuilder,
+        ...configArgs: RegExpToken[Name] extends (...args: infer Args) => any ? Args : never
+      ): RegExpToken[Name] extends (...args: any) => infer Ret ? Ret : never {
+        if ('dynamic' in config) {
+          const value = isLiteralArgument(configArgs) ? [getLiteralString(configArgs)] : configArgs;
+          return (config.dynamic as (this: RegExpToken, ...args: typeof value) => ReturnType<typeof configure>).apply(
+            this,
+            value
+          );
+        } else {
+          throw new Error('Invalid arguments for ' + tokenName);
+        }
+      }
+      if (`constant` in config && !('dynamic' in config)) {
+        return config.constant.apply(this);
+      } else if (!(`constant` in config) && 'dynamic' in config) {
+        return bindAsIncomplete(configure, this, tokenName);
+      } else if (`constant` in config && 'dynamic' in config) {
+        return assign(configure.bind(this), config.constant.apply(this), false);
+      } else {
+        throw new Error(`The custom token ${tokenName} does not have any valid configurations.`);
+      }
+    },
+    enumerable: true,
+    configurable: true,
+  });
+  funcTokens.forEach(token => {
+    if (!('toRegExp' in token)) return;
+    Object.defineProperty(token, tokenName, Object.getOwnPropertyDescriptor(RegExpBuilder.prototype, tokenName)!);
+  });
+  return r[tokenName];
+}

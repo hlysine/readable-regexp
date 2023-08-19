@@ -74,10 +74,11 @@ export function bindAsIncomplete<T extends Function, U>(
  * Copy all properties from source to target, including those in the prototype chain of source.
  * @param target - The target object to which the properties will be added.
  * @param source - The source object from which the properties will be copied.
+ * @param bindFunc - Whether to bind target to source.
  * @returns The target object.
  */
-export function assign<T extends Function, U>(target: T, source: U): T & U {
-  target = target.bind(source);
+export function assign<T extends Function, U>(target: T, source: U, bindFunc = true): T & U {
+  if (bindFunc) target = target.bind(source);
 
   const props: string[] = [];
   do {
