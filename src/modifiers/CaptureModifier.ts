@@ -9,6 +9,7 @@ export default class CaptureModifier implements RegExpModifier {
   }
 
   public modify(regExp: string): [string, string?] {
+    if (regExp.length === 0) throw new Error('Empty capture group');
     if (isBracketGroup(regExp) && regExp.startsWith('(?:')) {
       if (this.name === undefined) return ['(' + regExp.substring(3)];
       return [`(?<${this.name}>` + regExp.substring(3)];
