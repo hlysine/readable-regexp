@@ -4,6 +4,7 @@ export {
   /* These types are exported for the convenience of custom extensions */
   type RegExpToken,
   type LiteralFunction,
+  type GenericFunction,
   type NumberFunction,
   type TokenFunction,
   type MultiTokenFunction,

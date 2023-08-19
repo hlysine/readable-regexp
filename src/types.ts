@@ -5,6 +5,10 @@ export interface LiteralFunction {
   (template: TemplateStringsArray, ...args: unknown[]): RegExpToken;
 }
 
+export interface GenericFunction<Params extends unknown[], ReturnType> {
+  (...args: Params): ReturnType;
+}
+
 export interface NumberFunction {
   (num: number): RegExpToken;
 }
