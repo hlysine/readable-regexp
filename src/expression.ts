@@ -1896,12 +1896,18 @@ const funcTokens = [
   notBehind,
 ];
 
+/**
+ * Ensures that incomplete tokens are marked with the {@link IncompleteToken} interface.
+ */
 type IncompleteTokenCheck<TokenType, ResultType> = TokenType extends RegExpToken
   ? ResultType
   : TokenType extends IncompleteToken
   ? ResultType
   : { error: 'Invalid token type: tokens with required parameters should intersect the IncompleteToken type.' };
 
+/**
+ * Transforms template string arguments to string literals while leaving other arguments unchanged.
+ */
 type TransformStringLiteralArgs<Args> = Args extends [infer U, ...infer Rest]
   ? [
       U extends TemplateStringsArray ? string : U, // replace template string with ordinary string
@@ -1909,6 +1915,9 @@ type TransformStringLiteralArgs<Args> = Args extends [infer U, ...infer Rest]
     ]
   : Args;
 
+/**
+ * Specifies the configurations required for a given token type.
+ */
 type CustomTokenConfig<TokenType> = (TokenType extends RegExpToken
   ? {
       constant: (this: RegExpToken) => RegExpToken;
@@ -1918,6 +1927,56 @@ type CustomTokenConfig<TokenType> = (TokenType extends RegExpToken
     ? { dynamic: (this: RegExpToken, ...args: TransformStringLiteralArgs<Args>) => ReturnType }
     : {});
 
+/**
+ * Define a custom token that can be used in conjunction with other tokens.
+ * For a detailed guide on custom tokens, please read https://github.com/hlysine/readable-regexp#custom-tokens
+ *
+ * Notes:
+ *
+ * - TypeScript users should extend the {@link RegExpToken} interface to add their own custom tokens before calling this function.
+ * - The token name must be a valid JavaScript identifier.
+ * - The token name must not conflict with any existing properties of {@link RegExpToken}.
+ * - All custom tokens should be defined before **any** tokens are used to build regular expressions.
+ *
+ * @param tokenName - The name of the custom token. In TypeScript, it needs to be defined in the {@link RegExpToken} interface.
+ * @param config - The configuration for the custom token. Implement the `constant` method to return a constant token, or the `dynamic` method for a token that accepts arguments. Implement both for a mixed token.
+ * @returns The custom token
+ *
+ * @example
+ * Create a constant token
+ *
+ * Extend the RegExpToken interface to add a new token:
+ *
+ * ```ts
+ * import { RegExpToken } from 'readable-regexp';
+ *
+ * declare module 'readable-regexp' {
+ *   interface RegExpToken {
+ *     severity: RegExpToken;
+ *   }
+ * }
+ * ```
+ *
+ * Implement the custom token:
+ *
+ * ```ts
+ * const severity = defineCustomToken('severity', {
+ *   constant(this: RegExpToken) {
+ *     return this.oneOf`error` `warning` `info` `debug`;
+ *   },
+ * });
+ * ```
+ *
+ * Use the custom token:
+ *
+ * ```ts
+ * // Referencing the token returned by the defineCustomToken function
+ * console.log(severity.toString()); // (?:error|warning|info|debug)
+ *
+ * // Referencing the token from internal token store
+ * console.log(lineStart.severity.lineEnd.toString()); // ^(?:error|warning|info|debug)$
+ * ```
+ */
 export function defineCustomToken<Name extends keyof RegExpToken>(
   tokenName: Name,
   config: IncompleteTokenCheck<RegExpToken[Name], CustomTokenConfig<RegExpToken[Name]>>
