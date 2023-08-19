@@ -1897,13 +1897,13 @@ const funcTokens = [
 ];
 
 /**
- * Ensures that incomplete tokens are marked with the {@link IncompleteToken} interface.
+ * Checks if a token intersects either the {@link RegExpToken} or the {@link IncompleteToken} interface.
  */
-type IncompleteTokenCheck<TokenType, ResultType> = TokenType extends RegExpToken
-  ? ResultType
+type IncompleteTokenCheck<TokenType> = TokenType extends RegExpToken
+  ? true
   : TokenType extends IncompleteToken
-  ? ResultType
-  : { error: 'Invalid token type: tokens with required parameters should intersect the IncompleteToken type.' };
+  ? true
+  : false;
 
 /**
  * Transforms template string arguments to string literals while leaving other arguments unchanged.
@@ -1926,6 +1926,18 @@ type CustomTokenConfig<TokenType> = (TokenType extends RegExpToken
   (TokenType extends GenericFunction<infer Args, infer ReturnType>
     ? { dynamic: (this: RegExpToken, ...args: TransformStringLiteralArgs<Args>) => ReturnType }
     : {});
+
+const invalidReturnMessage = (val: unknown) =>
+  `Invalid return value from a constant token: ${val}.\n` +
+  'If you want to return any other values (which are non-chainable), ' +
+  'you should implement a dynamic token without parameters to make the chain termination explicit.';
+
+function ensureTokenReturned<T extends object>(value: T): T {
+  if ((typeof value !== 'object' && typeof value !== 'function') || value === null)
+    throw new Error(invalidReturnMessage(value));
+  if ('toRegExp' in value && 'toString' in value) return value;
+  throw new Error(invalidReturnMessage(value));
+}
 
 /**
  * Define a custom token that can be used in conjunction with other tokens.
@@ -1977,10 +1989,14 @@ type CustomTokenConfig<TokenType> = (TokenType extends RegExpToken
  * console.log(lineStart.severity.lineEnd.toString()); // ^(?:error|warning|info|debug)$
  * ```
  */
-export function defineToken<Name extends keyof RegExpToken>(
+export function defineToken<Name extends keyof RegExpToken, Check = IncompleteTokenCheck<RegExpToken[Name]>>(
   tokenName: Name,
-  config: IncompleteTokenCheck<RegExpToken[Name], CustomTokenConfig<RegExpToken[Name]>>
-): RegExpToken[Name] {
+  config: Check extends true
+    ? CustomTokenConfig<RegExpToken[Name]>
+    : {
+        error: 'Invalid token type: tokens should intersect the RegExpToken type if they are constant, or the IncompleteToken type if they are dynamic.';
+      }
+): Check extends true ? RegExpToken[Name] : never {
   if (tokenName in RegExpBuilder.prototype) throw new Error(`Token ${tokenName} already exists`);
   Object.defineProperty(RegExpBuilder.prototype, tokenName, {
     get() {
@@ -1995,15 +2011,15 @@ export function defineToken<Name extends keyof RegExpToken>(
             value
           );
         } else {
-          throw new Error('Invalid arguments for ' + tokenName);
+          throw new Error('Invalid arguments for ' + tokenName + '. This is probably a bug.');
         }
       }
       if (`constant` in config && !('dynamic' in config)) {
-        return config.constant.apply(this);
+        return ensureTokenReturned(config.constant.apply(this));
       } else if (!(`constant` in config) && 'dynamic' in config) {
         return bindAsIncomplete(configure, this, tokenName);
       } else if (`constant` in config && 'dynamic' in config) {
-        return assign(configure.bind(this), config.constant.apply(this), false);
+        return assign(configure.bind(this), ensureTokenReturned(config.constant.apply(this)), false);
       } else {
         throw new Error(`The custom token ${tokenName} does not have any valid configurations.`);
       }
@@ -2015,5 +2031,5 @@ export function defineToken<Name extends keyof RegExpToken>(
     if (!('toRegExp' in token)) return;
     Object.defineProperty(token, tokenName, Object.getOwnPropertyDescriptor(RegExpBuilder.prototype, tokenName)!);
   });
-  return r[tokenName];
+  return r[tokenName] as ReturnType<typeof defineToken>;
 }
