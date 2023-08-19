@@ -1960,7 +1960,7 @@ type CustomTokenConfig<TokenType> = (TokenType extends RegExpToken
  * Implement the custom token:
  *
  * ```ts
- * const severity = defineCustomToken('severity', {
+ * const severity = defineToken('severity', {
  *   constant(this: RegExpToken) {
  *     return this.oneOf`error` `warning` `info` `debug`;
  *   },
@@ -1970,14 +1970,14 @@ type CustomTokenConfig<TokenType> = (TokenType extends RegExpToken
  * Use the custom token:
  *
  * ```ts
- * // Referencing the token returned by the defineCustomToken function
+ * // Referencing the token returned by the defineToken function
  * console.log(severity.toString()); // (?:error|warning|info|debug)
  *
- * // Referencing the token from internal token store
+ * // Referencing the token in an expression
  * console.log(lineStart.severity.lineEnd.toString()); // ^(?:error|warning|info|debug)$
  * ```
  */
-export function defineCustomToken<Name extends keyof RegExpToken>(
+export function defineToken<Name extends keyof RegExpToken>(
   tokenName: Name,
   config: IncompleteTokenCheck<RegExpToken[Name], CustomTokenConfig<RegExpToken[Name]>>
 ): RegExpToken[Name] {

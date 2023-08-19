@@ -550,7 +550,7 @@ declare module 'readable-regexp' {
 
 #### Step 2 - Implement the tokens
 
-Use the `defineCustomToken` function to implement the tokens. This function takes the name of the token and its
+Use the `defineToken` function to implement the tokens. This function takes the name of the token and its
 implementation and returns the implemented token.
 
 **For CONSTANT tokens:**
@@ -560,14 +560,14 @@ implementation and returns the implemented token.
 - The token can append to, wrap around, or modify `this` in any way
 
 ```ts
-const severity = defineCustomToken('severity', {
+const severity = defineToken('severity', {
   constant(this: RegExpToken) {
     // Append a constant expression
     return this.oneOf`error``warning``info``debug`;
   },
 });
 
-const matchAll = defineCustomToken('matchAll', {
+const matchAll = defineToken('matchAll', {
   constant(this: RegExpToken) {
     // Wrap around the existing expression
     return lineStart.match(this).lineEnd;
@@ -583,14 +583,14 @@ const matchAll = defineCustomToken('matchAll', {
 - Template string arguments are converted to ordinary strings automatically
 
 ```ts
-const notExactly = defineCustomToken('notExactly', {
+const notExactly = defineToken('notExactly', {
   // Tagged template literals are converted to ordinary strings in the "value" argument
   dynamic(this: RegExpToken, value: string) {
     return this.notAhead(exactly(value)).repeat(value.length).notCharIn``;
   },
 });
 
-const exactValue = defineCustomToken('exactValue', {
+const exactValue = defineToken('exactValue', {
   // Implementation of function overloads
   dynamic(this: RegExpToken, num: number | boolean) {
     return this.exactly(String(num));
@@ -605,7 +605,7 @@ const exactValue = defineCustomToken('exactValue', {
 - If the custom token is called, the `dynamic` function will handle the call. Otherwise, the `constant` function will be used.
 
 ```ts
-const alpha = defineCustomToken('alpha', {
+const alpha = defineToken('alpha', {
   constant(this: RegExpToken) {
     return this.charIn`a-zA-Z`;
   },
@@ -620,7 +620,7 @@ const alpha = defineCustomToken('alpha', {
 Custom tokens are integrated as part of readable-regexp. So you can use them just like how you use a built-in token.
 
 ```ts
-// Start an expression with a custom token returned by defineCustomToken
+// Start an expression with a custom token returned by defineToken
 const expr1 = notExactly`foo`.exactly`bar`.toRegExp(); // /(?!foo)[^]{3}bar/
 
 // Use custom tokens as part of an expression chain
