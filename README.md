@@ -374,6 +374,15 @@ Apart from `-`, `^` and `]` are also escaped in the character class, so you cann
 Backslashes `\` are only escaped at the end of a string, so you can use escape sequences such as `\uffff` and `\xff` freely.
 If you want to include `\` in the character class, you should write it at the end of a string or escape with `\\`.
 
+Additionally, `charIn` allows you to merge character classes by simply passing one `charIn` token into another. For example:
+
+```ts
+const alphabet = charIn`a-zA-Z`; // the character class to be merged must not be negated (cannot be notCharIn)
+const alphanumeral1 = charIn`0-9`(alphabet);
+const alphanumeral2 = charIn`0-9${alphabet}`;
+const nonAlphanumeral = notCharIn`0-9`(alphabet);
+```
+
 ### Anchors
 
 | Function                                   | RegExp equivalent | Explanation                                                                       |
