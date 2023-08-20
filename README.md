@@ -12,7 +12,7 @@
 </div>
 
 <p align="center">
-Create readable Regular Expressions with concise and flexible syntax.
+Regular Expressions - quick and concise, readable and composable.
 </p>
 
 ![Quick example of readable-regexp](https://github.com/hlysine/readable-regexp/assets/25472513/3c0540d5-1b25-4f83-afb4-7ed16a3a5140)

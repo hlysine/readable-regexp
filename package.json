@@ -3,7 +3,7 @@
   "version": "1.4.0",
   "author": "Henry Lin",
   "license": "MIT",
-  "description": "Create readable Regular Expressions with concise and flexible syntax.",
+  "description": "Regular Expressions - quick and concise, readable and composable.",
   "keywords": [
     "regex",
     "regexp",
@@ -12,7 +12,9 @@
     "regular",
     "expression",
     "typescript",
-    "typed"
+    "typed",
+    "composable"
+    "concise"
   ],
   "homepage": "https://github.com/hlysine/readable-regexp#readme",
   "repository": "github:hlysine/readable-regexp",
