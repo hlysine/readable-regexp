@@ -356,7 +356,7 @@ uses the 2-byte sequence `\uffff`.
 | `` charIn`a-z_-` ``<br/>`charIn('a-z', '_-')`<br/>`` charIn`a-z` `_-` ``                                      | `[a-z_-]`         | Match a character listed in the group. A hyphen denotes a range of characters, such as `a-z`. †                                                                            |
 | `` notCharIn`a-z_-` ``<br/>`` not.charIn`a-z_-` ``<br/>`notCharIn('a-z', '_-')`<br/>`` notCharIn`a-z` `_-` `` | `[^a-z_-]`        | Match a character not listed in the group. †                                                                                                                               |
 | `` charRange`a` `z` ``<br/>`charRange('a', 'z')`                                                              | `[a-z]`           | Match a character ranging from the first char to the second one.<br/>Escape sequences are supported and the two characters must be in order.                               |
-| `` notCharRange`a` `z` ``<br/>`notCharRange('a', 'z')`                                                        | `[^a-z]`          | Match a character not in the range of first to second char.<br/>Escape sequences are supported and the two characters must be in order.                                    |
+| `` notCharRange`a` `z` ``<br/>`` not.charRange`a` `z` ``<br/>`notCharRange('a', 'z')`                         | `[^a-z]`          | Match a character not in the range of first to second char.<br/>Escape sequences are supported and the two characters must be in order.                                    |
 
 #### † Notes on character classes
 
