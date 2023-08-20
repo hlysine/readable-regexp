@@ -6,6 +6,7 @@ import {
   defineToken,
   exactly,
   lineStart,
+  oneOrMore,
   r,
 } from '../src';
 import { assertType } from './testUtils';
@@ -139,6 +140,7 @@ describe('custom tokens', () => {
     expect(testConstant.toString()).toBe('foo');
     expect(r.testConstant.toString()).toBe('foo');
     expect(lineStart.testConstant.toString()).toBe('^foo');
+    expect(oneOrMore.testConstant.toString()).toBe('(?:foo)+');
     // @ts-expect-error - the token is constant
     expect(() => testConstant`foo`).toThrow();
 
