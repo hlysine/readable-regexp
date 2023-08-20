@@ -1,4 +1,5 @@
 import { RegExpModifier } from '../types';
+import { isBracketGroup } from '../helper';
 
 export enum GroupType {
   NonCapture = 'nonCapture',
@@ -18,7 +19,8 @@ export default class GroupModifier implements RegExpModifier {
   public modify(regExp: string): [string, string?] {
     switch (this.groupType) {
       case GroupType.NonCapture:
-        return [`(?:${regExp})`];
+        // do not wrap multiple layers of non-capturing groups
+        return [isBracketGroup(regExp) && regExp.startsWith('(?:') ? regExp : `(?:${regExp})`];
       case GroupType.PositiveLookahead:
         return [`(?=${regExp})`];
       case GroupType.NegativeLookahead:

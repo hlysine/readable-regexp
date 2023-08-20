@@ -759,6 +759,10 @@ describe('group', () => {
     expect(() => not.group`foo`.toString()).toThrow();
     expect(() => not(group`foo`).toString()).toThrow();
   });
+  it('does not wrap multiple times', () => {
+    expect(group.group.exactly`foo`.toString()).toBe('(?:foo)');
+    expect(group.oneOf`foo``bar`.toString()).toBe('(?:foo|bar)');
+  });
   it('throws for invalid argument', () => {
     expect(group().toString()).toBe('(?:)');
     // @ts-expect-error - testing invalid arguments

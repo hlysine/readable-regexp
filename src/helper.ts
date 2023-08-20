@@ -1,5 +1,25 @@
 import { IncompleteToken, RegExpLiteral } from './types';
 
+export function escapeRegExp(text: string): string {
+  return text.replace(/[-[/\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+}
+
+export const hexNumber = /^[0-9a-fA-F]+$/;
+
+export const octalNumber = /^[0-7]+$/;
+
+// octal escape sequences are not matched here because they should be wrapped in a character class
+export const negatableCharLiteral = /^(?:\\u[0-9a-fA-F]{4}|\\x[0-9a-fA-F]{2})$/;
+
+// last option refers to octal character or capture group backreference
+export const charLiteral = /^(?:\\u[0-9a-fA-F]{4}|\\x[0-9a-fA-F]{2}|\\\d{1,3})$/;
+
+export const captureName = /^[a-zA-Z_][a-zA-Z0-9_]*$/;
+
+export const negatableTokens = /^\\[sdwb]$/;
+
+export const flagString = /^[gmiyusd]*$/;
+
 /**
  * Check whether a given value is a template strings array.
  * @param arg - The argument to check.
@@ -145,22 +165,14 @@ export function isBracketGroup(regExp: string): boolean {
   return false;
 }
 
-export function escapeRegExp(text: string): string {
-  return text.replace(/[-[/\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+export function wrapIfNeeded(regExp: string): string {
+  if (regExp.length === 1) return regExp;
+  if (regExp.length === 2 && regExp.startsWith('\\')) return regExp;
+  if (charLiteral.test(regExp)) return regExp;
+  if (isCharacterClass(regExp)) return regExp;
+  if (isBracketGroup(regExp)) {
+    // need to wrap lookarounds because they are not directly quantifiable
+    if (!/^\((?:\?=|\?!|\?<=|\?<!)/.test(regExp)) return regExp;
+  }
+  return `(?:${regExp})`;
 }
-
-export const hexNumber = /^[0-9a-fA-F]+$/;
-
-export const octalNumber = /^[0-7]+$/;
-
-// octal escape sequences are not matched here because they should be wrapped in a character class
-export const negatableCharLiteral = /^(?:\\u[0-9a-fA-F]{4}|\\x[0-9a-fA-F]{2})$/;
-
-// last option refers to octal character or capture group backreference
-export const charLiteral = /^(?:\\u[0-9a-fA-F]{4}|\\x[0-9a-fA-F]{2}|\\\d{1,3})$/;
-
-export const captureName = /^[a-zA-Z_][a-zA-Z0-9_]*$/;
-
-export const negatableTokens = /^\\[sdwb]$/;
-
-export const flagString = /^[gmiyusd]*$/;
