@@ -30,6 +30,8 @@ Be explicit and extract common pieces
 <details>
     <summary>Click to see examples</summary>
 
+--------------------------------
+
 Compare a readable-regexp expression:
 
 ```js
@@ -97,6 +99,8 @@ const email =
   /^([^<>()[\]\\.,;:@"\s]+(?:\.[^<>()[\]\\.,;:@"\s]+)*|".+")@(\[\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\]|(?:[a-zA-Z0-9\-]+\.)+[a-zA-Z]{2,})$/;
 ```
 
+--------------------------------
+
 </details>
 
 ### 📐 Flexible and Concise
@@ -105,6 +109,8 @@ Multiple shorthands and syntax options
 
 <details>
   <summary>Click to see examples</summary>
+
+--------------------------------
 
 Without all the shorthands, an expression looks like this:
 
@@ -156,6 +162,8 @@ const regExp = exactly`[`
 
 As you can see, most of the distracting brackets are gone, and you are left with a clean and concise expression.
 
+--------------------------------
+
 </details>
 
 ### 🛟 Safe
@@ -164,6 +172,8 @@ Type check, auto-complete, and runtime safeguards
 
 <details>
     <summary>Click to see examples</summary>
+
+--------------------------------
 
 Some errors can be avoided just by writing in readable-regexp:
 
@@ -206,6 +216,8 @@ const result2 = capture`foo`.ref(2).toRegExp().test('foofoo');
 // Error: The following backreferences are not defined: 2
 ```
 
+--------------------------------
+
 </details>
 
 ## Installation
@@ -237,6 +249,6 @@ const { oneOrMore, exactly } = readableRegExp;
 ## Quick Start / Documentation
 
 | [**Quick Start**](https://hlysine.gitbook.io/readable-regexp/getting-started/installation) |
-| ------------------------------------------------------------------------------------------ |
+|:------------------------------------------------------------------------------------------:|
 | [**Documentation**](https://hlysine.gitbook.io/readable-regexp/)                           |
 | [**TypeDoc**](https://hlysine.github.io/readable-regexp/)                                  |
