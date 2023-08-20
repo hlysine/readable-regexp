@@ -355,6 +355,8 @@ uses the 2-byte sequence `\uffff`.
 | `char`                                                                                                        | `.`               | Match any character other than newline (or including line terminators when single line flag is set)<br/>Note: `not.char` does not exist because it does not match anything |
 | `` charIn`a-z_-` ``<br/>`charIn('a-z', '_-')`<br/>`` charIn`a-z` `_-` ``                                      | `[a-z_-]`         | Match a character listed in the group. A hyphen denotes a range of characters, such as `a-z`. †                                                                            |
 | `` notCharIn`a-z_-` ``<br/>`` not.charIn`a-z_-` ``<br/>`notCharIn('a-z', '_-')`<br/>`` notCharIn`a-z` `_-` `` | `[^a-z_-]`        | Match a character not listed in the group. †                                                                                                                               |
+| `` charRange`a` `z` ``<br/>`charRange('a', 'z')`                                                              | `[a-z]`           | Match a character ranging from the first char to the second one.<br/>Escape sequences are supported and the two characters must be in order.                               |
+| `` notCharRange`a` `z` ``<br/>`notCharRange('a', 'z')`                                                        | `[^a-z]`          | Match a character not in the range of first to second char.<br/>Escape sequences are supported and the two characters must be in order.                                    |
 
 #### † Notes on character classes
 
@@ -374,13 +376,14 @@ Apart from `-`, `^` and `]` are also escaped in the character class, so you cann
 Backslashes `\` are only escaped at the end of a string, so you can use escape sequences such as `\uffff` and `\xff` freely.
 If you want to include `\` in the character class, you should write it at the end of a string or escape with `\\`.
 
-Additionally, `charIn` allows you to merge character classes by simply passing one `charIn` token into another. For example:
+Additionally, `charIn` allows you to merge character classes by simply passing in a `charIn` or `charRange` token. For example:
 
 ```ts
-const alphabet = charIn`a-zA-Z`; // the character class to be merged must not be negated (cannot be notCharIn)
-const alphanumeral1 = charIn`0-9`(alphabet);
-const alphanumeral2 = charIn`0-9${alphabet}`;
-const nonAlphanumeral = notCharIn`0-9`(alphabet);
+const symbols = charIn`-_*$`; // the character class to be merged must not be negated (cannot be notCharIn or notCharRange)
+const alphabet = charRange`a``z`;
+const specialWord = charIn`0-9`(alphabet)(symbols);
+const specialWord2 = charIn`0-9${alphabet}${symbols}`;
+const notSpecialWord = notCharIn`0-9`(alphabet)(symbols);
 ```
 
 ### Anchors
