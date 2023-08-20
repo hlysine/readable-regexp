@@ -215,20 +215,57 @@ export function countTail(str: string, char: string): number {
   return count;
 }
 
+const specialEscapes: { [sequence: string]: string } = {
+  '\\f': '\f',
+  '\\n': '\n',
+  '\\r': '\r',
+  '\\t': '\t',
+  '\\v': '\v',
+};
+
+const octalEscape = /^\\([0-7]+)$/;
+const hexEscape = /^\\x([0-9a-fA-F]+)$/;
+const unicodeEscape = /^\\u([0-9a-fA-F]+)$/;
+const unicodeVarEscape = /^\\u\{([0-9a-fA-F]+)\}$/;
+const controlEscape = /^\\c([a-zA-Z])$/;
+
+export function getCodePoint(char: string): number {
+  if ([...char].length === 1) return char.codePointAt(0)!;
+  if (specialEscapes[char]) return specialEscapes[char].codePointAt(0)!;
+  let match = octalEscape.exec(char);
+  if (match) {
+    const val = parseInt(match[1], 8);
+    if (val > 0o377)
+      throw new Error(`The octal escape sequence ${char} is not valid because it is greater than 0o377.`);
+    return val;
+  }
+  match = hexEscape.exec(char);
+  if (match) {
+    if (match[1].length > 2)
+      throw new Error(`The hex escape sequence ${char} is not valid because it is greater than 0xFF.`);
+    return parseInt(match[1], 16);
+  }
+  match = unicodeEscape.exec(char);
+  if (match) {
+    if (match[1].length > 4)
+      throw new Error(`The unicode escape sequence ${char} is not valid because it is greater than 0xFFFF.`);
+    return parseInt(match[1], 16);
+  }
+  match = unicodeVarEscape.exec(char);
+  if (match) {
+    const val = parseInt(match[1], 16);
+    if (val > 0x10ffff)
+      throw new Error(`The unicode escape sequence ${char} is not valid because it is greater than 0x10FFFF.`);
+    return val;
+  }
+  match = controlEscape.exec(char);
+  if (match) return match[1].toUpperCase().codePointAt(0)! - 'A'.codePointAt(0)! + 1;
+  if (char[0] === '\\' && [...char].length === 2) {
+    return char[1].codePointAt(0)!;
+  }
+  throw new Error(`The string ${char} is not a single character.`);
+}
+
 export function compareCodePoint(char1: string, char2: string): number {
-  // evaluate the string to unescape it
-  if (char1.length > 1 && char1.startsWith('\\')) {
-    char1 = new Function(`return "${char1.replace('"', '\\"')}"`)();
-  }
-  if (char2.length > 1 && char2.startsWith('\\')) {
-    char2 = new Function(`return "${char2.replace('"', '\\"')}"`)();
-  }
-  // spread the string to check for code-point length
-  if ([...char1].length > 1) {
-    throw new Error(`The string ${char1} is not a single character.`);
-  }
-  if ([...char2].length > 1) {
-    throw new Error(`The string ${char2} is not a single character.`);
-  }
-  return char1.codePointAt(0)! - char2.codePointAt(0)!;
+  return getCodePoint(char1) - getCodePoint(char2);
 }
