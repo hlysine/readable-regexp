@@ -104,33 +104,37 @@ export interface IncompleteToken {
  */
 export enum Flag {
   /**
+   * Output match indices.
+   */
+  Indices = 'd',
+  /**
    * Allows more than 1 match.
    */
   Global = 'g',
-  /**
-   * ^ and $ match start/end of line.
-   */
-  MultiLine = 'm',
   /**
    * Case insensitive.
    */
   IgnoreCase = 'i',
   /**
-   * The next match must follow the previous one.
+   * ^ and $ match start/end of line.
    */
-  Sticky = 'y',
-  /**
-   * Use full unicode.
-   */
-  Unicode = 'u',
+  MultiLine = 'm',
   /**
    * Dot matches newlines.
    */
   SingleLine = 's',
   /**
-   * Output match indices.
+   * Use full unicode.
    */
-  Indices = 'd',
+  Unicode = 'u',
+  /**
+   * Use all unicode and character set features.
+   */
+  UnicodeSets = 'v',
+  /**
+   * The next match must follow the previous one.
+   */
+  Sticky = 'y',
 }
 
 export type FlagUnion = `${Flag}`;

@@ -18,7 +18,7 @@ export const captureName = /^[a-zA-Z_][a-zA-Z0-9_]*$/;
 
 export const negatableTokens = /^\\[sdwb]$/;
 
-export const flagString = /^[gmiyusd]*$/;
+export const flagString = /^[dgimsuvy]*$/;
 
 /**
  * Check whether a given value is a template strings array.
