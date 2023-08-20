@@ -88,8 +88,9 @@ class RegExpBuilder implements RegExpToken {
 
   public static isRegExpBuilder(obj: unknown): obj is RegExpBuilder {
     return (
-      obj instanceof RegExpBuilder ||
-      (typeof obj === 'function' && `regExp` in obj && `modifiers` in obj && `executeModifiers` in obj)
+      !!obj &&
+      (obj instanceof RegExpBuilder ||
+        (typeof obj === 'function' && `regExp` in obj && `modifiers` in obj && `executeModifiers` in obj))
     );
   }
 
@@ -1927,16 +1928,13 @@ type CustomTokenConfig<TokenType> = (TokenType extends RegExpToken
     ? { dynamic: (this: RegExpToken, ...args: TransformStringLiteralArgs<Args>) => ReturnType }
     : {});
 
-const invalidReturnMessage = (val: unknown) =>
-  `Invalid return value from a constant token: ${val}.\n` +
-  'If you want to return any other values (which are non-chainable), ' +
-  'you should implement a dynamic token without parameters to make the chain termination explicit.';
-
 function ensureTokenReturned<T extends object>(value: T): T {
-  if ((typeof value !== 'object' && typeof value !== 'function') || value === null)
-    throw new Error(invalidReturnMessage(value));
-  if ('toRegExp' in value && 'toString' in value) return value;
-  throw new Error(invalidReturnMessage(value));
+  if (RegExpBuilder.isRegExpBuilder(value)) return value;
+  throw new Error(
+    `Invalid return value from a constant token: ${value}.\n` +
+      'If you want to return any other values (which are non-chainable), ' +
+      'you should implement a dynamic token without parameters to make the chain termination explicit.'
+  );
 }
 
 /**
@@ -2028,7 +2026,7 @@ export function defineToken<Name extends keyof RegExpToken, Check = IncompleteTo
     configurable: true,
   });
   funcTokens.forEach(token => {
-    if (!('toRegExp' in token)) return;
+    if (!RegExpBuilder.isRegExpBuilder(token)) return;
     Object.defineProperty(token, tokenName, Object.getOwnPropertyDescriptor(RegExpBuilder.prototype, tokenName)!);
   });
   return r[tokenName] as ReturnType<typeof defineToken>;
