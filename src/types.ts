@@ -793,6 +793,18 @@ export interface RegExpToken {
    * `\xff` freely. If you want to include `\` in the character class, you should write it at the end of a string or
    * escape with `\\`.
    *
+   * Additionally, `charIn` allows you to merge character classes by simply passing in a `charIn` or `charRange` token. For example:
+   *
+   * ```ts
+   * const symbols = charIn`-_*$`; // the character class to be merged must not be negated (cannot be notCharIn or notCharRange)
+   * const alphabet = charRange`a``z`;
+   * const specialWord = charIn`0-9`(alphabet)(symbols);
+   * const specialWord2 = charIn`0-9${alphabet}${symbols}`;
+   * const notSpecialWord = notCharIn`0-9`(alphabet)(symbols);
+   * ```
+   *
+   * ----------------------
+   *
    * @example
    *
    * ```js
@@ -847,8 +859,62 @@ export interface RegExpToken {
    */
   get notCharIn(): CharClassFunction & IncompleteToken;
 
+  /**
+   * Match a character ranging from the first char to the second one.
+   *
+   * Escape sequences are supported and the two characters must be in order.
+   *
+   * @example
+   *
+   * ```js
+   * charRange`a` `z`
+   * charRange('a', 'z')
+   * ```
+   *
+   * RegExp equivalent:
+   *
+   * ```js
+   * /[a-z]/
+   * ```
+   *
+   * @example Negated token
+   *
+   * ```js
+   * notCharRange`a` `z`
+   * not.charRange`a` `z`
+   * notCharRange('a', 'z')
+   * ```
+   *
+   * RegExp equivalent:
+   *
+   * ```js
+   * /[^a-z]/
+   * ```
+   */
   get charRange(): CharRangeFunction & IncompleteToken;
 
+  /**
+   * Match a character not in the range of first to second char.
+   *
+   * Escape sequences are supported and the two characters must be in order.
+   *
+   * `notCharRange` is a short form of `not.charRange`. For more details, see the documentation of
+   * {@link charRange}.
+   *
+   * @example
+   *
+   * ```js
+   * notCharRange`a` `z`
+   * not.charRange`a` `z`
+   * notCharRange('a', 'z')
+   * ```
+   *
+   * RegExp equivalent:
+   *
+   * ```js
+   * /[^a-z]/
+   * ```
+   */
   get notCharRange(): CharRangeFunction & IncompleteToken;
 
   /**
