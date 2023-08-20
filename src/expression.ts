@@ -3,7 +3,9 @@ import {
   CharClassFunction,
   FlagUnion,
   FlagsString,
+  GenericFunction,
   GroupFunction,
+  IncompleteToken,
   LiteralFunction,
   RegExpLiteral,
   RegExpModifier,
@@ -1876,3 +1878,158 @@ export const oneOf = r.oneOf;
  * ```
  */
 export const match = r.match;
+
+// a list of tokens with RegExpBuilder assigned to a function
+const funcTokens = [
+  not,
+  maybe,
+  maybeLazily,
+  zeroOrMore,
+  zeroOrMoreLazily,
+  oneOrMore,
+  oneOrMoreLazily,
+  capture,
+  group,
+  ahead,
+  behind,
+  notAhead,
+  notBehind,
+];
+
+/**
+ * Checks if a token intersects either the {@link RegExpToken} or the {@link IncompleteToken} interface.
+ */
+type IncompleteTokenCheck<TokenType> = TokenType extends RegExpToken
+  ? true
+  : TokenType extends IncompleteToken
+  ? true
+  : false;
+
+/**
+ * Transforms template string arguments to string literals while leaving other arguments unchanged.
+ */
+type TransformStringLiteralArgs<Args> = Args extends [infer U, ...infer Rest]
+  ? [
+      U extends TemplateStringsArray ? string : U, // replace template string with ordinary string
+      ...(Rest extends unknown[] ? (unknown[] extends Rest ? [] : Rest) : Rest), // Remove the rest parameter if the argument is a string literal
+    ]
+  : Args;
+
+/**
+ * Specifies the configurations required for a given token type.
+ */
+type CustomTokenConfig<TokenType> = (TokenType extends RegExpToken
+  ? {
+      constant: (this: RegExpToken) => RegExpToken;
+    }
+  : {}) &
+  (TokenType extends GenericFunction<infer Args, infer ReturnType>
+    ? { dynamic: (this: RegExpToken, ...args: TransformStringLiteralArgs<Args>) => ReturnType }
+    : {});
+
+const invalidReturnMessage = (val: unknown) =>
+  `Invalid return value from a constant token: ${val}.\n` +
+  'If you want to return any other values (which are non-chainable), ' +
+  'you should implement a dynamic token without parameters to make the chain termination explicit.';
+
+function ensureTokenReturned<T extends object>(value: T): T {
+  if ((typeof value !== 'object' && typeof value !== 'function') || value === null)
+    throw new Error(invalidReturnMessage(value));
+  if ('toRegExp' in value && 'toString' in value) return value;
+  throw new Error(invalidReturnMessage(value));
+}
+
+/**
+ * Define a custom token that can be used in conjunction with other tokens.
+ * For a detailed guide on custom tokens, please read https://github.com/hlysine/readable-regexp#custom-tokens
+ *
+ * Notes:
+ *
+ * - TypeScript users should extend the {@link RegExpToken} interface to add their own custom tokens before calling this function.
+ * - The token name must be a valid JavaScript identifier.
+ * - The token name must not conflict with any existing properties of {@link RegExpToken}.
+ * - All custom tokens should be defined before **any** tokens are used to build regular expressions.
+ *
+ * @param tokenName - The name of the custom token. In TypeScript, it needs to be defined in the {@link RegExpToken} interface.
+ * @param config - The configuration for the custom token. Implement the `constant` method to return a constant token, or the `dynamic` method for a token that accepts arguments. Implement both for a mixed token.
+ * @returns The custom token
+ *
+ * @example
+ * Create a constant token
+ *
+ * Extend the RegExpToken interface to add a new token:
+ *
+ * ```ts
+ * import { RegExpToken } from 'readable-regexp';
+ *
+ * declare module 'readable-regexp' {
+ *   interface RegExpToken {
+ *     severity: RegExpToken;
+ *   }
+ * }
+ * ```
+ *
+ * Implement the custom token:
+ *
+ * ```ts
+ * const severity = defineToken('severity', {
+ *   constant(this: RegExpToken) {
+ *     return this.oneOf`error` `warning` `info` `debug`;
+ *   },
+ * });
+ * ```
+ *
+ * Use the custom token:
+ *
+ * ```ts
+ * // Referencing the token returned by the defineToken function
+ * console.log(severity.toString()); // (?:error|warning|info|debug)
+ *
+ * // Referencing the token in an expression
+ * console.log(lineStart.severity.lineEnd.toString()); // ^(?:error|warning|info|debug)$
+ * ```
+ */
+export function defineToken<Name extends keyof RegExpToken, Check = IncompleteTokenCheck<RegExpToken[Name]>>(
+  tokenName: Name,
+  config: Check extends true
+    ? CustomTokenConfig<RegExpToken[Name]>
+    : {
+        error: 'Invalid token type: tokens should intersect the RegExpToken type if they are constant, or the IncompleteToken type if they are dynamic.';
+      }
+): Check extends true ? RegExpToken[Name] : never {
+  if (tokenName in RegExpBuilder.prototype) throw new Error(`Token ${tokenName} already exists`);
+  Object.defineProperty(RegExpBuilder.prototype, tokenName, {
+    get() {
+      function configure(
+        this: RegExpBuilder,
+        ...configArgs: RegExpToken[Name] extends (...args: infer Args) => any ? Args : never
+      ): RegExpToken[Name] extends (...args: any) => infer Ret ? Ret : never {
+        if ('dynamic' in config) {
+          const value = isLiteralArgument(configArgs) ? [getLiteralString(configArgs)] : configArgs;
+          return (config.dynamic as (this: RegExpToken, ...args: typeof value) => ReturnType<typeof configure>).apply(
+            this,
+            value
+          );
+        } else {
+          throw new Error('Invalid arguments for ' + tokenName + '. This is probably a bug.');
+        }
+      }
+      if (`constant` in config && !('dynamic' in config)) {
+        return ensureTokenReturned(config.constant.apply(this));
+      } else if (!(`constant` in config) && 'dynamic' in config) {
+        return bindAsIncomplete(configure, this, tokenName);
+      } else if (`constant` in config && 'dynamic' in config) {
+        return assign(configure.bind(this), ensureTokenReturned(config.constant.apply(this)), false);
+      } else {
+        throw new Error(`The custom token ${tokenName} does not have any valid configurations.`);
+      }
+    },
+    enumerable: true,
+    configurable: true,
+  });
+  funcTokens.forEach(token => {
+    if (!('toRegExp' in token)) return;
+    Object.defineProperty(token, tokenName, Object.getOwnPropertyDescriptor(RegExpBuilder.prototype, tokenName)!);
+  });
+  return r[tokenName] as ReturnType<typeof defineToken>;
+}

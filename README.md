@@ -34,6 +34,7 @@ Create readable Regular Expressions with concise and flexible syntax.
   - [Quantifiers](#quantifiers)
   - [Groups](#groups)
   - [Misc](#misc)
+  - [Custom Tokens](#custom-tokens)
 
 ## Installation
 
@@ -489,4 +490,142 @@ const coordinates = oneOrMore.digit
   .oneOrMore.digit
   .toRegExp(Flag.Global);
 console.log(coordinates.exec('[1,2] [3,4]'));  // expect 2 matches
+```
+
+### Custom Tokens
+
+Apart from extracting reusable expressions into variables, you can also define custom tokens directly, allowing you to
+use them as if they are part of the readable-regexp package for maximum convenience.
+
+There are 3 types of custom tokens:
+
+- **Constant**: tokens that modify the expression without needing parameters. These tokens are not callable.
+- **Dynamic**: tokens that take parameters and return different expressions depending on the parameters given. These tokens must be called to provide them with parameters.
+- **Mixed**: tokens with optional parameters. These tokens can be called or accessed directly.
+
+Rules for custom tokens:
+
+- The token name must be a valid JavaScript identifier.
+- The token name must not conflict with any existing properties of `RegExpToken`.
+- All custom tokens should be defined before **any** tokens are used to build regular expressions.
+
+Defining custom tokens is a 3-step process that requires minimal effort and maintains strong typing.
+
+#### Step 1 - Extend the `RegExpToken` interface
+
+**Only required for TypeScript users**
+
+To maintain strong typing on custom tokens, you should extend the built-in `RegExpToken` interface with the type of your
+custom token.
+
+```ts
+// Import the interface and helper types (as needed)
+import { RegExpToken, LiteralFunction, GenericFunction, IncompleteToken } from 'readable-regexp';
+
+// Extend the interface with a declaration
+declare module 'readable-regexp' {
+  interface RegExpToken {
+
+    // ===== CONSTANT tokens =====
+
+    severity: RegExpToken;
+    matchAll: RegExpToken;
+
+    // ===== DYNAMIC tokens =====
+    // Dynamic tokens must intersect the IncompleteToken type to signify that parameters are required
+
+    // Use the LiteralFunction type for tokens that take a single string parameter
+    notExactly: LiteralFunction & IncompleteToken;
+    // Use the GenericFunction type for all other dynamic tokens
+    // Use a union for function overloading
+    exactValue: GenericFunction<[num: number] | [bool: boolean], RegExpToken> & IncompleteToken;
+
+    // ===== MIXED tokens =====
+
+    alpha: GenericFunction<[upper: boolean], RegExpToken> & RegExpToken;
+
+  }
+}
+```
+
+#### Step 2 - Implement the tokens
+
+Use the `defineToken` function to implement the tokens. This function takes the name of the token and its
+implementation and returns the implemented token.
+
+**For CONSTANT tokens:**
+
+- Implement the `constant` function
+- `this` in the function is a `RegExpToken` that contains the expression preceding the custom token
+- The token can append to, wrap around, or modify `this` in any way
+
+```ts
+const severity = defineToken('severity', {
+  constant(this: RegExpToken) {
+    // Append a constant expression
+    return this.oneOf`error``warning``info``debug`;
+  },
+});
+
+const matchAll = defineToken('matchAll', {
+  constant(this: RegExpToken) {
+    // Wrap around the existing expression
+    return lineStart.match(this).lineEnd;
+  },
+});
+```
+
+**For DYNAMIC tokens:**
+
+- Implement the `dynamic` function
+- `this` in the function is a `RegExpToken` that contains the expression preceding the custom token
+- Token arguments are passed to the `dynamic` function as arguments
+- Template string arguments are converted to ordinary strings automatically
+
+```ts
+const notExactly = defineToken('notExactly', {
+  // Tagged template literals are converted to ordinary strings in the "value" argument
+  dynamic(this: RegExpToken, value: string) {
+    return this.notAhead(exactly(value)).repeat(value.length).notCharIn``;
+  },
+});
+
+const exactValue = defineToken('exactValue', {
+  // Implementation of function overloads
+  dynamic(this: RegExpToken, num: number | boolean) {
+    return this.exactly(String(num));
+  },
+});
+```
+
+**For MIXED tokens:**
+
+- Implement both the `constant` and `dynamic` functions
+- Same rules apply for both functions
+- If the custom token is called, the `dynamic` function will handle the call. Otherwise, the `constant` function will be used.
+
+```ts
+const alpha = defineToken('alpha', {
+  constant(this: RegExpToken) {
+    return this.charIn`a-zA-Z`;
+  },
+  dynamic(this: RegExpToken, upper: boolean) {
+    return upper ? this.charIn`A-Z` : this.charIn`a-z`;
+  },
+});
+```
+
+#### Step 3 - Use the token
+
+Custom tokens are integrated as part of readable-regexp. So you can use them just like how you use a built-in token.
+
+```ts
+// Start an expression with a custom token returned by defineToken
+const expr1 = notExactly`foo`.exactly`bar`.toRegExp(); // /(?!foo)[^]{3}bar/
+
+// Use custom tokens as part of an expression chain
+const expr2 = capture.severity.matchAll.toRegExp(); // /^(error|warning|info|debug)$/
+
+// Use custom tokens from the `r` shorthand
+const expr3 = r.alpha(false).toRegExp(); // /[a-z]/
 ```

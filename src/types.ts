@@ -1,8 +1,20 @@
 export type RegExpLiteral = [string] | [TemplateStringsArray, ...unknown[]];
 
+/**
+ * A function that takes a string input and returns a {@link RegExpToken}.
+ * The string can be given as a string parameter or a template string.
+ */
 export interface LiteralFunction {
   (literal: string): RegExpToken;
   (template: TemplateStringsArray, ...args: unknown[]): RegExpToken;
+}
+
+/**
+ * A function with flexible parameters and return type.
+ * This is used by custom tokens.
+ */
+export interface GenericFunction<Params extends unknown[], ReturnType> {
+  (...args: Params): ReturnType;
 }
 
 export interface NumberFunction {
@@ -44,6 +56,10 @@ export interface CharClassFunction {
   (...args: (string | RegExpToken)[]): RegExpToken & CharClassFunction;
 }
 
+/**
+ * A token that requires additional parameters.
+ * Terminal operations are defined as `never` to prevent the token from being used without the required parameters.
+ */
 export interface IncompleteToken {
   /**
    * @deprecated The token is incomplete. Please provide the required parameters.
