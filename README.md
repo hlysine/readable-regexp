@@ -15,64 +15,17 @@
 Regular Expressions - quick and concise, readable and composable.
 </p>
 
-![Quick example of readable-regexp](https://github.com/hlysine/readable-regexp/assets/25472513/3c0540d5-1b25-4f83-afb4-7ed16a3a5140)
+[![Quick example of readable-regexp](https://github.com/hlysine/readable-regexp/assets/25472513/3c0540d5-1b25-4f83-afb4-7ed16a3a5140)](https://hlysine.gitbook.io/readable-regexp/)
 
-## Table of Contents
-
-- [Installation](#installation)
-  - [Using a package manager](#using-a-package-manager)
-  - [Using a CDN](#using-a-cdn)
-- [Features](#features)
-  - [Readability](#readability)
-  - [Flexibility and Conciseness](#flexibility-and-conciseness)
-  - [Safety](#safety)
-- [Documentation](#documentation)
-  - [Syntax Rules](#syntax-rules)
-  - [Special Tokens](#special-tokens)
-  - [Character Classes](#character-classes)
-  - [Anchors](#anchors)
-  - [Quantifiers](#quantifiers)
-  - [Groups](#groups)
-  - [Misc](#misc)
-  - [Custom Tokens](#custom-tokens)
-
-## Installation
-
-### Using a package manager
-
-Install readable-regexp with your preferred package manager, and then import it with CommonJS or ES Modules syntax:
-
-```bash
-npm install readable-regexp
-
-yarn add readable-regexp
-```
-
-```js
-import { oneOrMore, exactly } from 'readable-regexp';
-
-const { oneOrMore, exactly } = require('readable-regexp');
-```
-
-### Using a CDN
-
-Import readable-regexp via a script tag in your HTML file, then access the `readableRegExp` global object in your JS code:
-
-```html
-<script src="https://cdn.jsdelivr.net/npm/readable-regexp/dist/readable-regexp.umd.js"></script>
-```
-
-```js
-const { oneOrMore, exactly } = readableRegExp;
-```
+<p align="center">
+<a href="#features">Features</a> • <a href="#installation">Installation</a> • <a href="#quick-start--documentation">Quick Start / Documentation</a>
+</p>
 
 ## Features
 
-### Readability
+### 📖 Readable
 
-readable-regexp offers much better readability, so you don't need to confuse your future self or write tons of comment
-just to explain 1 line of regexp. It also allows you to extract and re-use repeating parts of an expression, and to add
-inline comments to a part of the expression.
+Be explicit and extract common pieces
 
 <details>
     <summary>Click to see examples</summary>
@@ -146,10 +99,9 @@ const email =
 
 </details>
 
-### Flexibility and Conciseness
+### 📐 Flexible and Concise
 
-Readability is important, but conciseness is also equally important. This is why readable-regexp offers multiple
-shorthands and alternative syntax which you can adopt if you prefer.
+Multiple shorthands and syntax options
 
 <details>
   <summary>Click to see examples</summary>
@@ -206,12 +158,9 @@ As you can see, most of the distracting brackets are gone, and you are left with
 
 </details>
 
-### Safety
+### 🛟 Safe
 
-readable-regexp is written in TypeScript with strong typing, so auto-complete is available and a lot of common mistakes
-can be caught at compile time.
-There is also additional type and reference checking at run time, allowing you to catch errors before even creating a
-RegExp object.
+Type check, auto-complete, and runtime safeguards
 
 <details>
     <summary>Click to see examples</summary>
@@ -259,385 +208,35 @@ const result2 = capture`foo`.ref(2).toRegExp().test('foofoo');
 
 </details>
 
-## Documentation
+## Installation
 
-### Syntax Rules
+### With a package manager
 
-- Chain function calls with `.` to represent consecutive tokens.
+```bash
+npm install readable-regexp
 
-  - `` exactly`fo`.maybe`o` `` = `foo?`
-
-
-- Using a tagged template literal is equal to calling the function with one string argument. Interpolation also works in the tagged template literals.
-
-  - `` exactly`foo` `` = `exactly('foo')`
-  - `` exactly`foo${someVar}` `` = `exactly('foo' + someVar)`
-
-
-- Chaining function calls is equal to calling the function with multiple arguments.
-
-  - `` oneOf`foo` `bar` `baz` `` = `oneOf('foo')('bar')('baz')` = `oneOf('foo', 'bar', 'baz')`
-  - `` oneOf`foo` `bar` (maybe.digit) `` = `oneOf('foo', 'bar', maybe.digit)`
-
-
-- All expressions can be coerced to string. This is especially useful in character classes.
-
-  - `` charIn`${word}-.` `` = `` charIn`\w-.` ``
-
-
-- If a function expects an expression and your expression consists of 1 token only, you can chain the call to omit the bracket.
-
-  - `oneOrMore(word)` = `oneOrMore.word`
-  - `maybe(not(digit))` = `maybe.not.digit`
-
-
-- If you prefer, you may prefix all expressions with `r.` to avoid having to import all functions separately.
-
-```js
-import { r } from 'readable-regexp';
-
-const regExp = r.oneOrMore(r.exactly`fo`.maybe`o`);
+yarn add readable-regexp
 ```
 
 ```js
 import { oneOrMore, exactly } from 'readable-regexp';
 
-const regExp = oneOrMore(exactly`fo`.maybe`o`);
+const { oneOrMore, exactly } = require('readable-regexp');
 ```
 
-### Special Tokens
+### With a CDN
 
-| Function                                               | RegExp equivalent | Explanation                                                       |
-|--------------------------------------------------------|-------------------|-------------------------------------------------------------------|
-| `` exactly`(yes/no)` ``                                | `\(yes\/no\)`     | Match the given string literally, escaping all special characters |
-| `lineFeed`                                             | `\n`              | Match a line feed character                                       |
-| `not.lineFeed`<br/>`not(lineFeed)`                     | `[^\n]`           | Match anything other than a line feed                             |
-| `carriageReturn`                                       | `\r`              | Match a carriage return character                                 |
-| `not.carriageReturn`<br/>`not(carriageReturn)`         | `[^\r]`           | Match anything other than a carriage return                       |
-| `backspace`                                            | `[\b]`            | Match a backspace character                                       |
-| `not.backspace`<br/>`not(backspace)`                   | `[^\b]`           | Match anything other than a backspace                             |
-| `tab`                                                  | `\t`              | Match a tab character                                             |
-| `not.tab`<br/>`not(tab)`                               | `[^\t]`           | Match anything other than a tab                                   |
-| `verticalWhitespace`                                   | `\v`              | Match a vertical whitespace character                             |
-| `not.verticalWhitespace`<br/>`not(verticalWhitespace)` | `[^\v]`           | Match anything other than a vertical whitespace                   |
-| `formFeed`                                             | `\f`              | Match a form feed character                                       |
-| `not.formFeed`<br/>`not(formFeed)`                     | `[^\f]`           | Match anything other than a form feed                             |
-| `nullChar`                                             | `\0`              | Match a null character                                            |
-| `not.nullChar`<br/>`not(nullChar)`                     | `[^\0]`           | Match anything not null                                           |
-| `` octal`123` ``<br/>`octal('123')`                    | `[\123]`          | Match a character with the given code point in base-8 †           |
-| `` not.octal`123` ``<br/>`not(octal('123'))`           | `[^\123]`         | Match anything other than the specified character                 |
-| `` hex`3f` ``<br/>`hex('3f')`                          | `\x3f`            | Match a character with the given code point in base-16 ‡          |
-| `` not.hex`3f` ``<br/>`not(hex('3f'))`                 | `[^\x3f]`         | Match anything other than the specified character                 |
-| `` unicode`3ef1` ``<br/>`unicode('3ef1')`              | `\u3ef1`          | Match a character with the given code point in base-16 ‡          |
-| `` not.unicode`3ef1` ``<br/>`not(unicode('3ef1'))`     | `[^\u3ef1]`       | Match anything other than the specified character                 |
-
-#### † Notes on `octal`
-
-The RegExp output of `octal` is always wrapped in a character class to disambiguate it from capture group back-references.
-
-The maximum allowed value is `0o377`, which is equivalent to `0xff`.
-
-#### ‡ Notes on `hex` and `unicode`
-
-Both have the same effect, but `hex` uses the single-byte escape sequence `\xff` if possible, while `unicode` always
-uses the 2-byte sequence `\uffff`.
-
-### Character Classes
-
-| Function                                                                                                      | RegExp equivalent | Explanation                                                                                                                                                                |
-|---------------------------------------------------------------------------------------------------------------|-------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `word`                                                                                                        | `\w`              | Match alphanumeric characters and underscore                                                                                                                               |
-| `not.word`<br/>`not(word)`                                                                                    | `\W`              | Match anything other than `\w`                                                                                                                                             |
-| `digit`                                                                                                       | `\d`              | Match a character between `0` to `9`                                                                                                                                       |
-| `not.digit`<br/>`not(digit)`                                                                                  | `\D`              | Match anything other than a digit                                                                                                                                          |
-| `whitespace`                                                                                                  | `\s`              | Match all types of whitespace characters                                                                                                                                   |
-| `not.whitespace`<br/>`not(whitespace)`                                                                        | `\S`              | Match anything other than a whitespace                                                                                                                                     |
-| `char`                                                                                                        | `.`               | Match any character other than newline (or including line terminators when single line flag is set)<br/>Note: `not.char` does not exist because it does not match anything |
-| `` charIn`a-z_-` ``<br/>`charIn('a-z', '_-')`<br/>`` charIn`a-z` `_-` ``                                      | `[a-z_-]`         | Match a character listed in the group. A hyphen denotes a range of characters, such as `a-z`. †                                                                            |
-| `` notCharIn`a-z_-` ``<br/>`` not.charIn`a-z_-` ``<br/>`notCharIn('a-z', '_-')`<br/>`` notCharIn`a-z` `_-` `` | `[^a-z_-]`        | Match a character not listed in the group. †                                                                                                                               |
-| `` charRange`a` `z` ``<br/>`charRange('a', 'z')`                                                              | `[a-z]`           | Match a character ranging from the first char to the second one.<br/>Escape sequences are supported and the two characters must be in order.                               |
-| `` notCharRange`a` `z` ``<br/>`` not.charRange`a` `z` ``<br/>`notCharRange('a', 'z')`                         | `[^a-z]`          | Match a character not in the range of first to second char.<br/>Escape sequences are supported and the two characters must be in order.                                    |
-
-#### † Notes on character classes
-
-`charIn` accepts a list of strings and special sequences, but you can also combine the list into one string if you prefer:
-
-- `charIn('a-z0-9' + whitespace)`
-- `` charIn`a-z0-9${whitespace}` ``
-- `` charIn`a-z0-9\s` ``
-
-However, combining a list of options into one string is not equivalent to a simple string concatenation. `-` is escaped
-at the beginning and end of each string in the list, so `` charIn`a-` `z` `` matches `a`, `-` and `z` literally, while
-`` charIn`a-z` `` matches alphabets from `a` to `z`.
-
-Apart from `-`, `^` and `]` are also escaped in the character class, so you cannot negate a `charIn` via a `^` character
-(you should use `notCharIn`), and you cannot close a character class prematurely.
-
-Backslashes `\` are only escaped at the end of a string, so you can use escape sequences such as `\uffff` and `\xff` freely.
-If you want to include `\` in the character class, you should write it at the end of a string or escape with `\\`.
-
-Additionally, `charIn` allows you to merge character classes by simply passing in a `charIn` or `charRange` token. For example:
-
-```ts
-const symbols = charIn`-_*$`; // the character class to be merged must not be negated (cannot be notCharIn or notCharRange)
-const alphabet = charRange`a``z`;
-const specialWord = charIn`0-9`(alphabet)(symbols);
-const specialWord2 = charIn`0-9${alphabet}${symbols}`;
-const notSpecialWord = notCharIn`0-9`(alphabet)(symbols);
+```html
+<script src="https://cdn.jsdelivr.net/npm/readable-regexp/dist/readable-regexp.umd.js"></script>
 ```
-
-### Anchors
-
-| Function                                   | RegExp equivalent | Explanation                                                                       |
-|--------------------------------------------|-------------------|-----------------------------------------------------------------------------------|
-| `lineStart`                                | `^`               | Assert position at the start of string, or start of line if multiline flag is set |
-| `not.lineStart`<br/>`not(lineStart)`       | `(?!^)`           | Assert position not at the start of string/line                                   |
-| `lineEnd`                                  | `$`               | Assert position at the end of string, or end of line if multiline flag is set     |
-| `not.lineEnd`<br/>`not(lineEnd)`           | `(?!$)`           | Assert position not at the end of string/line                                     |
-| `wordBoundary`                             | `\b`              | Assert position at a word boundary, between `word` and non-`word` characters      |
-| `not.wordBoundary`<br/>`not(wordBoundary)` | `\B`              | Assert position not at a word boundary                                            |
-
-### Quantifiers
-
-| Function                                                                                                                                                                 | RegExp equivalent                    | Explanation                                                                                                                |
-|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------|----------------------------------------------------------------------------------------------------------------------------|
-| `` repeat(3,5)`foo` ``<br/>`` repeat(3,5).exactly`foo` ``<br/>`repeat(3,5)('foo')`<br/><br/>`` repeat(3)`foo` ``<br/>`` repeat(3).exactly`foo` ``<br/>`repeat(3)('foo')` | `(?:foo){3,5}`<br/><br/>`(?:foo){3}` | Match a token the specified amount of times. Supply 1 parameter for an exact number of times, or 2 parameters for min/max. |
-| `` repeatLazily(3,5)`foo` ``<br/>`` repeat.lazily(3,5)`foo` ``                                                                                                           | `(?:foo){3,5}?`                      | Same as `repeat`, but match as short as possible                                                                           |
-| `` atLeast(3)`foo` ``<br/>`` atLeast(3).exactly`foo` ``<br/>`atLeast(3)('foo')`                                                                                          | `(?:foo){3,}`                        | Match a token at least the specified amount of times.                                                                      |
-| `` atLeastLazily(3)`foo` ``<br/>`` atLeast.lazily(3)`foo` ``                                                                                                             | `(?:foo){3,}?`                       | Same as `atLeast`, but match as short as possible                                                                          |
-| `` atMost(3)`foo` ``<br/>`` atMost(3).exactly`foo` ``<br/>`atMost(3)('foo')`                                                                                             | `(?:foo){0,3}`                       | Match a token at most the specified amount of times.                                                                       |
-| `` atMostLazily(3)`foo` ``<br/>`` atMost.lazily(3)`foo` ``                                                                                                               | `(?:foo){0,3}?`                      | Same as `atMost`, but match as short as possible                                                                           |
-| `` maybe`foo` ``<br/>`` maybe.exactly`foo` ``<br/>`maybe('foo')`                                                                                                         | `(?:foo)?`                           | Match a token 0 or 1 times                                                                                                 |
-| `` maybeLazily`foo` ``<br/>`` maybe.lazily`foo` ``                                                                                                                       | `(?:foo)??`                          | Same as `maybe`, but match as short as possible                                                                            |
-| `` zeroOrMore`foo` ``<br/>`` zeroOrMore.exactly`foo` ``<br/>`zeroOrMore('foo')`                                                                                          | `(?:foo)*`                           | Match a token 0 to infinite times                                                                                          |
-| `` zeroOrMoreLazily`foo` ``<br/>`` zeroOrMore.lazily`foo` ``                                                                                                             | `(?:foo)*?`                          | Same as `zeroOrMore`, but match as short as possible                                                                       |
-| `` oneOrMore`foo` ``<br/>`` oneOrMore.exactly`foo` ``<br/>`oneOrMore('foo')`                                                                                             | `(?:foo)+`                           | Match a token 1 to infinite times                                                                                          |
-| `` oneOrMoreLazily`foo` ``<br/>`` oneOrMore.lazily`foo` ``                                                                                                               | `(?:foo)+?`                          | Same as `oneOrMore`, but match as short as possible                                                                        |
-
-### Groups
-
-| Function                                                                                               | RegExp equivalent                    | Explanation                                                                                                         |
-|--------------------------------------------------------------------------------------------------------|--------------------------------------|---------------------------------------------------------------------------------------------------------------------|
-| `` capture`foo` ``<br/>`` capture.exactly`foo` ``<br/>`capture('foo')`                                 | `(foo)`                              | Wrap the given token in a capture group                                                                             |
-| `` captureAs`name` `foo` ``<br/>`` captureAs`name`.exactly`foo` ``<br/>`captureAs('name')('foo')`      | `(?<name>foo)`                       | Wrap the given token in a named capture group                                                                       |
-| `` captureAs`name` `foo`.ref`name` ``<br/>`` capture`foo`.ref(1) ``                                    | `(?<name>foo)\k<name>`<br/>`(foo)\1` | Supply a number to reference the capture group with that index. Supply a string to reference a named capture group. |
-| `` group`foo` ``<br/>`` group.exactly`foo` ``<br/>`group('foo')`                                       | `(?:foo)`                            | Wrap the given token in a non-capture group                                                                         |
-| `` ahead`foo` ``<br/>`` ahead.exactly`foo` ``<br/>`ahead('foo')`                                       | `(?=foo)`                            | Wrap the given token in a positive lookahead                                                                        |
-| `` behind`foo` ``<br/>`` behind.exactly`foo` ``<br/>`behind('foo')`                                    | `(?<=foo)`                           | Wrap the given token in a positive lookbehind                                                                       |
-| `` notAhead`foo` ``<br/>`` not.ahead`foo` ``<br/>`` notAhead.exactly`foo` ``<br/>`notAhead('foo')`     | `(?!foo)`                            | Wrap the given token in a negative lookahead                                                                        |
-| `` notBehind`foo` ``<br/>`` not.behind`foo` ``<br/>`` notBehind.exactly`foo` ``<br/>`notBehind('foo')` | `(?<!foo)`                           | Wrap the given token in a negative lookbehind                                                                       |
-| `` oneOf`foo` `bar` ``<br/>`` oneOf(exactly`foo`, exactly`bar`) ``<br/>`oneOf('foo', 'bar')`           | <code>(?:foo&#124;bar)</code>        | Match one in the provided list of options                                                                           |
-
-### Misc
-
-#### `match`
-
-Include another readable RegExp token in the current expression. This is useful for extracting and re-using common expressions.
-
-Example:
 
 ```js
-const number = oneOrMore.digit;
-const coordinates = match(number).exactly`,`.match(number);
+const { oneOrMore, exactly } = readableRegExp;
 ```
 
-This is equivalent to:
+## Quick Start / Documentation
 
-```js
-const coordinates = oneOrMore.digit.exactly`,`.oneOrMore.digit;
-```
-
-`match` can also accept multiple tokens and chain them together, which can be useful for code formatting.
-
-Example:
-
-```js
-const filename = match(
-    oneOrMore.word,
-    exactly`_`,
-    oneOrMore.digit,
-    exactly`.txt`
-);
-```
-
-This is equivalent to:
-
-```js
-const filename = oneOrMore.word.exactly`_`.oneOrMore.digit.exactly`.txt`;
-```
-
-#### `toString()`
-
-Get the current expression as a RegExp string. This is a terminal operation, which means no more functions can
-be chained after `toString`, and the string output cannot be converted back to a readable RegExp token.
-
-Back-references are validated when `toString` is called, and an error will be thrown if any of the back-references are
-invalid.
-
-Example:
-
-```js
-const coordinates = oneOrMore.digit.exactly`,`.oneOrMore.digit.toString();
-expect(coordinates).toBe("\\d+,\\d+");
-```
-
-#### `toRegExp(flags?)`
-
-Get a RegExp object of the current expression. This is a terminal operation, which means no more functions can
-be chained after `toRegExp`, and the output cannot be converted back to a readable RegExp token.
-
-Back-references are validated when `toRegExp` is called, and an error will be thrown if any of the back-references are
-invalid.
-
-You can supply a list of flags to set in the RegExp object:
-
-- `toRegExp('gmi')`
-- `` toRegExp`gmi` ``
-- `toRegExp(Flag.Global, Flag.MultiLine, Flag.IgnoreCase)`
-- `toRegExp('g', 'm', 'i')`
-
-```js
-const coordinates = oneOrMore.digit
-  .exactly`,`
-  .oneOrMore.digit
-  .toRegExp(Flag.Global);
-console.log(coordinates.exec('[1,2] [3,4]'));  // expect 2 matches
-```
-
-### Custom Tokens
-
-Apart from extracting reusable expressions into variables, you can also define custom tokens directly, allowing you to
-use them as if they are part of the readable-regexp package for maximum convenience.
-
-There are 3 types of custom tokens:
-
-- **Constant**: tokens that modify the expression without needing parameters. These tokens are not callable.
-- **Dynamic**: tokens that take parameters and return different expressions depending on the parameters given. These tokens must be called to provide them with parameters.
-- **Mixed**: tokens with optional parameters. These tokens can be called or accessed directly.
-
-Rules for custom tokens:
-
-- The token name must be a valid JavaScript identifier.
-- The token name must not conflict with any existing properties of `RegExpToken`.
-- All custom tokens should be defined before **any** tokens are used to build regular expressions.
-
-Defining custom tokens is a 3-step process that requires minimal effort and maintains strong typing.
-
-#### Step 1 - Extend the `RegExpToken` interface
-
-**Only required for TypeScript users**
-
-To maintain strong typing on custom tokens, you should extend the built-in `RegExpToken` interface with the type of your
-custom token.
-
-```ts
-// Import the interface and helper types (as needed)
-import { RegExpToken, LiteralFunction, GenericFunction, IncompleteToken } from 'readable-regexp';
-
-// Extend the interface with a declaration
-declare module 'readable-regexp' {
-  interface RegExpToken {
-
-    // ===== CONSTANT tokens =====
-
-    severity: RegExpToken;
-    matchAll: RegExpToken;
-
-    // ===== DYNAMIC tokens =====
-    // Dynamic tokens must intersect the IncompleteToken type to signify that parameters are required
-
-    // Use the LiteralFunction type for tokens that take a single string parameter
-    notExactly: LiteralFunction & IncompleteToken;
-    // Use the GenericFunction type for all other dynamic tokens
-    // Use a union for function overloading
-    exactValue: GenericFunction<[num: number] | [bool: boolean], RegExpToken> & IncompleteToken;
-
-    // ===== MIXED tokens =====
-
-    alpha: GenericFunction<[upper: boolean], RegExpToken> & RegExpToken;
-
-  }
-}
-```
-
-#### Step 2 - Implement the tokens
-
-Use the `defineToken` function to implement the tokens. This function takes the name of the token and its
-implementation and returns the implemented token.
-
-**For CONSTANT tokens:**
-
-- Implement the `constant` function
-- `this` in the function is a `RegExpToken` that contains the expression preceding the custom token
-- The token can append to, wrap around, or modify `this` in any way
-
-```ts
-const severity = defineToken('severity', {
-  constant(this: RegExpToken) {
-    // Append a constant expression
-    return this.oneOf`error``warning``info``debug`;
-  },
-});
-
-const matchAll = defineToken('matchAll', {
-  constant(this: RegExpToken) {
-    // Wrap around the existing expression
-    return lineStart.match(this).lineEnd;
-  },
-});
-```
-
-**For DYNAMIC tokens:**
-
-- Implement the `dynamic` function
-- `this` in the function is a `RegExpToken` that contains the expression preceding the custom token
-- Token arguments are passed to the `dynamic` function as arguments
-- Template string arguments are converted to ordinary strings automatically
-
-```ts
-const notExactly = defineToken('notExactly', {
-  // Tagged template literals are converted to ordinary strings in the "value" argument
-  dynamic(this: RegExpToken, value: string) {
-    return this.notAhead(exactly(value)).repeat(value.length).notCharIn``;
-  },
-});
-
-const exactValue = defineToken('exactValue', {
-  // Implementation of function overloads
-  dynamic(this: RegExpToken, num: number | boolean) {
-    return this.exactly(String(num));
-  },
-});
-```
-
-**For MIXED tokens:**
-
-- Implement both the `constant` and `dynamic` functions
-- Same rules apply for both functions
-- If the custom token is called, the `dynamic` function will handle the call. Otherwise, the `constant` function will be used.
-
-```ts
-const alpha = defineToken('alpha', {
-  constant(this: RegExpToken) {
-    return this.charIn`a-zA-Z`;
-  },
-  dynamic(this: RegExpToken, upper: boolean) {
-    return upper ? this.charIn`A-Z` : this.charIn`a-z`;
-  },
-});
-```
-
-#### Step 3 - Use the token
-
-Custom tokens are integrated as part of readable-regexp. So you can use them just like how you use a built-in token.
-
-```ts
-// Start an expression with a custom token returned by defineToken
-const expr1 = notExactly`foo`.exactly`bar`.toRegExp(); // /(?!foo)[^]{3}bar/
-
-// Use custom tokens as part of an expression chain
-const expr2 = capture.severity.matchAll.toRegExp(); // /^(error|warning|info|debug)$/
-
-// Use custom tokens from the `r` shorthand
-const expr3 = r.alpha(false).toRegExp(); // /[a-z]/
-```
+| [**Quick Start**](https://hlysine.gitbook.io/readable-regexp/getting-started/installation) |
+| ------------------------------------------------------------------------------------------ |
+| [**Documentation**](https://hlysine.gitbook.io/readable-regexp/)                           |
+| [**TypeDoc**](https://hlysine.github.io/readable-regexp/)                                  |
