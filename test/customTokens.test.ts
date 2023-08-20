@@ -14,6 +14,7 @@ declare module '../src' {
   interface RegExpToken {
     testConstant: RegExpToken;
     testString: string;
+    testEmpty: null;
     testObject: { foo: string };
 
     testDynamicLiteral: LiteralFunction & IncompleteToken;
@@ -60,8 +61,8 @@ describe('custom tokens', () => {
 
     expect(() => {
       // @ts-expect-error - no config provided
-      const testObject = defineToken('testObject', {});
-      assertType<never>(testObject);
+      const testEmpty = defineToken('testEmpty', {});
+      assertType<never>(testEmpty);
     }).toThrow('valid configurations');
 
     expect(() => {
