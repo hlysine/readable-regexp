@@ -999,6 +999,8 @@ describe('charIn', () => {
     expect(charIn`\\\\`.toString()).toBe('[\\\\]');
     expect(charIn`a-z\\``s`.toString()).toBe('[a-z\\\\s]');
     expect(charIn`a-z``\\s`.toString()).toBe('[a-z\\s]');
+    expect(charIn`ab-``z`.toString()).toBe('[ab\\-z]');
+    expect(charIn`ab\\-``z`.toString()).toBe('[ab\\-z]');
   });
   it('is chainable and quantifiable', () => {
     expect(charIn`a``b``c`.char.toString()).toBe('[abc].');

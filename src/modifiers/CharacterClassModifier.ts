@@ -4,18 +4,15 @@ function escapeForCharClass(option: string): string {
   if (option.startsWith('-')) {
     option = '\\-' + option.substring(1);
   }
-  if (option.endsWith('-')) {
-    option = option.substring(0, option.length - 1) + '\\-';
-  }
   let charEscaped = false;
   for (let i = 0; i < option.length; i++) {
     const char = option[i];
     if (charEscaped) {
       charEscaped = false;
-    } else if (char === '\\') {
+    } else if (char === '\\' || char === '-') {
       if (i === option.length - 1) {
         // escape backslash at the end of the string
-        option = option + '\\';
+        option = option.substring(0, option.length - 1) + '\\' + char;
         break;
       } else {
         charEscaped = true;
