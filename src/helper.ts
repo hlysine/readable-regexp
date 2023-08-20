@@ -176,3 +176,41 @@ export function wrapIfNeeded(regExp: string): string {
   }
   return `(?:${regExp})`;
 }
+
+export function escapeForCharClass(option: string): string {
+  if (option.startsWith('-')) {
+    option = '\\-' + option.substring(1);
+  }
+  let charEscaped = false;
+  for (let i = 0; i < option.length; i++) {
+    const char = option[i];
+    if (charEscaped) {
+      charEscaped = false;
+    } else if (char === '\\' || char === '-') {
+      if (i === option.length - 1) {
+        // escape characters at the end of the string
+        option = option.slice(0, -1) + '\\' + char;
+        break;
+      } else {
+        charEscaped = true;
+      }
+    } else if (char === ']' || char === '^') {
+      // escape this character
+      option = option.substring(0, i) + '\\' + option.substring(i);
+      charEscaped = true;
+    }
+  }
+  return option;
+}
+
+export function countTail(str: string, char: string): number {
+  let count = 0;
+  for (let i = str.length - 1; i >= 0; i--) {
+    if (str[i] === char) {
+      count++;
+    } else {
+      break;
+    }
+  }
+  return count;
+}

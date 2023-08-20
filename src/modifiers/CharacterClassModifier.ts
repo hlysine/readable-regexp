@@ -1,30 +1,5 @@
 import { RegExpModifier } from '../types';
-
-function escapeForCharClass(option: string): string {
-  if (option.startsWith('-')) {
-    option = '\\-' + option.substring(1);
-  }
-  let charEscaped = false;
-  for (let i = 0; i < option.length; i++) {
-    const char = option[i];
-    if (charEscaped) {
-      charEscaped = false;
-    } else if (char === '\\' || char === '-') {
-      if (i === option.length - 1) {
-        // escape backslash at the end of the string
-        option = option.substring(0, option.length - 1) + '\\' + char;
-        break;
-      } else {
-        charEscaped = true;
-      }
-    } else if (char === ']' || char === '^') {
-      // escape this character
-      option = option.substring(0, i) + '\\' + option.substring(i);
-      charEscaped = true;
-    }
-  }
-  return option;
-}
+import { countTail, escapeForCharClass } from '../helper';
 
 export default class CharacterClassModifier implements RegExpModifier {
   private readonly options: string[] = [];
@@ -47,7 +22,13 @@ export default class CharacterClassModifier implements RegExpModifier {
       combined = '-' + combined.substring(2);
     }
     if (combined.endsWith('\\-')) {
-      combined = combined.substring(0, combined.length - 2) + '-';
+      const before = countTail(combined.slice(0, -2), '\\');
+      if (before % 2 === 0) {
+        combined = combined.slice(0, -2) + '-';
+      }
+    }
+    if (countTail(combined, '\\') % 2 === 1) {
+      combined += '\\';
     }
     return [`[${this.negative ? '^' : ''}${combined}]`, regExp];
   }
