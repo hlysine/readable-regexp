@@ -41,7 +41,7 @@ function isRegExpToken(token: unknown): token is RegExpToken {
 }
 
 describe('custom tokens', () => {
-  it('behaves correctly', () => {
+  it('supports constant tokens', () => {
     const testConstant = defineToken('testConstant', {
       constant(this: RegExpToken) {
         expect(isRegExpToken(this)).toBe(true);
@@ -77,6 +77,14 @@ describe('custom tokens', () => {
       assertType<never>(testObject);
     }).toThrow('Invalid return value');
 
+    expect(testConstant.toString()).toBe('foo');
+    expect(r.testConstant.toString()).toBe('foo');
+    expect(lineStart.testConstant.toString()).toBe('^foo');
+    expect(oneOrMore.testConstant.toString()).toBe('(?:foo)+');
+    // @ts-expect-error - the token is constant
+    expect(() => testConstant`foo`).toThrow();
+  });
+  it('supports dynamic tokens', () => {
     const testDynamicLiteral = defineToken('testDynamicLiteral', {
       dynamic(this: RegExpToken, str: string) {
         expect(isRegExpToken(this)).toBe(true);
@@ -125,27 +133,16 @@ describe('custom tokens', () => {
       GenericFunction<[str: string | number] | [TemplateStringsArray, ...unknown[]], RegExpToken> & IncompleteToken
     >(testDynamicMixed);
 
-    const testMixed = defineToken('testMixed', {
-      dynamic(this: RegExpToken, val: string) {
-        expect(isRegExpToken(this)).toBe(true);
-        return this.exactly(String(val));
-      },
-      constant(this: RegExpToken) {
-        expect(isRegExpToken(this)).toBe(true);
-        return this.char;
-      },
-    });
-    assertType<LiteralFunction & RegExpToken>(testMixed);
-
-    expect(testConstant.toString()).toBe('foo');
-    expect(r.testConstant.toString()).toBe('foo');
-    expect(lineStart.testConstant.toString()).toBe('^foo');
-    expect(oneOrMore.testConstant.toString()).toBe('(?:foo)+');
-    // @ts-expect-error - the token is constant
-    expect(() => testConstant`foo`).toThrow();
-
     // @ts-expect-error - the token is incomplete
-    expect(() => testDynamicLiteral.toString()).toThrow();
+    expect(() => testDynamicLiteral.toString()).toThrow('Required parameters');
+    // @ts-expect-error - the token is incomplete
+    expect(() => testDynamicLiteral.toRegExp()).toThrow('Required parameters');
+    // @ts-expect-error - the token is incomplete
+    expect(() => testDynamicLiteral.executeModifiers()).toThrow('Required parameters');
+    // @ts-expect-error - the token is incomplete
+    expect(() => testDynamicLiteral.addModifier()).toThrow('Required parameters');
+    // @ts-expect-error - the token is incomplete
+    expect(() => testDynamicLiteral.addNode()).toThrow('Required parameters');
     expect(testDynamicLiteral`foo`.toString()).toBe('foo');
     expect(testDynamicLiteral('foo').toString()).toBe('foo');
     expect(r.testDynamicLiteral`foo`.toString()).toBe('foo');
@@ -178,6 +175,19 @@ describe('custom tokens', () => {
     expect(testDynamicMixed`abc`.toString()).toBe('[abc]');
     expect(r.testDynamicMixed('abc').toString()).toBe('[abc]');
     expect(lineStart.testDynamicMixed('abc').toString()).toBe('^[abc]');
+  });
+  it('supports mixed tokens', () => {
+    const testMixed = defineToken('testMixed', {
+      dynamic(this: RegExpToken, val: string) {
+        expect(isRegExpToken(this)).toBe(true);
+        return this.exactly(String(val));
+      },
+      constant(this: RegExpToken) {
+        expect(isRegExpToken(this)).toBe(true);
+        return this.char;
+      },
+    });
+    assertType<LiteralFunction & RegExpToken>(testMixed);
 
     expect(testMixed.toString()).toBe('.');
     expect(r.testMixed.toString()).toBe('.');
