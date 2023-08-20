@@ -10,6 +10,7 @@ import {
   captureAs,
   char,
   charIn,
+  charRange,
   digit,
   exactly,
   group,
@@ -22,6 +23,7 @@ import {
   notAhead,
   notBehind,
   notCharIn,
+  notCharRange,
   octal,
   oneOf,
   oneOrMore,
@@ -30,7 +32,9 @@ import {
   ref,
   repeat,
   repeatLazily,
+  tab,
   unicode,
+  verticalWhitespace,
   whitespace,
   word,
   zeroOrMore,
@@ -1088,6 +1092,69 @@ describe('notCharIn', () => {
     expect(() => notCharIn.toString()).toThrow('required parameters');
     // @ts-expect-error - testing missing arguments
     expect(() => notCharIn.notCharIn(3).toString()).toThrow();
+  });
+});
+
+describe('charRange', () => {
+  it('accepts two strings', () => {
+    expect(charRange`a``z`.toString()).toBe('[a-z]');
+    expect(charRange('a')('z').toString()).toBe('[a-z]');
+    expect(charRange`a`('z').toString()).toBe('[a-z]');
+    expect(charRange('a')`z`.toString()).toBe('[a-z]');
+    expect(charRange('a', 'z').toString()).toBe('[a-z]');
+  });
+  it('validates range order', () => {
+    expect(charRange`a``z`.toString()).toBe('[a-z]');
+    expect(() => charRange`z``a`.toString()).toThrow('Invalid charRange');
+    expect(() => charRange`\n``\0`.toString()).toThrow('Invalid charRange');
+    expect(() => charRange`\\n``\\0`.toString()).toThrow('Invalid charRange');
+    expect(() => charRange`\xef``\x32`.toString()).toThrow('Invalid charRange');
+    expect(() => charRange`\\xef``\\x32`.toString()).toThrow('Invalid charRange');
+    expect(() => charRange`\uef12``\u2314`.toString()).toThrow('Invalid charRange');
+    expect(() => charRange`\\uef12``\\u2314`.toString()).toThrow('Invalid charRange');
+    expect(() => charRange`÷``×`.toString()).toThrow('Invalid charRange');
+    expect(() => charRange`👍``👋`.toString()).toThrow('Invalid charRange');
+  });
+  it('works with nested char classes', () => {
+    expect(charIn`a-z`(charRange`A``Z`).toString()).toBe('[a-zA-Z]');
+    expect(charIn`a-z${charRange`A``Z`}`.toString()).toBe('[a-zA-Z]');
+    expect(() => charIn`a-z`(notCharRange`A``Z`).toString()).toThrow('negated');
+    expect(() => notCharIn`a-z`(notCharRange`A``Z`).toString()).toThrow('negated');
+    expect(notCharIn`a-z`(charRange`A``Z`).toString()).toBe('[^a-zA-Z]');
+  });
+  it('escapes properly', () => {
+    expect(charRange`\\``a`.toString()).toBe('[\\\\-a]');
+    expect(charRange`$``\\`.toString()).toBe('[$-\\\\]');
+    expect(charRange`^``_`.toString()).toBe('[\\^-_]');
+    expect(charRange`[``]`.toString()).toBe('[[-\\]]');
+  });
+  it('is chainable and quantifiable', () => {
+    expect(charRange`a``c`.char.toString()).toBe('[a-c].');
+    expect(oneOrMore.charRange`a``b`.toString()).toBe('[a-b]+');
+    expect(oneOrMore.charRange('a', 'b').toString()).toBe('[a-b]+');
+    expect(oneOrMore.charRange`${tab}``${verticalWhitespace}`.toString()).toBe('[\\t-\\v]+');
+  });
+  it('can be negated', () => {
+    expect(not.charRange`a``z`.toString()).toBe('[^a-z]');
+    expect(not(charRange`a``z`).toString()).toBe('[^a-z]');
+    expect(notCharRange`a``z`.toString()).toBe('[^a-z]');
+  });
+  it('throws for invalid argument', () => {
+    // @ts-expect-error - testing invalid arguments
+    expect(() => charRange().toString()).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => charRange``.toString()).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => charRange(1)).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => charRange('a', 1, 12)).toThrow();
+    expect(() => charRange`abc``def`).toThrow();
+    expect(() => charRange`z``a`).toThrow();
+
+    // @ts-expect-error - testing missing arguments
+    expect(() => charRange.toString()).toThrow('required parameters');
+    // @ts-expect-error - testing missing arguments
+    expect(() => charRange.charRange(3).toString()).toThrow();
   });
 });
 
