@@ -1148,13 +1148,83 @@ describe('charRange', () => {
     expect(() => charRange(1)).toThrow();
     // @ts-expect-error - testing invalid arguments
     expect(() => charRange('a', 1, 12)).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => charRange('a', 1)).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => charRange('a')(1)).toThrow();
     expect(() => charRange`abc``def`).toThrow();
+    expect(() => charRange`a``def`).toThrow();
     expect(() => charRange`z``a`).toThrow();
 
     // @ts-expect-error - testing missing arguments
     expect(() => charRange.toString()).toThrow('required parameters');
     // @ts-expect-error - testing missing arguments
     expect(() => charRange.charRange(3).toString()).toThrow();
+  });
+});
+
+describe('notCharRange', () => {
+  it('accepts two strings', () => {
+    expect(notCharRange`a``z`.toString()).toBe('[^a-z]');
+    expect(notCharRange('a')('z').toString()).toBe('[^a-z]');
+    expect(notCharRange`a`('z').toString()).toBe('[^a-z]');
+    expect(notCharRange('a')`z`.toString()).toBe('[^a-z]');
+    expect(notCharRange('a', 'z').toString()).toBe('[^a-z]');
+  });
+  it('validates range order', () => {
+    expect(notCharRange`a``z`.toString()).toBe('[^a-z]');
+    expect(() => notCharRange`z``a`.toString()).toThrow('Invalid charRange');
+    expect(() => notCharRange`\n``\0`.toString()).toThrow('Invalid charRange');
+    expect(() => notCharRange`\\n``\\0`.toString()).toThrow('Invalid charRange');
+    expect(() => notCharRange`\xef``\x32`.toString()).toThrow('Invalid charRange');
+    expect(() => notCharRange`\\xef``\\x32`.toString()).toThrow('Invalid charRange');
+    expect(() => notCharRange`\uef12``\u2314`.toString()).toThrow('Invalid charRange');
+    expect(() => notCharRange`\\uef12``\\u2314`.toString()).toThrow('Invalid charRange');
+    expect(() => notCharRange`÷``×`.toString()).toThrow('Invalid charRange');
+    expect(() => notCharRange`👍``👋`.toString()).toThrow('Invalid charRange');
+  });
+  it('rejected as nested char classes', () => {
+    expect(() => charIn`a-z`(notCharRange`A``Z`).toString()).toThrow('negated');
+    expect(() => notCharIn`a-z`(notCharRange`A``Z`).toString()).toThrow('negated');
+  });
+  it('escapes properly', () => {
+    expect(notCharRange`\\``a`.toString()).toBe('[^\\\\-a]');
+    expect(notCharRange`$``\\`.toString()).toBe('[^$-\\\\]');
+    expect(notCharRange`^``_`.toString()).toBe('[^\\^-_]');
+    expect(notCharRange`[``]`.toString()).toBe('[^[-\\]]');
+  });
+  it('is chainable and quantifiable', () => {
+    expect(notCharRange`a``c`.char.toString()).toBe('[^a-c].');
+    expect(oneOrMore.notCharRange`a``b`.toString()).toBe('[^a-b]+');
+    expect(oneOrMore.notCharRange('a', 'b').toString()).toBe('[^a-b]+');
+    expect(oneOrMore.notCharRange`${tab}``${verticalWhitespace}`.toString()).toBe('[^\\t-\\v]+');
+  });
+  it('cannot be negated', () => {
+    expect(() => not.notCharRange`a``z`.toString()).toThrow();
+    expect(() => not(notCharRange`a``z`).toString()).toThrow();
+    expect(notCharRange`a``z`.toString()).toBe('[^a-z]');
+  });
+  it('throws for invalid argument', () => {
+    // @ts-expect-error - testing invalid arguments
+    expect(() => notCharRange().toString()).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => notCharRange``.toString()).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => notCharRange(1)).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => notCharRange('a', 1, 12)).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => notCharRange('a', 1)).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => notCharRange('a')(1)).toThrow();
+    expect(() => notCharRange`abc``def`).toThrow();
+    expect(() => notCharRange`a``def`).toThrow();
+    expect(() => notCharRange`z``a`).toThrow();
+
+    // @ts-expect-error - testing missing arguments
+    expect(() => notCharRange.toString()).toThrow('required parameters');
+    // @ts-expect-error - testing missing arguments
+    expect(() => notCharRange.notCharRange(3).toString()).toThrow();
   });
 });
 
