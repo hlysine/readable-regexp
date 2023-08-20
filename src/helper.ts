@@ -191,7 +191,7 @@ export function escapeForCharClass(option: string): string {
         // escape characters at the end of the string
         option = option.slice(0, -1) + '\\' + char;
         break;
-      } else {
+      } else if (char === '\\') {
         charEscaped = true;
       }
     } else if (char === ']' || char === '^') {
