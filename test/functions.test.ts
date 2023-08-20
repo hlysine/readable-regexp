@@ -989,6 +989,19 @@ describe('charIn', () => {
     expect(charIn('0-9', 'A-Z', exactly`abc`).toString()).toBe('[0-9A-Zabc]');
     expect(charIn('abc')('def')(exactly`GHI`).toString()).toBe('[abcdefGHI]');
   });
+  it('works with nested char classes', () => {
+    expect(charIn`a-z`(charIn`A-Z`).toString()).toBe('[a-zA-Z]');
+    expect(charIn`a-z${charIn`A-Z`}`.toString()).toBe('[a-zA-Z]');
+    expect(() => charIn`a-z`(notCharIn`A-Z`).toString()).toThrow('negated');
+    expect(() => notCharIn`a-z`(notCharIn`A-Z`).toString()).toThrow('negated');
+    expect(notCharIn`a-z`(charIn`A-Z`).toString()).toBe('[^a-zA-Z]');
+    expect(charIn`a-z`(exactly`[A-Z]`).toString()).toBe('[a-z\\[A\\-Z\\]]');
+    expect(charIn`abc`(charIn`-z`).toString()).toBe('[abc\\-z]');
+    expect(charIn`abc-`(charIn`z`).toString()).toBe('[abc\\-z]');
+    expect(charIn`abc\\`(charIn`z`).toString()).toBe('[abc\\\\z]');
+    expect(charIn`abc\\-`(charIn`z`).toString()).toBe('[abc\\-z]');
+    expect(charIn`abc`(charIn`\\z`).toString()).toBe('[abc\\z]');
+  });
   it('escapes properly', () => {
     expect(charIn`-abc``0-9``def-`.toString()).toBe('[-abc0-9def-]');
     expect(charIn`0-9``-abc``def-`.toString()).toBe('[0-9\\-abcdef-]');
@@ -1001,6 +1014,10 @@ describe('charIn', () => {
     expect(charIn`a-z``\\s`.toString()).toBe('[a-z\\s]');
     expect(charIn`ab-``z`.toString()).toBe('[ab\\-z]');
     expect(charIn`ab\\-``z`.toString()).toBe('[ab\\-z]');
+    expect(charIn`ab\\-``z-`.toString()).toBe('[ab\\-z-]');
+    expect(charIn`ab\\-``z\\-`.toString()).toBe('[ab\\-z-]');
+    expect(charIn`ab\\-``z\\\\-`.toString()).toBe('[ab\\-z\\\\-]');
+    expect(charIn`ab\\-``z\\\\\\-`.toString()).toBe('[ab\\-z\\\\-]');
   });
   it('is chainable and quantifiable', () => {
     expect(charIn`a``b``c`.char.toString()).toBe('[abc].');

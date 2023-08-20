@@ -16,9 +16,11 @@ import {
   assign,
   bindAsIncomplete,
   captureName,
+  escapeForCharClass,
   flagString,
   getLiteralString,
   hexNumber,
+  isCharacterClass,
   isLiteralArgument,
   octalNumber,
 } from './helper';
@@ -275,12 +277,24 @@ class RegExpBuilder implements RegExpToken {
       this: RegExpBuilder,
       ...args: RegExpLiteral | (string | RegExpToken)[]
     ): RegExpToken & CharClassFunction {
+      function extractIfCharClass(regExp: string): string {
+        if (!isCharacterClass(regExp)) return regExp; // this is not supported behavior but we won't throw an error
+        if (regExp.startsWith('[^')) throw new Error('Merging a negated character class is not supported');
+        return escapeForCharClass(regExp.slice(1, -1));
+      }
       if (!(this.modifiers[0] instanceof CharacterClassModifier))
         throw new Error(
           `Unexpected modifier, expected CharacterClassModifier, but got ${this.modifiers[0]}. This is probably a bug.`
         );
       if (isLiteralArgument(args)) {
-        const literal = getLiteralString(args, false);
+        const [str, ...rest] = args;
+        const literal = getLiteralString(
+          [
+            str,
+            ...rest.map(arg => (RegExpBuilder.isRegExpBuilder(arg) ? extractIfCharClass(arg.executeModifiers()) : arg)),
+          ] as RegExpLiteral,
+          false
+        );
         return assign(
           func,
           this.mutateModifier(modifier => (modifier as CharacterClassModifier).add(literal))
@@ -292,7 +306,7 @@ class RegExpBuilder implements RegExpToken {
             const mod = modifier as CharacterClassModifier;
             args.forEach(arg => {
               if (RegExpBuilder.isRegExpBuilder(arg)) {
-                mod.add(arg.executeModifiers());
+                mod.add(extractIfCharClass(arg.executeModifiers()));
               } else if (typeof arg === 'string') {
                 mod.add(arg);
               } else {
