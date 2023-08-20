@@ -214,3 +214,21 @@ export function countTail(str: string, char: string): number {
   }
   return count;
 }
+
+export function compareCodePoint(char1: string, char2: string): number {
+  // evaluate the string to unescape it
+  if (char1.length > 1 && char1.startsWith('\\')) {
+    char1 = new Function(`return "${char1.replace('"', '\\"')}"`)();
+  }
+  if (char2.length > 1 && char2.startsWith('\\')) {
+    char2 = new Function(`return "${char2.replace('"', '\\"')}"`)();
+  }
+  // spread the string to check for code-point length
+  if ([...char1].length > 1) {
+    throw new Error(`The string ${char1} is not a single character.`);
+  }
+  if ([...char2].length > 1) {
+    throw new Error(`The string ${char2} is not a single character.`);
+  }
+  return char1.codePointAt(0)! - char2.codePointAt(0)!;
+}

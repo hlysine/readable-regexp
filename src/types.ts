@@ -56,6 +56,17 @@ export interface CharClassFunction {
   (...args: (string | RegExpToken)[]): RegExpToken & CharClassFunction;
 }
 
+export interface CharRangeFunction {
+  (template: TemplateStringsArray, ...args: unknown[]): HalfCharRangeFunction & IncompleteToken;
+  (start: string, end: string): RegExpToken;
+  (start: string): HalfCharRangeFunction & IncompleteToken;
+}
+
+export interface HalfCharRangeFunction {
+  (template: TemplateStringsArray, ...args: unknown[]): RegExpToken;
+  (end: string): RegExpToken;
+}
+
 /**
  * A token that requires additional parameters.
  * Terminal operations are defined as `never` to prevent the token from being used without the required parameters.
@@ -835,6 +846,10 @@ export interface RegExpToken {
    * ```
    */
   get notCharIn(): CharClassFunction & IncompleteToken;
+
+  get charRange(): CharRangeFunction & IncompleteToken;
+
+  get notCharRange(): CharRangeFunction & IncompleteToken;
 
   /**
    * Negate a given token, causing it to match anything other than the token itself.

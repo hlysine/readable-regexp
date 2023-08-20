@@ -16,6 +16,7 @@ import {
   assign,
   bindAsIncomplete,
   captureName,
+  compareCodePoint,
   escapeForCharClass,
   flagString,
   getLiteralString,
@@ -322,6 +323,36 @@ class RegExpBuilder implements RegExpToken {
 
   public get notCharIn(): RegExpToken['notCharIn'] {
     return this.not.charIn;
+  }
+
+  public get charRange(): RegExpToken['charRange'] {
+    function func(this: RegExpBuilder, ...args: RegExpLiteral | [start: string, end: string]) {
+      const continuation = (start: string) =>
+        function func2(this: RegExpBuilder, ...args2: RegExpLiteral): RegExpToken {
+          if (isLiteralArgument(args2)) {
+            const end = getLiteralString(args2, false);
+            if (compareCodePoint(start, end) > 0) throw new Error(`Invalid charRange: ${start} > ${end}`);
+            return this.charIn`${start === '\\' ? '\\\\' : start}-${end}`;
+          } else {
+            throw new Error('Invalid second argument for charRange');
+          }
+        };
+      if (isLiteralArgument(args)) {
+        const literal = getLiteralString(args, false);
+        return bindAsIncomplete(continuation(literal), this, 'charRange');
+      } else if (args.length === 2 && typeof args[0] === 'string' && typeof args[1] === 'string') {
+        const [start, end] = args;
+        if (compareCodePoint(start, end) > 0) throw new Error(`Invalid charRange: ${start} > ${end}`);
+        return this.charIn`${start === '\\' ? '\\\\' : start}-${end}`;
+      } else {
+        throw new Error('Invalid arguments for charRange');
+      }
+    }
+    return bindAsIncomplete(func, this, 'charRange') as RegExpToken['charRange'];
+  }
+
+  public get notCharRange(): RegExpToken['notCharRange'] {
+    return this.not.charRange;
   }
 
   public get not(): RegExpToken['not'] {
@@ -1285,6 +1316,10 @@ export const charIn = r.charIn;
  * ```
  */
 export const notCharIn = r.notCharIn;
+
+export const charRange = r.charRange;
+
+export const notCharRange = r.notCharRange;
 
 /**
  * Negate a given token, causing it to match anything other than the token itself.
