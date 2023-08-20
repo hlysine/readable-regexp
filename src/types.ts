@@ -700,6 +700,9 @@ export interface RegExpToken {
   get exactly(): LiteralFunction & IncompleteToken;
 
   /**
+   * @deprecated Octal escape sequences (\\ followed by one, two, or three octal digits) are deprecated in string and regular expression literals.
+   *
+   * ----------------------
    * Match a character with the given code point in base-8.
    *
    * Notes:
