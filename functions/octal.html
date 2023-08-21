@@ -19,12 +19,6 @@
 <ul class="tsd-signatures">
 <li class="tsd-signature tsd-anchor-link" id="octal"><span class="tsd-kind-call-signature">octal</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">literal</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/RegExpToken.html" class="tsd-signature-type tsd-kind-interface">RegExpToken</a><a href="#octal" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><g stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" id="icon-anchor"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5"></path></g></svg></a></li>
 <li class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Match a character with the given code point in base-8.</p>
-<p>Notes:</p>
-<p>The RegExp output of <code>octal</code> is always wrapped in a character class to disambiguate it from capture group
-back-references.</p>
-<p>The maximum allowed value is <code>0o377</code>, which is equivalent to <code>0xff</code>.</p>
-</div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
@@ -32,22 +26,31 @@ back-references.</p>
 <h5><span class="tsd-kind-parameter">literal</span>: <span class="tsd-signature-type">string</span></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="../interfaces/RegExpToken.html" class="tsd-signature-type tsd-kind-interface">RegExpToken</a></h4>
 <div class="tsd-comment tsd-typography">
+<h4>Deprecated</h4><p>Octal escape sequences (\ followed by one, two, or three octal digits) are deprecated in string and regular expression literals.</p>
+<hr>
+<p>Match a character with the given code point in base-8.</p>
+<p>Notes:</p>
+<p>The RegExp output of <code>octal</code> is always wrapped in a character class to disambiguate it from capture group
+back-references.</p>
+<p>The maximum allowed value is <code>0o377</code>, which is equivalent to <code>0xff</code>.</p>
+
 <h4>Example</h4><pre><code class="language-js"><span class="hl-4">octal</span><span class="hl-6">`123`</span><br/><span class="hl-4">octal</span><span class="hl-1">(</span><span class="hl-6">&#39;123&#39;</span><span class="hl-1">)</span>
 </code><button>Copy</button></pre>
 <p>RegExp equivalent:</p>
 <pre><code class="language-js"><span class="hl-7">/</span><span class="hl-8">[</span><span class="hl-0">\123</span><span class="hl-8">]</span><span class="hl-7">/</span>
 </code><button>Copy</button></pre>
+
+<h4>Example</h4><p>Negated token</p>
+<pre><code class="language-js"><span class="hl-3">not</span><span class="hl-1">.</span><span class="hl-4">octal</span><span class="hl-6">`123`</span><br/><span class="hl-4">not</span><span class="hl-1">(</span><span class="hl-4">octal</span><span class="hl-1">(</span><span class="hl-6">&#39;123&#39;</span><span class="hl-1">))</span>
+</code><button>Copy</button></pre>
+<p>RegExp equivalent:</p>
+<pre><code class="language-js"><span class="hl-7">/</span><span class="hl-8">[^</span><span class="hl-0">\123</span><span class="hl-8">]</span><span class="hl-7">/</span>
+</code><button>Copy</button></pre>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/hlysine/readable-regexp/blob/741b2c5/src/types.ts#L8">types.ts:8</a></li></ul></aside></li>
+<li>Defined in <a href="https://github.com/hlysine/readable-regexp/blob/f1a0f16/src/types.ts#L8">types.ts:8</a></li></ul></aside></li>
 <li class="tsd-signature tsd-anchor-link" id="octal-1"><span class="tsd-kind-call-signature">octal</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">template</span>, <span class="tsd-signature-symbol">...</span><span class="tsd-kind-parameter">args</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/RegExpToken.html" class="tsd-signature-type tsd-kind-interface">RegExpToken</a><a href="#octal-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
 <li class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Match a character with the given code point in base-8.</p>
-<p>Notes:</p>
-<p>The RegExp output of <code>octal</code> is always wrapped in a character class to disambiguate it from capture group
-back-references.</p>
-<p>The maximum allowed value is <code>0o377</code>, which is equivalent to <code>0xff</code>.</p>
-</div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
@@ -57,14 +60,29 @@ back-references.</p>
 <h5><code class="tsd-tag ts-flagRest">Rest</code> <span class="tsd-signature-symbol">...</span><span class="tsd-kind-parameter">args</span>: <span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">[]</span></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="../interfaces/RegExpToken.html" class="tsd-signature-type tsd-kind-interface">RegExpToken</a></h4>
 <div class="tsd-comment tsd-typography">
+<h4>Deprecated</h4><p>Octal escape sequences (\ followed by one, two, or three octal digits) are deprecated in string and regular expression literals.</p>
+<hr>
+<p>Match a character with the given code point in base-8.</p>
+<p>Notes:</p>
+<p>The RegExp output of <code>octal</code> is always wrapped in a character class to disambiguate it from capture group
+back-references.</p>
+<p>The maximum allowed value is <code>0o377</code>, which is equivalent to <code>0xff</code>.</p>
+
 <h4>Example</h4><pre><code class="language-js"><span class="hl-4">octal</span><span class="hl-6">`123`</span><br/><span class="hl-4">octal</span><span class="hl-1">(</span><span class="hl-6">&#39;123&#39;</span><span class="hl-1">)</span>
 </code><button>Copy</button></pre>
 <p>RegExp equivalent:</p>
 <pre><code class="language-js"><span class="hl-7">/</span><span class="hl-8">[</span><span class="hl-0">\123</span><span class="hl-8">]</span><span class="hl-7">/</span>
 </code><button>Copy</button></pre>
+
+<h4>Example</h4><p>Negated token</p>
+<pre><code class="language-js"><span class="hl-3">not</span><span class="hl-1">.</span><span class="hl-4">octal</span><span class="hl-6">`123`</span><br/><span class="hl-4">not</span><span class="hl-1">(</span><span class="hl-4">octal</span><span class="hl-1">(</span><span class="hl-6">&#39;123&#39;</span><span class="hl-1">))</span>
+</code><button>Copy</button></pre>
+<p>RegExp equivalent:</p>
+<pre><code class="language-js"><span class="hl-7">/</span><span class="hl-8">[^</span><span class="hl-0">\123</span><span class="hl-8">]</span><span class="hl-7">/</span>
+</code><button>Copy</button></pre>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/hlysine/readable-regexp/blob/741b2c5/src/types.ts#L9">types.ts:9</a></li></ul></aside></li></ul></section></div>
+<li>Defined in <a href="https://github.com/hlysine/readable-regexp/blob/f1a0f16/src/types.ts#L9">types.ts:9</a></li></ul></aside></li></ul></section></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">
@@ -122,6 +140,7 @@ back-references.</p>
 <li><a href="captureAs.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>capture<wbr/>As</span></a></li>
 <li><a href="charIn.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>char<wbr/>In</span></a></li>
 <li><a href="charRange.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>char<wbr/>Range</span></a></li>
+<li><a href="control.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>control</span></a></li>
 <li><a href="defineToken.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>define<wbr/>Token</span></a></li>
 <li><a href="exactly.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>exactly</span></a></li>
 <li><a href="group.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>group</span></a></li>

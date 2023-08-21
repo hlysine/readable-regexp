@@ -1,4 +1,4 @@
-<!DOCTYPE html><html class="default" lang="en"><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>match | readable-regexp</title><meta name="description" content="Documentation for readable-regexp"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="../assets/style.css"/><link rel="stylesheet" href="../assets/highlight.css"/><script defer src="../assets/main.js"></script><script async src="../assets/search.js" id="tsd-search-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os"</script><header class="tsd-page-toolbar">
+<!DOCTYPE html><html class="default" lang="en"><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>control | readable-regexp</title><meta name="description" content="Documentation for readable-regexp"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="../assets/style.css"/><link rel="stylesheet" href="../assets/highlight.css"/><script defer src="../assets/main.js"></script><script async src="../assets/search.js" id="tsd-search-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os"</script><header class="tsd-page-toolbar">
 <div class="tsd-toolbar-contents container">
 <div class="table-cell" id="tsd-search" data-base="..">
 <div class="field"><label for="tsd-search-field" class="tsd-widget tsd-toolbar-icon search no-caption"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M15.7824 13.833L12.6666 10.7177C12.5259 10.5771 12.3353 10.499 12.1353 10.499H11.6259C12.4884 9.39596 13.001 8.00859 13.001 6.49937C13.001 2.90909 10.0914 0 6.50048 0C2.90959 0 0 2.90909 0 6.49937C0 10.0896 2.90959 12.9987 6.50048 12.9987C8.00996 12.9987 9.39756 12.4863 10.5008 11.6239V12.1332C10.5008 12.3332 10.5789 12.5238 10.7195 12.6644L13.8354 15.7797C14.1292 16.0734 14.6042 16.0734 14.8948 15.7797L15.7793 14.8954C16.0731 14.6017 16.0731 14.1267 15.7824 13.833ZM6.50048 10.499C4.29094 10.499 2.50018 8.71165 2.50018 6.49937C2.50018 4.29021 4.28781 2.49976 6.50048 2.49976C8.71001 2.49976 10.5008 4.28708 10.5008 6.49937C10.5008 8.70852 8.71314 10.499 6.50048 10.499Z" fill="var(--color-text)"></path></svg></label><input type="text" id="tsd-search-field" aria-label="Search"/></div>
@@ -13,37 +13,74 @@
 <div class="tsd-page-title">
 <ul class="tsd-breadcrumb">
 <li><a href="../modules.html">readable-regexp</a></li>
-<li><a href="match.html">match</a></li></ul>
-<h1>Function match</h1></div>
+<li><a href="control.html">control</a></li></ul>
+<h1>Function control</h1></div>
 <section class="tsd-panel">
 <ul class="tsd-signatures">
-<li class="tsd-signature tsd-anchor-link" id="match"><span class="tsd-kind-call-signature">match</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span><span class="tsd-kind-parameter">nodes</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/RegExpToken.html" class="tsd-signature-type tsd-kind-interface">RegExpToken</a><a href="#match" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><g stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" id="icon-anchor"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5"></path></g></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="control"><span class="tsd-kind-call-signature">control</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">literal</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/RegExpToken.html" class="tsd-signature-type tsd-kind-interface">RegExpToken</a><a href="#control" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><g stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" id="icon-anchor"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5"></path><path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5"></path></g></svg></a></li>
 <li class="tsd-description">
-<div class="tsd-comment tsd-typography"><p>Include another readable RegExp token in the current expression. This is useful for extracting and re-using common
-expressions.</p>
+<div class="tsd-comment tsd-typography"><p>Match a control character with value equal to the given letter&#39;s character value modulo 32.
+Only a letter from <code>a</code> to <code>z</code> or <code>A</code> to <code>Z</code> is allowed.</p>
+<p>For example, <code>\cJ</code> represents line break (<code>\n</code>), because the code point of <code>J</code> is 74, and 74 modulo 32 is 10,
+which is the code point of line break. Because an uppercase letter and its lowercase form differ by 32,
+<code>\cJ</code> and <code>\cj</code> are equivalent. You can represent control characters from 1 to 26 in this form.</p>
+<p>( <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Regular_expressions/Character_escape#description">https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Regular_expressions/Character_escape#description</a> )</p>
 </div>
 <div class="tsd-parameters">
 <h4 class="tsd-parameters-title">Parameters</h4>
 <ul class="tsd-parameter-list">
 <li>
-<h5><code class="tsd-tag ts-flagRest">Rest</code> <span class="tsd-signature-symbol">...</span><span class="tsd-kind-parameter">nodes</span>: <a href="../interfaces/RegExpToken.html" class="tsd-signature-type tsd-kind-interface">RegExpToken</a><span class="tsd-signature-symbol">[]</span></h5></li></ul></div>
+<h5><span class="tsd-kind-parameter">literal</span>: <span class="tsd-signature-type ">Alphabet</span></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="../interfaces/RegExpToken.html" class="tsd-signature-type tsd-kind-interface">RegExpToken</a></h4>
 <div class="tsd-comment tsd-typography">
-<h4>Example</h4><pre><code class="language-js"><span class="hl-0">const</span><span class="hl-1"> </span><span class="hl-2">number</span><span class="hl-1"> = </span><span class="hl-3">oneOrMore</span><span class="hl-1">.</span><span class="hl-3">digit</span><span class="hl-1">;</span><br/><span class="hl-0">const</span><span class="hl-1"> </span><span class="hl-2">coordinates</span><span class="hl-1"> = </span><span class="hl-4">match</span><span class="hl-1">(</span><span class="hl-3">number</span><span class="hl-1">).</span><span class="hl-4">exactly</span><span class="hl-6">`,`</span><span class="hl-1">.</span><span class="hl-4">match</span><span class="hl-1">(</span><span class="hl-3">number</span><span class="hl-1">);</span>
+<h4>Example</h4><pre><code class="language-js"><span class="hl-4">control</span><span class="hl-6">`j`</span><br/><span class="hl-4">control</span><span class="hl-1">(</span><span class="hl-6">&#39;j&#39;</span><span class="hl-1">)</span><br/><span class="hl-4">control</span><span class="hl-6">`J`</span><br/><span class="hl-4">control</span><span class="hl-1">(</span><span class="hl-6">&#39;J&#39;</span><span class="hl-1">)</span>
 </code><button>Copy</button></pre>
-<p>This is equivalent to:</p>
-<pre><code class="language-js"><span class="hl-0">const</span><span class="hl-1"> </span><span class="hl-2">coordinates</span><span class="hl-1"> = </span><span class="hl-3">oneOrMore</span><span class="hl-1">.</span><span class="hl-3">digit</span><span class="hl-1">.</span><span class="hl-4">exactly</span><span class="hl-6">`,`</span><span class="hl-1">.</span><span class="hl-3">oneOrMore</span><span class="hl-1">.</span><span class="hl-3">digit</span><span class="hl-1">;</span>
+<p>RegExp equivalent:</p>
+<pre><code class="language-js"><span class="hl-7">/</span><span class="hl-11">\c</span><span class="hl-7">j/</span><br/><span class="hl-7">/</span><span class="hl-0">\cJ</span><span class="hl-7">/</span>
 </code><button>Copy</button></pre>
-<p><code>match</code> can also accept multiple tokens and chain them together, which can be useful for code formatting.</p>
 
-<h4>Example</h4><pre><code class="language-js"><span class="hl-0">const</span><span class="hl-1"> </span><span class="hl-2">filename</span><span class="hl-1"> = </span><span class="hl-4">match</span><span class="hl-1">(</span><br/><span class="hl-1">  </span><span class="hl-3">oneOrMore</span><span class="hl-1">.</span><span class="hl-3">word</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-4">exactly</span><span class="hl-6">`_`</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-3">oneOrMore</span><span class="hl-1">.</span><span class="hl-3">digit</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-4">exactly</span><span class="hl-6">`.txt`</span><br/><span class="hl-1">);</span>
+<h4>Example</h4><p>Negated token</p>
+<pre><code class="language-js"><span class="hl-3">not</span><span class="hl-1">.</span><span class="hl-4">control</span><span class="hl-6">`j`</span><br/><span class="hl-4">not</span><span class="hl-1">(</span><span class="hl-4">control</span><span class="hl-1">(</span><span class="hl-6">&#39;j&#39;</span><span class="hl-1">))</span><br/><span class="hl-3">not</span><span class="hl-1">.</span><span class="hl-4">control</span><span class="hl-6">`J`</span><br/><span class="hl-4">not</span><span class="hl-1">(</span><span class="hl-4">control</span><span class="hl-1">(</span><span class="hl-6">&#39;J&#39;</span><span class="hl-1">))</span>
 </code><button>Copy</button></pre>
-<p>This is equivalent to:</p>
-<pre><code class="language-js"><span class="hl-0">const</span><span class="hl-1"> </span><span class="hl-2">filename</span><span class="hl-1"> = </span><span class="hl-3">oneOrMore</span><span class="hl-1">.</span><span class="hl-3">word</span><span class="hl-1">.</span><span class="hl-4">exactly</span><span class="hl-6">`_`</span><span class="hl-1">.</span><span class="hl-3">oneOrMore</span><span class="hl-1">.</span><span class="hl-3">digit</span><span class="hl-1">.</span><span class="hl-4">exactly</span><span class="hl-6">`.txt`</span><span class="hl-1">;</span>
+<p>RegExp equivalent:</p>
+<pre><code class="language-js"><span class="hl-7">/</span><span class="hl-8">[^</span><span class="hl-11">\c</span><span class="hl-7">j</span><span class="hl-8">]</span><span class="hl-7">/</span><br/><span class="hl-7">/</span><span class="hl-8">[^</span><span class="hl-0">\cJ</span><span class="hl-8">]</span><span class="hl-7">/</span>
 </code><button>Copy</button></pre>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/hlysine/readable-regexp/blob/f1a0f16/src/types.ts#L64">types.ts:64</a></li></ul></aside></li></ul></section></div>
+<li>Defined in <a href="https://github.com/hlysine/readable-regexp/blob/f1a0f16/src/types.ts#L43">types.ts:43</a></li></ul></aside></li>
+<li class="tsd-signature tsd-anchor-link" id="control-1"><span class="tsd-kind-call-signature">control</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">template</span>, <span class="tsd-signature-symbol">...</span><span class="tsd-kind-parameter">args</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/RegExpToken.html" class="tsd-signature-type tsd-kind-interface">RegExpToken</a><a href="#control-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Match a control character with value equal to the given letter&#39;s character value modulo 32.
+Only a letter from <code>a</code> to <code>z</code> or <code>A</code> to <code>Z</code> is allowed.</p>
+<p>For example, <code>\cJ</code> represents line break (<code>\n</code>), because the code point of <code>J</code> is 74, and 74 modulo 32 is 10,
+which is the code point of line break. Because an uppercase letter and its lowercase form differ by 32,
+<code>\cJ</code> and <code>\cj</code> are equivalent. You can represent control characters from 1 to 26 in this form.</p>
+<p>( <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Regular_expressions/Character_escape#description">https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Regular_expressions/Character_escape#description</a> )</p>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li>
+<h5><span class="tsd-kind-parameter">template</span>: <span class="tsd-signature-type ">TemplateStringsArray</span></h5></li>
+<li>
+<h5><code class="tsd-tag ts-flagRest">Rest</code> <span class="tsd-signature-symbol">...</span><span class="tsd-kind-parameter">args</span>: <span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">[]</span></h5></li></ul></div>
+<h4 class="tsd-returns-title">Returns <a href="../interfaces/RegExpToken.html" class="tsd-signature-type tsd-kind-interface">RegExpToken</a></h4>
+<div class="tsd-comment tsd-typography">
+<h4>Example</h4><pre><code class="language-js"><span class="hl-4">control</span><span class="hl-6">`j`</span><br/><span class="hl-4">control</span><span class="hl-1">(</span><span class="hl-6">&#39;j&#39;</span><span class="hl-1">)</span><br/><span class="hl-4">control</span><span class="hl-6">`J`</span><br/><span class="hl-4">control</span><span class="hl-1">(</span><span class="hl-6">&#39;J&#39;</span><span class="hl-1">)</span>
+</code><button>Copy</button></pre>
+<p>RegExp equivalent:</p>
+<pre><code class="language-js"><span class="hl-7">/</span><span class="hl-11">\c</span><span class="hl-7">j/</span><br/><span class="hl-7">/</span><span class="hl-0">\cJ</span><span class="hl-7">/</span>
+</code><button>Copy</button></pre>
+
+<h4>Example</h4><p>Negated token</p>
+<pre><code class="language-js"><span class="hl-3">not</span><span class="hl-1">.</span><span class="hl-4">control</span><span class="hl-6">`j`</span><br/><span class="hl-4">not</span><span class="hl-1">(</span><span class="hl-4">control</span><span class="hl-1">(</span><span class="hl-6">&#39;j&#39;</span><span class="hl-1">))</span><br/><span class="hl-3">not</span><span class="hl-1">.</span><span class="hl-4">control</span><span class="hl-6">`J`</span><br/><span class="hl-4">not</span><span class="hl-1">(</span><span class="hl-4">control</span><span class="hl-1">(</span><span class="hl-6">&#39;J&#39;</span><span class="hl-1">))</span>
+</code><button>Copy</button></pre>
+<p>RegExp equivalent:</p>
+<pre><code class="language-js"><span class="hl-7">/</span><span class="hl-8">[^</span><span class="hl-11">\c</span><span class="hl-7">j</span><span class="hl-8">]</span><span class="hl-7">/</span><br/><span class="hl-7">/</span><span class="hl-8">[^</span><span class="hl-0">\cJ</span><span class="hl-8">]</span><span class="hl-7">/</span>
+</code><button>Copy</button></pre>
+</div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/hlysine/readable-regexp/blob/f1a0f16/src/types.ts#L44">types.ts:44</a></li></ul></aside></li></ul></section></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">
@@ -101,12 +138,12 @@ expressions.</p>
 <li><a href="captureAs.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>capture<wbr/>As</span></a></li>
 <li><a href="charIn.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>char<wbr/>In</span></a></li>
 <li><a href="charRange.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>char<wbr/>Range</span></a></li>
-<li><a href="control.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>control</span></a></li>
+<li><a href="control.html" class="current"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>control</span></a></li>
 <li><a href="defineToken.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>define<wbr/>Token</span></a></li>
 <li><a href="exactly.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>exactly</span></a></li>
 <li><a href="group.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>group</span></a></li>
 <li><a href="hex.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>hex</span></a></li>
-<li><a href="match.html" class="current"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>match</span></a></li>
+<li><a href="match.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>match</span></a></li>
 <li><a href="maybe.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>maybe</span></a></li>
 <li><a href="maybeLazily.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>maybe<wbr/>Lazily</span></a></li>
 <li><a href="not.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>not</span></a></li>

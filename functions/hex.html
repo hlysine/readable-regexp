@@ -36,9 +36,16 @@ while <code>unicode</code> always uses the 2-byte sequence <code>\uffff</code>.<
 <p>RegExp equivalent:</p>
 <pre><code class="language-js"><span class="hl-7">/</span><span class="hl-0">\x3f</span><span class="hl-7">/</span>
 </code><button>Copy</button></pre>
+
+<h4>Example</h4><p>Negated token</p>
+<pre><code class="language-js"><span class="hl-3">not</span><span class="hl-1">.</span><span class="hl-4">hex</span><span class="hl-6">`3f`</span><br/><span class="hl-4">not</span><span class="hl-1">(</span><span class="hl-4">hex</span><span class="hl-1">(</span><span class="hl-6">&#39;3f&#39;</span><span class="hl-1">))</span>
+</code><button>Copy</button></pre>
+<p>RegExp equivalent:</p>
+<pre><code class="language-js"><span class="hl-7">/</span><span class="hl-8">[^</span><span class="hl-0">\x3f</span><span class="hl-8">]</span><span class="hl-7">/</span>
+</code><button>Copy</button></pre>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/hlysine/readable-regexp/blob/741b2c5/src/types.ts#L8">types.ts:8</a></li></ul></aside></li>
+<li>Defined in <a href="https://github.com/hlysine/readable-regexp/blob/f1a0f16/src/types.ts#L8">types.ts:8</a></li></ul></aside></li>
 <li class="tsd-signature tsd-anchor-link" id="hex-1"><span class="tsd-kind-call-signature">hex</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">template</span>, <span class="tsd-signature-symbol">...</span><span class="tsd-kind-parameter">args</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/RegExpToken.html" class="tsd-signature-type tsd-kind-interface">RegExpToken</a><a href="#hex-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-comment tsd-typography"><p>Match a character with the given code point in base-16.</p>
@@ -60,9 +67,16 @@ while <code>unicode</code> always uses the 2-byte sequence <code>\uffff</code>.<
 <p>RegExp equivalent:</p>
 <pre><code class="language-js"><span class="hl-7">/</span><span class="hl-0">\x3f</span><span class="hl-7">/</span>
 </code><button>Copy</button></pre>
+
+<h4>Example</h4><p>Negated token</p>
+<pre><code class="language-js"><span class="hl-3">not</span><span class="hl-1">.</span><span class="hl-4">hex</span><span class="hl-6">`3f`</span><br/><span class="hl-4">not</span><span class="hl-1">(</span><span class="hl-4">hex</span><span class="hl-1">(</span><span class="hl-6">&#39;3f&#39;</span><span class="hl-1">))</span>
+</code><button>Copy</button></pre>
+<p>RegExp equivalent:</p>
+<pre><code class="language-js"><span class="hl-7">/</span><span class="hl-8">[^</span><span class="hl-0">\x3f</span><span class="hl-8">]</span><span class="hl-7">/</span>
+</code><button>Copy</button></pre>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/hlysine/readable-regexp/blob/741b2c5/src/types.ts#L9">types.ts:9</a></li></ul></aside></li></ul></section></div>
+<li>Defined in <a href="https://github.com/hlysine/readable-regexp/blob/f1a0f16/src/types.ts#L9">types.ts:9</a></li></ul></aside></li></ul></section></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">
@@ -120,6 +134,7 @@ while <code>unicode</code> always uses the 2-byte sequence <code>\uffff</code>.<
 <li><a href="captureAs.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>capture<wbr/>As</span></a></li>
 <li><a href="charIn.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>char<wbr/>In</span></a></li>
 <li><a href="charRange.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>char<wbr/>Range</span></a></li>
+<li><a href="control.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>control</span></a></li>
 <li><a href="defineToken.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>define<wbr/>Token</span></a></li>
 <li><a href="exactly.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>exactly</span></a></li>
 <li><a href="group.html"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="#icon-64"></use></svg><span>group</span></a></li>
