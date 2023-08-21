@@ -1001,6 +1001,7 @@ describe('charIn', () => {
     expect(notCharIn`a-z`(charIn`A-Z`).toString()).toBe('[^a-zA-Z]');
     expect(charIn`a-z`(exactly`[A-Z]`).toString()).toBe('[a-z\\[A\\-Z\\]]');
     expect(charIn`abc`(charIn`-z`).toString()).toBe('[abc\\-z]');
+    expect(charIn`abc${charIn`-z`}`.toString()).toBe('[abc\\-z]');
     expect(charIn`abc-`(charIn`z`).toString()).toBe('[abc\\-z]');
     expect(charIn`abc\\`(charIn`z`).toString()).toBe('[abc\\\\z]');
     expect(charIn`abc\\-`(charIn`z`).toString()).toBe('[abc\\-z]');
