@@ -11,6 +11,7 @@ import {
   char,
   charIn,
   charRange,
+  control,
   digit,
   exactly,
   group,
@@ -208,6 +209,52 @@ describe('unicode', () => {
     expect(() => unicode.toString()).toThrow('required parameters');
     // @ts-expect-error - testing missing arguments
     expect(() => unicode.unicode`12ef`.toString()).toThrow();
+  });
+});
+
+describe('control', () => {
+  it('accepts literals', () => {
+    expect(control`e`.toString()).toBe('\\ce');
+    expect(control('e').toString()).toBe('\\ce');
+    expect(control`Z`.toString()).toBe('\\cZ');
+    expect(control('Z').toString()).toBe('\\cZ');
+  });
+  it('accepts template literals', () => {
+    expect(control`${'a'}`.toString()).toBe('\\ca');
+    expect(control`${'A'}`.toString()).toBe('\\cA');
+  });
+  it('validates correctly', () => {
+    expect(control`a`.toString()).toBe('\\ca');
+    expect(control`A`.toString()).toBe('\\cA');
+    expect(control`z`.toString()).toBe('\\cz');
+    expect(control`Z`.toString()).toBe('\\cZ');
+    expect(() => control``).toThrow();
+    expect(() => control`abc`).toThrow();
+    expect(() => control`1`).toThrow();
+    expect(() => control` `).toThrow();
+  });
+  it('can be negated and quantified', () => {
+    expect(not.control`a`.toString()).toBe('[^\\ca]');
+    expect(oneOrMore.control`a`.toString()).toBe('\\ca+');
+    expect(oneOrMore.not.control`a`.toString()).toBe('[^\\ca]+');
+    expect(not.control`z`.toString()).toBe('[^\\cz]');
+    expect(oneOrMore.control`z`.toString()).toBe('\\cz+');
+    expect(oneOrMore.not.control`z`.toString()).toBe('[^\\cz]+');
+  });
+  it('is recognized as literal', () => {
+    expect(oneOrMore.control`a`.toString()).toBe('\\ca+');
+  });
+  it('throws for invalid argument', () => {
+    // @ts-expect-error - testing invalid arguments
+    expect(() => control(1).toString()).toThrow('control character');
+    // @ts-expect-error - testing invalid arguments
+    expect(() => control()).toThrow();
+    // @ts-expect-error - testing invalid arguments
+    expect(() => control('a', 'b')).toThrow();
+    // @ts-expect-error - testing missing arguments
+    expect(() => control.toString()).toThrow('required parameters');
+    // @ts-expect-error - testing missing arguments
+    expect(() => control.control`e`.toString()).toThrow();
   });
 });
 
@@ -954,6 +1001,7 @@ describe('match', () => {
     expect(match(exactly`foo`).toString()).toBe('foo');
     expect(match(exactly`foo`, exactly`bar`).toString()).toBe('foobar');
     expect(match(not.behind`foo`, maybe.exactly`bar`, oneOrMore`baz`).toString()).toBe('(?<!foo)(?:bar)?(?:baz)+');
+    expect(oneOrMore.match(exactly`fo`.maybe`o`).toString()).toBe('(?:foo?)+');
   });
   it('is chainable', () => {
     expect(match(exactly`foo`).char.toString()).toBe('foo.');
