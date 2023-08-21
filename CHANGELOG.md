@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.1] - 2023-08-21
+
+### Added
+
+- `v` flag
+- `control` token for control character escape `\cJ`
+- Code examples for negated `hex`, `unicode`, `control` and `octal` tokens in documentation
+
+### Changed
+
+- Updated `charRange` to resolve escape sequences without using `new Function`
+- Marked `octal` as deprecated
+
 ## [1.5.0] - 2023-08-20
 
 ### Added
@@ -124,3 +137,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [1.3.4]: https://github.com/hlysine/readable-regexp/releases/tag/v1.3.4
 [1.4.0]: https://github.com/hlysine/readable-regexp/releases/tag/v1.4.0
 [1.5.0]: https://github.com/hlysine/readable-regexp/releases/tag/v1.5.0
+[1.5.1]: https://github.com/hlysine/readable-regexp/releases/tag/v1.5.1
