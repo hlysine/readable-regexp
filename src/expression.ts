@@ -1205,6 +1205,19 @@ export const exactly = r.exactly;
  * ```js
  * /[\123]/
  * ```
+ *
+ * @example Negated token
+ *
+ * ```js
+ * not.octal`123`
+ * not(octal('123'))
+ * ```
+ *
+ * RegExp equivalent:
+ *
+ * ```js
+ * /[^\123]/
+ * ```
  */
 export const octal = r.octal;
 
@@ -1228,6 +1241,19 @@ export const octal = r.octal;
  * ```js
  * /\x3f/
  * ```
+ *
+ * @example Negated token
+ *
+ * ```js
+ * not.hex`3f`
+ * not(hex('3f'))
+ * ```
+ *
+ * RegExp equivalent:
+ *
+ * ```js
+ * /[^\x3f]/
+ * ```
  */
 export const hex = r.hex;
 
@@ -1250,6 +1276,19 @@ export const hex = r.hex;
  *
  * ```js
  * /\u3ef1/
+ * ```
+ *
+ * @example Negated token
+ *
+ * ```js
+ * not.unicode`3ef1`
+ * not(unicode('3ef1'))
+ * ```
+ *
+ * RegExp equivalent:
+ *
+ * ```js
+ * /[^\u3ef1]/
  * ```
  */
 export const unicode = r.unicode;
@@ -1278,6 +1317,22 @@ export const unicode = r.unicode;
  * ```js
  * /\cj/
  * /\cJ/
+ * ```
+ *
+ * @example Negated token
+ *
+ * ```js
+ * not.control`j`
+ * not(control('j'))
+ * not.control`J`
+ * not(control('J'))
+ * ```
+ *
+ * RegExp equivalent:
+ *
+ * ```js
+ * /[^\cj]/
+ * /[^\cJ]/
  * ```
  */
 export const control = r.control;

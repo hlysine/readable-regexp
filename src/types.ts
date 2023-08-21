@@ -742,6 +742,7 @@ export interface RegExpToken {
    * @deprecated Octal escape sequences (\\ followed by one, two, or three octal digits) are deprecated in string and regular expression literals.
    *
    * ----------------------
+   *
    * Match a character with the given code point in base-8.
    *
    * Notes:
@@ -762,6 +763,19 @@ export interface RegExpToken {
    *
    * ```js
    * /[\123]/
+   * ```
+   *
+   * @example Negated token
+   *
+   * ```js
+   * not.octal`123`
+   * not(octal('123'))
+   * ```
+   *
+   * RegExp equivalent:
+   *
+   * ```js
+   * /[^\123]/
    * ```
    */
   get octal(): LiteralFunction & IncompleteToken;
@@ -786,6 +800,19 @@ export interface RegExpToken {
    * ```js
    * /\x3f/
    * ```
+   *
+   * @example Negated token
+   *
+   * ```js
+   * not.hex`3f`
+   * not(hex('3f'))
+   * ```
+   *
+   * RegExp equivalent:
+   *
+   * ```js
+   * /[^\x3f]/
+   * ```
    */
   get hex(): LiteralFunction & IncompleteToken;
 
@@ -808,6 +835,19 @@ export interface RegExpToken {
    *
    * ```js
    * /\u3ef1/
+   * ```
+   *
+   * @example Negated token
+   *
+   * ```js
+   * not.unicode`3ef1`
+   * not(unicode('3ef1'))
+   * ```
+   *
+   * RegExp equivalent:
+   *
+   * ```js
+   * /[^\u3ef1]/
    * ```
    */
   get unicode(): LiteralFunction & IncompleteToken;
@@ -836,6 +876,22 @@ export interface RegExpToken {
    * ```js
    * /\cj/
    * /\cJ/
+   * ```
+   *
+   * @example Negated token
+   *
+   * ```js
+   * not.control`j`
+   * not.control('j')
+   * not.control`J`
+   * not.control('J')
+   * ```
+   *
+   * RegExp equivalent:
+   *
+   * ```js
+   * /[^\cj]/
+   * /[^\cJ]/
    * ```
    */
   get control(): ControlFunction & IncompleteToken;
