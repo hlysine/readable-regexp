@@ -17,6 +17,7 @@ import {
   bindAsIncomplete,
   captureName,
   compareCodePoint,
+  controlChar,
   escapeForCharClass,
   flagString,
   getLiteralString,
@@ -271,6 +272,15 @@ class RegExpBuilder implements RegExpToken {
       return this.addNode(`\\u${num.toString(16).padStart(4, '0')}`);
     }
     return bindAsIncomplete(func, this, 'unicode');
+  }
+
+  public get control(): RegExpToken['control'] {
+    function func(this: RegExpBuilder, ...args: RegExpLiteral): RegExpToken {
+      const literal = getLiteralString(args, false);
+      if (!controlChar.test(literal)) throw new Error('Invalid control character');
+      return this.addNode(`\\c${literal}`);
+    }
+    return bindAsIncomplete(func, this, 'control');
   }
 
   public get charIn(): RegExpToken['charIn'] {
@@ -1243,6 +1253,34 @@ export const hex = r.hex;
  * ```
  */
 export const unicode = r.unicode;
+
+/**
+ * Match a control character with value equal to the given letter's character value modulo 32.
+ * Only a letter from `a` to `z` or `A` to `Z` is allowed.
+ *
+ * For example, `\cJ` represents line break (`\n`), because the code point of `J` is 74, and 74 modulo 32 is 10,
+ * which is the code point of line break. Because an uppercase letter and its lowercase form differ by 32,
+ * `\cJ` and `\cj` are equivalent. You can represent control characters from 1 to 26 in this form.
+ *
+ * ( https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Regular_expressions/Character_escape#description )
+ *
+ * @example
+ *
+ * ```js
+ * control`j`
+ * control('j')
+ * control`J`
+ * control('J')
+ * ```
+ *
+ * RegExp equivalent:
+ *
+ * ```js
+ * /\cj/
+ * /\cJ/
+ * ```
+ */
+export const control = r.control;
 
 /**
  * Match a character listed in the group. A hyphen denotes a range of characters, such as `a-z`.

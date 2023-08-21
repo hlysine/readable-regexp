@@ -9,6 +9,41 @@ export interface LiteralFunction {
   (template: TemplateStringsArray, ...args: unknown[]): RegExpToken;
 }
 
+type Lowercase =
+  | 'a'
+  | 'b'
+  | 'c'
+  | 'd'
+  | 'e'
+  | 'f'
+  | 'g'
+  | 'h'
+  | 'i'
+  | 'j'
+  | 'k'
+  | 'l'
+  | 'm'
+  | 'n'
+  | 'o'
+  | 'p'
+  | 'q'
+  | 'r'
+  | 's'
+  | 't'
+  | 'u'
+  | 'v'
+  | 'w'
+  | 'x'
+  | 'y'
+  | 'z';
+
+type Alphabet = Lowercase | Uppercase<Lowercase>;
+
+export interface ControlFunction {
+  (literal: Alphabet): RegExpToken;
+  (template: TemplateStringsArray, ...args: unknown[]): RegExpToken;
+}
+
 /**
  * A function with flexible parameters and return type.
  * This is used by custom tokens.
@@ -776,6 +811,34 @@ export interface RegExpToken {
    * ```
    */
   get unicode(): LiteralFunction & IncompleteToken;
+
+  /**
+   * Match a control character with value equal to the given letter's character value modulo 32.
+   * Only a letter from `a` to `z` or `A` to `Z` is allowed.
+   *
+   * For example, `\cJ` represents line break (`\n`), because the code point of `J` is 74, and 74 modulo 32 is 10,
+   * which is the code point of line break. Because an uppercase letter and its lowercase form differ by 32,
+   * `\cJ` and `\cj` are equivalent. You can represent control characters from 1 to 26 in this form.
+   *
+   * ( https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Regular_expressions/Character_escape#description )
+   *
+   * @example
+   *
+   * ```js
+   * control`j`
+   * control('j')
+   * control`J`
+   * control('J')
+   * ```
+   *
+   * RegExp equivalent:
+   *
+   * ```js
+   * /\cj/
+   * /\cJ/
+   * ```
+   */
+  get control(): ControlFunction & IncompleteToken;
 
   /**
    * Match a character listed in the group. A hyphen denotes a range of characters, such as `a-z`.
