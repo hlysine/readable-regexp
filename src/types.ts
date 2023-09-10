@@ -256,6 +256,47 @@ export interface FlagFunction {
   <TFlag extends string>(flags?: FlagsString<TFlag> & TFlag): RegExp;
 }
 
+export enum RegExpTokenType {
+  Word,
+  Digit,
+  Whitespace,
+  Char,
+  CharClass,
+
+  LineStart,
+  LineEnd,
+  WordBoundary,
+
+  Literal,
+  LineFeed,
+  CarriageReturn,
+  Backspace,
+  Tab,
+  VerticalWhitespace,
+  FormFeed,
+  NullChar,
+  Octal,
+  Hex,
+  Unicode,
+  Control,
+
+  Repeat,
+  AtLeast,
+  AtMost,
+  Maybe,
+  ZeroOrMore,
+  OneOrMore,
+
+  Capture,
+  NamedCapture,
+  BackReference,
+  NamedBackReference,
+  Group,
+  Lookahead,
+  Lookbehind,
+  Alternation,
+}
+
 /**
  * A RegExp token that can be chained with other tokens to form a RegExp expression.
  */

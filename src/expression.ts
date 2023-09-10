@@ -10,6 +10,7 @@ import {
   RegExpLiteral,
   RegExpModifier,
   RegExpToken,
+  RegExpTokenType,
   TokenFunction,
 } from './types';
 import {
@@ -40,17 +41,20 @@ class RegExpBuilder implements RegExpToken {
   public readonly modifiers: RegExpModifier[];
   public readonly backreferences: (string | number)[];
   public readonly namedGroups: (string | number)[];
+  public readonly tokenSet: Set<RegExpTokenType>;
 
   public constructor(
     regExp?: string,
     modifiers?: RegExpModifier[],
     backreferences?: (string | number)[],
-    namedGroups?: (string | number)[]
+    namedGroups?: (string | number)[],
+    tokenSet?: Set<RegExpTokenType>
   ) {
     this.regExp = regExp ?? '';
     this.modifiers = modifiers ?? [];
     this.backreferences = backreferences ?? [];
     this.namedGroups = namedGroups ?? [];
+    this.tokenSet = tokenSet ?? new Set();
   }
 
   public toString(): string {
@@ -113,35 +117,55 @@ class RegExpBuilder implements RegExpToken {
         .join('')
     );
   }
-
-  public addNode(node: string | RegExpBuilder, modifyBuilder?: (regExp: RegExpBuilder) => void): RegExpBuilder {
+  public addNode(
+    node: string,
+    type: RegExpTokenType | RegExpTokenType[],
+    modifyBuilder?: (regExp: RegExpBuilder) => void
+  ): RegExpBuilder;
+  public addNode(node: RegExpBuilder, modifyBuilder?: (regExp: RegExpBuilder) => void): RegExpBuilder;
+  public addNode(
+    node: string | RegExpBuilder,
+    arg1?: RegExpTokenType | RegExpTokenType[] | ((regExp: RegExpBuilder) => void),
+    arg2?: (regExp: RegExpBuilder) => void
+  ): RegExpBuilder {
     let builder: RegExpBuilder;
     if (typeof node === 'string') {
+      const type = arg1 as RegExpTokenType | RegExpTokenType[];
+      const modifyBuilder = arg2;
       builder = new RegExpBuilder(
         this.executeModifiers(node),
         undefined,
         this.backreferences.slice(),
-        this.namedGroups.slice()
+        this.namedGroups.slice(),
+        Array.isArray(type) ? new Set([...this.tokenSet, ...type]) : new Set([...this.tokenSet, type])
       );
+      if (modifyBuilder) modifyBuilder(builder);
     } else {
+      const modifyBuilder = arg1 as ((regExp: RegExpBuilder) => void) | undefined;
       builder = new RegExpBuilder(
         this.executeModifiers(node.executeModifiers()),
         undefined,
         [...this.backreferences, ...node.backreferences],
-        [...this.namedGroups, ...node.namedGroups]
+        [...this.namedGroups, ...node.namedGroups],
+        new Set([...this.tokenSet, ...node.tokenSet])
       );
+      if (modifyBuilder) modifyBuilder(builder);
     }
 
-    if (modifyBuilder) modifyBuilder(builder);
     return builder;
   }
 
-  public addModifier(modifier: RegExpModifier, modifyBuilder?: (regExp: RegExpBuilder) => void): RegExpBuilder {
+  public addModifier(
+    modifier: RegExpModifier,
+    type: RegExpTokenType | RegExpTokenType[],
+    modifyBuilder?: (regExp: RegExpBuilder) => void
+  ): RegExpBuilder {
     const builder = new RegExpBuilder(
       this.regExp,
       [modifier, ...this.modifiers],
       this.backreferences.slice(),
-      this.namedGroups.slice()
+      this.namedGroups.slice(),
+      Array.isArray(type) ? new Set([...this.tokenSet, ...type]) : new Set([...this.tokenSet, type])
     );
     if (modifyBuilder) modifyBuilder(builder);
     return builder;
@@ -159,7 +183,13 @@ class RegExpBuilder implements RegExpToken {
 
     const newModifiers = this.modifiers.map(modifier => modifier.clone());
     mutation(newModifiers[0]);
-    const builder = new RegExpBuilder(this.regExp, newModifiers, this.backreferences.slice(), this.namedGroups.slice());
+    const builder = new RegExpBuilder(
+      this.regExp,
+      newModifiers,
+      this.backreferences.slice(),
+      this.namedGroups.slice(),
+      new Set(this.tokenSet)
+    );
     if (modifyBuilder) modifyBuilder(builder);
     return builder;
   }
@@ -169,66 +199,66 @@ class RegExpBuilder implements RegExpToken {
    */
 
   public get char(): RegExpToken['char'] {
-    return this.addNode('.');
+    return this.addNode('.', RegExpTokenType.Char);
   }
 
   public get whitespace(): RegExpToken['whitespace'] {
-    return this.addNode('\\s');
+    return this.addNode('\\s', RegExpTokenType.Whitespace);
   }
 
   public get digit(): RegExpToken['digit'] {
-    return this.addNode('\\d');
+    return this.addNode('\\d', RegExpTokenType.Digit);
   }
 
   public get word(): RegExpToken['word'] {
-    return this.addNode('\\w');
+    return this.addNode('\\w', RegExpTokenType.Word);
   }
 
   public get verticalWhitespace(): RegExpToken['verticalWhitespace'] {
-    return this.addNode('\\v');
+    return this.addNode('\\v', RegExpTokenType.VerticalWhitespace);
   }
 
   public get backspace(): RegExpToken['backspace'] {
-    return this.addNode('[\\b]');
+    return this.addNode('[\\b]', RegExpTokenType.Backspace);
   }
 
   public get lineFeed(): RegExpToken['lineFeed'] {
-    return this.addNode('\\n');
+    return this.addNode('\\n', RegExpTokenType.LineFeed);
   }
 
   public get formFeed(): RegExpToken['formFeed'] {
-    return this.addNode('\\f');
+    return this.addNode('\\f', RegExpTokenType.FormFeed);
   }
 
   public get carriageReturn(): RegExpToken['carriageReturn'] {
-    return this.addNode('\\r');
+    return this.addNode('\\r', RegExpTokenType.CarriageReturn);
   }
 
   public get tab(): RegExpToken['tab'] {
-    return this.addNode('\\t');
+    return this.addNode('\\t', RegExpTokenType.Tab);
   }
 
   public get nullChar(): RegExpToken['nullChar'] {
-    return this.addNode('\\0');
+    return this.addNode('\\0', RegExpTokenType.NullChar);
   }
 
   public get lineStart(): RegExpToken['lineStart'] {
-    return this.addNode('^');
+    return this.addNode('^', RegExpTokenType.LineStart);
   }
 
   public get lineEnd(): RegExpToken['lineEnd'] {
-    return this.addNode('$');
+    return this.addNode('$', RegExpTokenType.LineEnd);
   }
 
   public get wordBoundary(): RegExpToken['wordBoundary'] {
-    return this.addNode('\\b');
+    return this.addNode('\\b', RegExpTokenType.WordBoundary);
   }
 
   public get exactly(): RegExpToken['exactly'] {
     function func(this: RegExpBuilder, ...args: RegExpLiteral): RegExpToken {
       if (!isLiteralArgument(args)) throw new Error('Invalid arguments for exactly');
       const literal = getLiteralString(args);
-      return this.addNode(literal);
+      return this.addNode(literal, RegExpTokenType.Literal);
     }
     return bindAsIncomplete(func, this, 'exactly');
   }
@@ -246,7 +276,7 @@ class RegExpBuilder implements RegExpToken {
           'Octal literals above 0o377 have inconsistent behavior. Please use hex/unicode literals instead'
         );
       }
-      return this.addNode(`[\\${num.toString(8)}]`);
+      return this.addNode(`[\\${num.toString(8)}]`, [RegExpTokenType.Octal, RegExpTokenType.CharClass]);
     }
     return bindAsIncomplete(func, this, 'octal');
   }
@@ -257,8 +287,8 @@ class RegExpBuilder implements RegExpToken {
       if (!hexNumber.test(literal)) throw new Error('Invalid hex character');
       const num = Number.parseInt(literal, 16);
       if (Number.isNaN(num) || num > 0xffff || num < 0) throw new Error('Invalid hex character');
-      if (num <= 0xff) return this.addNode(`\\x${num.toString(16).padStart(2, '0')}`);
-      else return this.addNode(`\\u${num.toString(16).padStart(4, '0')}`);
+      if (num <= 0xff) return this.addNode(`\\x${num.toString(16).padStart(2, '0')}`, RegExpTokenType.Hex);
+      else return this.addNode(`\\u${num.toString(16).padStart(4, '0')}`, RegExpTokenType.Unicode);
     }
     return bindAsIncomplete(func, this, 'hex');
   }
@@ -269,7 +299,7 @@ class RegExpBuilder implements RegExpToken {
       if (!hexNumber.test(literal)) throw new Error('Invalid unicode character');
       const num = Number.parseInt(literal, 16);
       if (Number.isNaN(num) || num > 0xffff || num < 0) throw new Error('Invalid unicode character');
-      return this.addNode(`\\u${num.toString(16).padStart(4, '0')}`);
+      return this.addNode(`\\u${num.toString(16).padStart(4, '0')}`, RegExpTokenType.Unicode);
     }
     return bindAsIncomplete(func, this, 'unicode');
   }
@@ -278,7 +308,7 @@ class RegExpBuilder implements RegExpToken {
     function func(this: RegExpBuilder, ...args: RegExpLiteral): RegExpToken {
       const literal = getLiteralString(args, false);
       if (!controlChar.test(literal)) throw new Error('Invalid control character');
-      return this.addNode(`\\c${literal}`);
+      return this.addNode(`\\c${literal}`, RegExpTokenType.Control);
     }
     return bindAsIncomplete(func, this, 'control');
   }
@@ -328,7 +358,11 @@ class RegExpBuilder implements RegExpToken {
         );
       }
     }
-    return bindAsIncomplete(func, this.addModifier(new CharacterClassModifier(false)), 'charIn');
+    return bindAsIncomplete(
+      func,
+      this.addModifier(new CharacterClassModifier(false), RegExpTokenType.CharClass),
+      'charIn'
+    );
   }
 
   public get notCharIn(): RegExpToken['notCharIn'] {
@@ -373,7 +407,7 @@ class RegExpBuilder implements RegExpToken {
         throw new Error('Invalid arguments for not');
       }
     }
-    return assign(func, this.addModifier(new NegationModifier()));
+    return assign(func, this.addModifier(new NegationModifier(), []));
   }
 
   /*
@@ -385,14 +419,14 @@ class RegExpBuilder implements RegExpToken {
       function func(this: RegExpBuilder, ...args: RegExpLiteral | [RegExpToken]): RegExpToken {
         if (isLiteralArgument(args)) {
           const literal = getLiteralString(args);
-          return this.addNode(literal);
+          return this.addNode(literal, RegExpTokenType.Literal);
         } else if (RegExpBuilder.isRegExpBuilder(args[0])) {
           return this.addNode(args[0]);
         } else {
           throw new Error('Invalid arguments for repeat');
         }
       }
-      return assign(func, this.addModifier(new RepeatQuantifier(min, max ?? min)));
+      return assign(func, this.addModifier(new RepeatQuantifier(min, max ?? min), RegExpTokenType.Repeat));
     }
     return bindAsIncomplete(configure, this, 'repeat');
   }
@@ -409,14 +443,14 @@ class RegExpBuilder implements RegExpToken {
       function func(this: RegExpBuilder, ...args: RegExpLiteral | [RegExpToken]): RegExpToken {
         if (isLiteralArgument(args)) {
           const literal = getLiteralString(args);
-          return this.addNode(literal);
+          return this.addNode(literal, RegExpTokenType.Literal);
         } else if (RegExpBuilder.isRegExpBuilder(args[0])) {
           return this.addNode(args[0]);
         } else {
           throw new Error('Invalid arguments for atLeast');
         }
       }
-      return assign(func, this.addModifier(new RepeatQuantifier(limit, undefined)));
+      return assign(func, this.addModifier(new RepeatQuantifier(limit, undefined), RegExpTokenType.AtLeast));
     }
     return bindAsIncomplete(configure, this, 'atLeast');
   }
@@ -433,14 +467,14 @@ class RegExpBuilder implements RegExpToken {
       function func(this: RegExpBuilder, ...args: RegExpLiteral | [RegExpToken]): RegExpToken {
         if (isLiteralArgument(args)) {
           const literal = getLiteralString(args);
-          return this.addNode(literal);
+          return this.addNode(literal, RegExpTokenType.Literal);
         } else if (RegExpBuilder.isRegExpBuilder(args[0])) {
           return this.addNode(args[0]);
         } else {
           throw new Error('Invalid arguments for atMost');
         }
       }
-      return assign(func, this.addModifier(new RepeatQuantifier(undefined, limit)));
+      return assign(func, this.addModifier(new RepeatQuantifier(undefined, limit), RegExpTokenType.AtMost));
     }
     return bindAsIncomplete(configure, this, 'atMost');
   }
@@ -456,14 +490,14 @@ class RegExpBuilder implements RegExpToken {
     function func(this: RegExpBuilder, ...args: RegExpLiteral | [RegExpToken]): RegExpToken {
       if (isLiteralArgument(args)) {
         const literal = getLiteralString(args);
-        return this.addNode(literal);
+        return this.addNode(literal, RegExpTokenType.Literal);
       } else if (RegExpBuilder.isRegExpBuilder(args[0])) {
         return this.addNode(args[0]);
       } else {
         throw new Error('Invalid arguments for maybe');
       }
     }
-    return assign(func, this.addModifier(new SimpleQuantifier(regExp => `${regExp}?`)));
+    return assign(func, this.addModifier(new SimpleQuantifier(regExp => `${regExp}?`), RegExpTokenType.Maybe));
   }
 
   public get maybeLazily(): RegExpToken['maybeLazily'] {
@@ -474,14 +508,14 @@ class RegExpBuilder implements RegExpToken {
     function func(this: RegExpBuilder, ...args: RegExpLiteral | [RegExpToken]): RegExpToken {
       if (isLiteralArgument(args)) {
         const literal = getLiteralString(args);
-        return this.addNode(literal);
+        return this.addNode(literal, RegExpTokenType.Literal);
       } else if (RegExpBuilder.isRegExpBuilder(args[0])) {
         return this.addNode(args[0]);
       } else {
         throw new Error('Invalid arguments for zeroOrMore');
       }
     }
-    return assign(func, this.addModifier(new SimpleQuantifier(regExp => `${regExp}*`)));
+    return assign(func, this.addModifier(new SimpleQuantifier(regExp => `${regExp}*`), RegExpTokenType.ZeroOrMore));
   }
 
   public get zeroOrMoreLazily(): RegExpToken['zeroOrMoreLazily'] {
@@ -492,14 +526,14 @@ class RegExpBuilder implements RegExpToken {
     function func(this: RegExpBuilder, ...args: RegExpLiteral | [RegExpToken]): RegExpToken {
       if (isLiteralArgument(args)) {
         const literal = getLiteralString(args);
-        return this.addNode(literal);
+        return this.addNode(literal, RegExpTokenType.Literal);
       } else if (RegExpBuilder.isRegExpBuilder(args[0])) {
         return this.addNode(args[0]);
       } else {
         throw new Error('Invalid arguments for oneOrMore');
       }
     }
-    return assign(func, this.addModifier(new SimpleQuantifier(regExp => `${regExp}+`)));
+    return assign(func, this.addModifier(new SimpleQuantifier(regExp => `${regExp}+`), RegExpTokenType.OneOrMore));
   }
 
   public get oneOrMoreLazily(): RegExpToken['oneOrMoreLazily'] {
@@ -510,7 +544,7 @@ class RegExpBuilder implements RegExpToken {
     function func(this: RegExpBuilder, ...args: RegExpLiteral | [RegExpToken]): RegExpToken {
       if (isLiteralArgument(args)) {
         const literal = getLiteralString(args);
-        return this.addNode(literal);
+        return this.addNode(literal, RegExpTokenType.Literal);
       } else if (RegExpBuilder.isRegExpBuilder(args[0])) {
         return this.addNode(args[0]);
       } else {
@@ -533,10 +567,10 @@ class RegExpBuilder implements RegExpToken {
   public get capture(): RegExpToken['capture'] {
     function func(this: RegExpBuilder, ...args: RegExpLiteral | [RegExpToken?]): RegExpToken {
       if (args.length === 0) {
-        return this.addNode('');
+        throw new Error('Capture group is empty');
       } else if (isLiteralArgument(args)) {
         const literal = getLiteralString(args);
-        return this.addNode(literal);
+        return this.addNode(literal, RegExpTokenType.Literal);
       } else if (RegExpBuilder.isRegExpBuilder(args[0])) {
         return this.addNode(args[0]);
       } else {
@@ -545,7 +579,7 @@ class RegExpBuilder implements RegExpToken {
     }
     return assign(
       func,
-      this.addModifier(new CaptureModifier(), builder => builder.namedGroups.push(0))
+      this.addModifier(new CaptureModifier(), RegExpTokenType.Capture, builder => builder.namedGroups.push(0))
     );
   }
 
@@ -562,10 +596,10 @@ class RegExpBuilder implements RegExpToken {
         throw new Error('Invalid capture name. It must be alpha numeric and must not begin with a digit');
       function func(this: RegExpBuilder, ...args: RegExpLiteral | [RegExpToken?]): RegExpToken {
         if (args.length === 0) {
-          return this.addNode('');
+          throw new Error('Named capture group is empty');
         } else if (isLiteralArgument(args)) {
           const literal = getLiteralString(args);
-          return this.addNode(literal);
+          return this.addNode(literal, RegExpTokenType.Literal);
         } else if (RegExpBuilder.isRegExpBuilder(args[0])) {
           return this.addNode(args[0]);
         } else {
@@ -574,7 +608,9 @@ class RegExpBuilder implements RegExpToken {
       }
       return assign(
         func,
-        this.addModifier(new CaptureModifier(name), builder => builder.namedGroups.push(name, 0))
+        this.addModifier(new CaptureModifier(name), RegExpTokenType.NamedCapture, builder =>
+          builder.namedGroups.push(name, 0)
+        )
       );
     }
     return bindAsIncomplete(configure, this, 'captureAs');
@@ -585,12 +621,16 @@ class RegExpBuilder implements RegExpToken {
       if (args.length === 1 && typeof args[0] === 'number') {
         const index = args[0];
         if (index <= 0) throw new Error('Invalid group index in ref');
-        return this.addNode(`\\${args[0]}`, builder => builder.backreferences.push(index));
+        return this.addNode(`\\${args[0]}`, RegExpTokenType.BackReference, builder =>
+          builder.backreferences.push(index)
+        );
       } else if (isLiteralArgument(args)) {
         const literal = getLiteralString(args, false);
         if (!captureName.test(literal))
           throw new Error('Invalid capture name. It must be alpha numeric and must not begin with a digit');
-        return this.addNode(`\\k<${literal}>`, builder => builder.backreferences.push(literal));
+        return this.addNode(`\\k<${literal}>`, RegExpTokenType.NamedBackReference, builder =>
+          builder.backreferences.push(literal)
+        );
       } else {
         throw new Error('Invalid arguments for ref');
       }
@@ -601,49 +641,49 @@ class RegExpBuilder implements RegExpToken {
   public get group(): RegExpToken['group'] {
     function func(this: RegExpBuilder, ...args: RegExpLiteral | [RegExpToken?]): RegExpToken {
       if (args.length === 0) {
-        return this.addNode('');
+        throw new Error('Non-capture group is empty');
       } else if (isLiteralArgument(args)) {
         const literal = getLiteralString(args);
-        return this.addNode(literal);
+        return this.addNode(literal, RegExpTokenType.Literal);
       } else if (RegExpBuilder.isRegExpBuilder(args[0])) {
         return this.addNode(args[0]);
       } else {
         throw new Error('Invalid arguments for group');
       }
     }
-    return assign(func, this.addModifier(new GroupModifier(GroupType.NonCapture)));
+    return assign(func, this.addModifier(new GroupModifier(GroupType.NonCapture), RegExpTokenType.Group));
   }
 
   public get ahead(): RegExpToken['ahead'] {
     function func(this: RegExpBuilder, ...args: RegExpLiteral | [RegExpToken?]): RegExpToken {
       if (args.length === 0) {
-        return this.addNode('');
+        throw new Error('Lookahead is empty');
       } else if (isLiteralArgument(args)) {
         const literal = getLiteralString(args);
-        return this.addNode(literal);
+        return this.addNode(literal, RegExpTokenType.Literal);
       } else if (RegExpBuilder.isRegExpBuilder(args[0])) {
         return this.addNode(args[0]);
       } else {
         throw new Error('Invalid arguments for group');
       }
     }
-    return assign(func, this.addModifier(new GroupModifier(GroupType.PositiveLookahead)));
+    return assign(func, this.addModifier(new GroupModifier(GroupType.PositiveLookahead), RegExpTokenType.Lookahead));
   }
 
   public get behind(): RegExpToken['behind'] {
     function func(this: RegExpBuilder, ...args: RegExpLiteral | [RegExpToken?]): RegExpToken {
       if (args.length === 0) {
-        return this.addNode('');
+        throw new Error('Lookbehind is empty');
       } else if (isLiteralArgument(args)) {
         const literal = getLiteralString(args);
-        return this.addNode(literal);
+        return this.addNode(literal, RegExpTokenType.Literal);
       } else if (RegExpBuilder.isRegExpBuilder(args[0])) {
         return this.addNode(args[0]);
       } else {
         throw new Error('Invalid arguments for group');
       }
     }
-    return assign(func, this.addModifier(new GroupModifier(GroupType.PositiveLookbehind)));
+    return assign(func, this.addModifier(new GroupModifier(GroupType.PositiveLookbehind), RegExpTokenType.Lookbehind));
   }
 
   public get notAhead(): RegExpToken['notAhead'] {
@@ -667,7 +707,10 @@ class RegExpBuilder implements RegExpToken {
         const literal = getLiteralString(args);
         return assign(
           func,
-          this.mutateModifier(modifier => (modifier as AlternationModifier).add(literal))
+          this.mutateModifier(
+            modifier => (modifier as AlternationModifier).add(literal),
+            builder => builder.tokenSet.add(RegExpTokenType.Literal)
+          )
         );
       } else {
         return assign(
@@ -690,13 +733,16 @@ class RegExpBuilder implements RegExpToken {
                 if (RegExpBuilder.isRegExpBuilder(arg)) {
                   builder.backreferences.push(...arg.backreferences);
                   builder.namedGroups.push(...arg.namedGroups);
+                  arg.tokenSet.forEach(token => builder.tokenSet.add(token));
+                } else if (typeof arg === 'string') {
+                  builder.tokenSet.add(RegExpTokenType.Literal);
                 }
               })
           )
         );
       }
     }
-    return bindAsIncomplete(func, this.addModifier(new AlternationModifier()), 'oneOf');
+    return bindAsIncomplete(func, this.addModifier(new AlternationModifier(), RegExpTokenType.Alternation), 'oneOf');
   }
 
   /*

@@ -628,7 +628,7 @@ describe('capture', () => {
     expect(() => not(capture`foo`).toString()).toThrow();
   });
   it('throws for invalid argument', () => {
-    expect(() => capture().toString()).toThrow('Empty capture group');
+    expect(() => capture().toString()).toThrow('is empty');
     // @ts-expect-error - testing invalid arguments
     expect(() => capture(1)).toThrow();
     // @ts-expect-error - testing invalid arguments
@@ -684,7 +684,7 @@ describe('captureAs', () => {
     // @ts-expect-error - testing invalid arguments
     expect(() => captureAs('a', 'b')).toThrow();
 
-    expect(() => captureAs`foo`().toString()).toThrow('Empty capture group');
+    expect(() => captureAs`foo`().toString()).toThrow('is empty');
     // @ts-expect-error - testing invalid arguments
     expect(() => captureAs`foo`(1)).toThrow();
     // @ts-expect-error - testing invalid arguments
@@ -815,7 +815,7 @@ describe('group', () => {
     expect(group.oneOf`foo``bar`.toString()).toBe('(?:foo|bar)');
   });
   it('throws for invalid argument', () => {
-    expect(group().toString()).toBe('(?:)');
+    expect(() => group().toString()).toThrow('is empty');
     // @ts-expect-error - testing invalid arguments
     expect(() => group(1)).toThrow();
     // @ts-expect-error - testing invalid arguments
@@ -849,7 +849,7 @@ describe('ahead', () => {
     expect(not(ahead`foo`).toString()).toBe('(?!foo)');
   });
   it('throws for invalid argument', () => {
-    expect(ahead().toString()).toBe('(?=)');
+    expect(() => ahead().toString()).toThrow('is empty');
     // @ts-expect-error - testing invalid arguments
     expect(() => ahead(1)).toThrow();
     // @ts-expect-error - testing invalid arguments
@@ -883,7 +883,7 @@ describe('behind', () => {
     expect(not(behind`foo`).toString()).toBe('(?<!foo)');
   });
   it('throws for invalid argument', () => {
-    expect(behind().toString()).toBe('(?<=)');
+    expect(() => behind().toString()).toThrow('is empty');
     // @ts-expect-error - testing invalid arguments
     expect(() => behind(1)).toThrow();
     // @ts-expect-error - testing invalid arguments
@@ -917,7 +917,7 @@ describe('notAhead', () => {
     expect(() => not(notAhead`foo`).toString()).toThrow();
   });
   it('throws for invalid argument', () => {
-    expect(notAhead().toString()).toBe('(?!)');
+    expect(() => notAhead().toString()).toThrow('is empty');
     // @ts-expect-error - testing invalid arguments
     expect(() => notAhead(1)).toThrow();
     // @ts-expect-error - testing invalid arguments
@@ -951,7 +951,7 @@ describe('notBehind', () => {
     expect(() => not(notBehind`foo`).toString()).toThrow();
   });
   it('throws for invalid argument', () => {
-    expect(notBehind().toString()).toBe('(?<!)');
+    expect(() => notBehind().toString()).toThrow('is empty');
     // @ts-expect-error - testing invalid arguments
     expect(() => notBehind(1)).toThrow();
     // @ts-expect-error - testing invalid arguments
