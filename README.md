@@ -7,7 +7,7 @@
 [![TypeScript](https://img.shields.io/badge/built%20with-TypeScript-blue)](https://www.typescriptlang.org/)
 [![npm](https://img.shields.io/npm/v/readable-regexp)](https://www.npmjs.com/package/readable-regexp)
 [![npm bundle size](https://img.shields.io/bundlephobia/minzip/readable-regexp)](https://www.npmjs.com/package/readable-regexp)
-[![Dependency Count](https://img.shields.io/badge/dynamic/json?url=https://api.npmutil.com/package/readable-regexp&label=dependencies&query=$.dependencies.count)](https://www.npmjs.com/package/readable-regexp)
+[![Dependencies](https://depx.co/api/badge/readable-regexp)](https://www.npmjs.com/package/readable-regexp)
 
 </div>
 

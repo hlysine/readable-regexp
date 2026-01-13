@@ -1,6 +1,6 @@
 {
   "name": "readable-regexp",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "author": "Henry Lin",
   "license": "MIT",
   "description": "Regular Expressions - quick and concise, readable and composable.",
